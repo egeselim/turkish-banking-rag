@@ -1,0 +1,29 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/*
+!.vscode/extensions.json
+TestResults/
+*.trx
+*.coverage
+
+# Yerel veri
+*.db
+*.db-shm
+*.db-wal
+eval/reports/local/
+
+# Sırlar (user-secrets repo dışında tutulur; yine de emniyet için)
+.env
+*.env
+appsettings.*.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Yerel deney çıktıları (spike sonuçları vb.)
+artifacts/

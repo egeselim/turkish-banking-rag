@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Assistant.Core/Assistant.Core.csproj" />
+    <Project Path="src/Assistant.Privacy/Assistant.Privacy.csproj" />
+    <Project Path="src/Assistant.Rag/Assistant.Rag.csproj" />
+    <Project Path="src/Assistant.Web/Assistant.Web.csproj" />
+    <Project Path="src/SelimBank.AppHost/SelimBank.AppHost.csproj" />
+    <Project Path="src/SelimBank.ServiceDefaults/SelimBank.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Assistant.Core.Tests/Assistant.Core.Tests.csproj" />
+    <Project Path="tests/Assistant.Privacy.Tests/Assistant.Privacy.Tests.csproj" />
+    <Project Path="tests/Assistant.Rag.Tests/Assistant.Rag.Tests.csproj" />
+  </Folder>
+</Solution>
