@@ -1,6 +1,6 @@
 # ADR-001: NIM model seçimi (ana, küçük, embedding)
 
-- **Durum:** Kabul edildi (embedding kararı geçici; 3. haftada eval ile kesinleşecek)
+- **Durum:** Kabul edildi. Embedding kararı 2026-10-25'te (1.5) **revize edildi**: 1b yerine 8b; aşağıdaki "Revizyon" bölümüne bakın.
 - **Tarih:** 2026-10-24
 - **Adım:** 1.2
 
@@ -10,7 +10,16 @@
 |---|---|---|
 | Ana sohbet ve araç çağrısı | `nvidia/nemotron-3-ultra-550b-a55b` (`Nim:ChatModel`) | `nvidia/nemotron-3.5-lightning-30b-a3b` |
 | Küçük model (niyet sınıflandırma ve yönlendirme) | `nvidia/nemotron-3.5-bolt-e4b` (`Nim:SmallChatModel`) | yok |
-| Embedding | `nvidia/nemotron-3.5-embed-1b` (`Nim:EmbeddingModel`, 2048 boyut, asimetrik) | `nvidia/nemotron-3.5-embed-8b` (4096 boyut; kalitede daha iyi ama erişimi güvenilmez, aşağıya bakın) |
+| Embedding | `nvidia/nemotron-3.5-embed-8b` (`Nim:EmbeddingModel`, 4096 boyut, asimetrik) | `nvidia/nemotron-3.5-embed-1b` (2048 boyut; Türkçe parafrazda belirgin biçimde zayıf) |
+
+## Revizyon (2026-10-25, adım 1.5): embedding 1b'den 8b'ye
+
+İlk karar, 8b modeli 3 denemenin 2'sinde takıldığı için 1b'yi seçmişti. 1.5'te iki şey ortaya çıktı:
+
+1. **Takılmaların asıl nedeni istek boyutuydu.** Toplamı yaklaşık 5.500 karakteri aşan embedding istekleri (1b dahil) hata dönmeden asılı kalıyor; küçük olanlar 1 saniyenin altında dönüyor. `NimEmbeddingGenerator` artık istekleri 4.000 karakterle sınırlıyor; HTTP katmanında da 20 saniyelik deneme zaman aşımı ve 3 yeniden deneme var. Bu düzenlemeden sonra 101 chunk'ın tamamı 8b ile sorunsuz embed edildi.
+2. **1b, gerçek corpus'ta neredeyse rastgele sonuç veriyor.** 10 soruluk smoke testte Hit@1 1/10; benzerlik skorları 0,29–0,49 aralığına sıkışıyor. Aynı soruların hepsinde birkaç uzun KVKK maddesi üst sıralara çıkıyor. 8b ile Hit@1 10/10. Ölçüm [ADR-002](ADR-002-hybrid-search.md)'de. `nemotron-3-embed-1b` ile `nemotron-3.5-embed-1b` birebir aynı skorları veriyor; muhtemelen aynı modelin iki adı.
+
+Spike'taki 6 kısa pasajlık test bu farkı göstermemişti (1b 4/6, 8b 6/6). Bu da küçük örneklerle model seçmenin riskini gösteriyor.
 
 Model değiştirmek yalnızca bir konfigürasyon değişikliği. Embedding modeli değişirse Qdrant collection'ı yeniden oluşturulur, çünkü vektör boyutu ve vektör uzayı değişir.
 

@@ -10,10 +10,38 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 1.2 NIM kablolaması + model spike | Tamam | ADR-001; çevrimdışı 12/12 ve Live kabul testleri 4/4 yeşil |
 | 1.3 Privacy | Tamam | Çevrimdışı 57/57 (Privacy 38), Live 4/4 maskeleme katmanı arkasında |
 | 1.4 Dokümanlar + PdfPig + chunking | Tamam | Çevrimdışı 82/82 (Rag 25); 4 doküman, 101 chunk |
-| 1.5 Ingestion + hybrid search | Başlamadı | |
+| 1.5 Ingestion + hybrid search | Tamam | ADR-002; çevrimdışı 101/101 (Qdrant entegrasyonu dahil), Live 4/4; smoke Hit@1 10/10 |
 | 1.6 Blazor sohbet + kaynaklar | Başlamadı | |
 
 ## Günlük
+
+### 2026-10-25 (oturum 5): 1.5
+- **Connector'ın kaynak kodu incelendi:** `HybridSearchAsync`'in keyword tarafı sıralamasız bir filtre; full-text indeks Türkçeyi bilmiyor. Bu yüzden kendi hybrid aramamızı yazdık ([ADR-002](decisions/ADR-002-hybrid-search.md)): Qdrant vektörü (VectorData üzerinden) + bellek içi BM25 + RRF.
+- **Rag/Search:**
+  - `TurkishTextNormalizer`: tr-TR küçük harf, Türkçe karakter sadeleştirme, stop-word'ler, ilk 5 harfle kök kırpma.
+  - `Bm25Index`, `ReciprocalRankFusion`.
+  - `ChunkRecord`: şema kodda tanımlı, çünkü vektör boyutu konfigürasyondan geliyor.
+  - `ChunkIndex.SyncAsync`: idempotent. Kimlikler içerikten türetildiği için değişmeyen chunk yeniden embed edilmiyor; kaynaktan çıkan chunk siliniyor; ardından BM25 yeniden kuruluyor.
+  - `HybridRetriever`: üç mod var: Hybrid, VectorOnly, KeywordOnly.
+- **Core:**
+  - `AddRag()`: Qdrant collection'ı adı `chunks_{model}_{dim}` olacak şekilde kuruyor, `ChunkIndex` ve `HybridRetriever`'ı kaydediyor. Bir `QdrantClient`'ın DI'da olmasını bekliyor.
+  - `NimOptions.EmbeddingDimensions` eklendi.
+- **NIM'de bulunan sorun:** Toplamı yaklaşık 5.500 karakteri aşan embedding istekleri hata vermeden asılı kalıyor. Düzeltmeler:
+  - `NimEmbeddingGenerator` istekleri 4.000 karakterle sınırlıyor; birim testi var.
+  - Embedding HttpClient'ına 20 saniyelik deneme zaman aşımı ve 3 yeniden deneme eklendi. Chat istemcisine eklenmedi; onun yeniden denemesini SDK yapıyor.
+- **Embedding modeli 1b'den 8b'ye değişti** ([ADR-001](decisions/ADR-001-nim-model-selection.md)):
+  - 1b, gerçek corpus'ta Hit@1 1/10 verdi. Boru hattında hata olmadığı, Qdrant'sız yerel kosinüs hesabıyla doğrulandı; aynı skorlar çıktı.
+  - 8b ile Hit@1 10/10.
+  - 8b'nin daha önceki "takılma" sorunu aslında istek boyutu sorunuydu.
+- **Ölçüm (`RetrievalSmokeTests`, Live, Docker gerekir; rapor `artifacts/retrieval/smoke.md`):** 10 elle yazılmış soru.
+  - 8b ile: vektör 10/10, BM25 7/10, bizim hybrid 10/10, connector hybrid 5/10 (Hit@1).
+  - 1b ile bizim hybrid, yalnız vektöre göre Hit@5'i 4/10'dan 9/10'a çıkardı.
+  - Testte bir eşik var: hybrid Hit@5 en az %80.
+- **Testler:**
+  - Rag.Tests birim testleri: normalizer, BM25, RRF.
+  - Rag.Tests entegrasyon testleri (`Category=Integration`, Testcontainers ve Qdrant v1.18.0): idempotent senkronizasyon, silinen chunk'ların temizlenmesi, Türkçe karakter kullanılmadan yazılmış sorgu, kayıtların bozulmadan geri okunması.
+  - Core.Tests: embedding istek bölme testi.
+- **Not:** `dotnet test` artık Docker istiyor (entegrasyon testleri). Docker olmadan çalıştırmak için: `--filter-not-trait "Category=Integration"`.
 
 ### 2026-10-25 (oturum 4): 1.4
 - **Kaynaklar** ([docs/sources/README.md](sources/README.md)):
@@ -99,10 +127,9 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**1.5: Ingestion ve hybrid search.**
-- Paketler: `CommunityToolkit.VectorData.Qdrant` (1.0.1) ve `Microsoft.Extensions.VectorData.Abstractions`. API'ler, özellikle `IKeywordHybridSearchable` ve full-text indeks seçenekleri, kurulu sürümün dokümanından doğrulanacak.
-- `ChunkRecord`: vektör (2048 boyut), `IsFullTextIndexed` normalize `SearchText`, filtrelenebilir `DocId`, alıntı için etiket, yol ve sayfa alanları. Collection adı `chunks_{model}_{dim}`.
-- Türkçe normalizer: tr-TR küçük harf (İ/ı) ve basit ek kırpma; aynı normalizer hem indekse hem sorgu anahtar kelimelerine uygulanacak.
-- Idempotent ingestion: deterministik chunk kimlikleri ve içerik hash'i ile upsert; dokümandan silinen chunk'lar collection'dan da silinecek.
-- Test: Testcontainers Qdrant ve deterministik sahte embedding ile hem anahtar kelime hem anlamsal sorguda doğru chunk ilk 5'te olmalı; aynı corpus iki kez yüklendiğinde kayıt sayısı değişmemeli.
-- İlk retrieval ölçümü: 1.6 öncesinde, elle yazılmış 10 soruluk küçük bir set (3.1'deki tam set gelene kadar) gerçek embedding ile denenecek.
+**1.6: Blazor sohbeti ve kaynak gösterme (1. haftanın son adımı).**
+- Web: `AddQdrantClient("qdrant")` (Aspire.Qdrant.Client), `AddNimModels`, `AddRag`. Açılışta `docs/sources` PDF'lerini okuyup `ChunkIndex.SyncAsync` çalıştıran bir hosted service; kaynak klasörünün yolu konfigürasyondan gelecek.
+- **Önce şu borç kapanmalı:** ServiceDefaults'taki standart resilience handler tüm HttpClient'lara ekleniyor (deneme başına 10 sn). Bu hem ana modelin uzun cevaplarını kesecek hem de embedding istemcisinde ikinci bir resilience katmanı oluşturacak. `nim` ve `nim-embeddings` istemcileri bunun dışında tutulmalı.
+- Sohbet: streaming; RAG bağlamı bir araç (`SearchDocuments`) ya da context provider ile verilecek (AF API'si kurulu sürümden doğrulanacak); cevabın altında kaynak kartları (doküman, sayfa, etiket).
+- Sistem prompt'u Türkçe: yalnızca getirilen kaynaklardan cevap ver; kaynak yoksa "bilmiyorum" de (ADR-001'deki halüsinasyon bulgusu).
+- Test: sahte chat client ve retriever ile atıf formatı; elle demo; `RetrievalSmokeTests` yeniden çalıştırılacak.

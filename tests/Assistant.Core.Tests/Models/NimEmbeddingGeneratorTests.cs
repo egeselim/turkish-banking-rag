@@ -42,6 +42,28 @@ public class NimEmbeddingGeneratorTests
     }
 
     [Fact]
+    public async Task Splits_large_inputs_into_requests_under_the_size_limit_and_keeps_order()
+    {
+        // Each response embeds input i as [first char code of input i], so order is checkable.
+        var handler = new RecordingHandler(request =>
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(request.Content!.ReadAsStringAsync().Result);
+            var inputs = doc.RootElement.GetProperty("input").EnumerateArray().Select(e => e.GetString()!).ToList();
+            string data = string.Join(',', inputs.Select((s, i) => $$"""{"index":{{i}},"embedding":[{{(int)s[0]}}]}"""));
+            return Json($$$"""{"model":"m","data":[{{{data}}}],"usage":{"prompt_tokens":1,"total_tokens":1}}""");
+        });
+        var generator = Create(handler);
+        var texts = Enumerable.Range(0, 12).Select(i => (char)('A' + i) + new string('x', 999)).ToList(); // 12 x 1000 chars
+
+        var result = await generator.GenerateAsync(texts, EmbeddingInputType.ForPassage(), TestContext.Current.CancellationToken);
+
+        Assert.True(handler.Requests.Count >= 3);
+        Assert.All(handler.Requests, r => Assert.True(r.Body.Length < NimEmbeddingGenerator.MaxCharsPerRequest + 500, $"request body {r.Body.Length} chars"));
+        Assert.Equal(texts.Select(t => (float)t[0]), result.Select(e => e.Vector.Span[0]));
+        Assert.Equal(handler.Requests.Count, result.Usage!.InputTokenCount);
+    }
+
+    [Fact]
     public async Task Throws_without_input_type_and_sends_nothing()
     {
         var handler = new RecordingHandler(_ => Json("{}"));

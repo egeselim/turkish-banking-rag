@@ -25,6 +25,11 @@
     <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.11.0" />
   </ItemGroup>
 
+  <ItemGroup Label="VectorData">
+    <PackageVersion Include="Microsoft.Extensions.VectorData.Abstractions" Version="10.11.0" />
+    <PackageVersion Include="CommunityToolkit.VectorData.Qdrant" Version="1.0.1" />
+  </ItemGroup>
+
   <ItemGroup Label="Documents">
     <PackageVersion Include="PdfPig" Version="0.1.16" />
   </ItemGroup>
@@ -39,5 +44,6 @@
   <ItemGroup Label="Test">
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
+    <PackageVersion Include="Testcontainers.Qdrant" Version="4.16.0" />
   </ItemGroup>
 </Project>

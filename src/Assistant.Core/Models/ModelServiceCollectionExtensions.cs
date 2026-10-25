@@ -30,8 +30,20 @@ public static class ModelServiceCollectionExtensions
                 }
             });
 
+        // Chat: retries come from the OpenAI SDK (NimOptions.MaxRetries); an HTTP retry layer would multiply them.
         services.AddHttpClient(NimClientFactory.HttpClientName, (sp, http) =>
             http.Timeout = sp.GetRequiredService<IOptions<NimOptions>>().Value.RequestTimeout);
+
+        // Embeddings answer in under a second, but free-tier requests occasionally hang indefinitely.
+        // Ingestion makes many calls, so cut a stuck attempt early and retry instead of failing the whole sync.
+        services.AddHttpClient(NimClientFactory.EmbeddingHttpClientName)
+            .AddStandardResilienceHandler(o =>
+            {
+                o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
+                o.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(40); // must be >= 2 x attempt timeout
+                o.Retry.MaxRetryAttempts = 3;
+                o.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(90);
+            });
 
         services.TryAddSingleton<IPiiMasker, PiiMasker>();
 
@@ -39,7 +51,7 @@ public static class ModelServiceCollectionExtensions
         services.AddKeyedChatClient(SmallChatClientKey, sp => CreateChatClient(sp, o => o.SmallChatModel));
         services.AddEmbeddingGenerator(sp =>
         {
-            var (options, http) = Resolve(sp);
+            var (options, http) = Resolve(sp, NimClientFactory.EmbeddingHttpClientName);
             var raw = NimClientFactory.CreateEmbeddingGenerator(options, options.EmbeddingModel, http);
             return new PiiMaskingEmbeddingGenerator(raw, sp.GetRequiredService<IPiiMasker>());
         });
@@ -49,16 +61,16 @@ public static class ModelServiceCollectionExtensions
 
     private static PiiMaskingChatClient CreateChatClient(IServiceProvider sp, Func<NimOptions, string> modelSelector)
     {
-        var (options, http) = Resolve(sp);
+        var (options, http) = Resolve(sp, NimClientFactory.HttpClientName);
         var raw = NimClientFactory.CreateChatClient(options, modelSelector(options), http);
         return new PiiMaskingChatClient(raw, sp.GetRequiredService<IPiiMasker>());
     }
 
-    private static (NimOptions Options, HttpClient Http) Resolve(IServiceProvider sp)
+    private static (NimOptions Options, HttpClient Http) Resolve(IServiceProvider sp, string httpClientName)
     {
         var options = sp.GetRequiredService<IOptions<NimOptions>>().Value;
         options.Validate();
-        var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient(NimClientFactory.HttpClientName);
+        var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient(httpClientName);
         return (options, http);
     }
 }

@@ -18,6 +18,9 @@ public sealed class NimOptions
 
     public string EmbeddingModel { get; set; } = "";
 
+    /// <summary>Vector size of <see cref="EmbeddingModel"/>; part of the vector collection name.</summary>
+    public int EmbeddingDimensions { get; set; }
+
     public TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(120);
 
     /// <summary>Chat SDK retries per request. Kept low: a stuck free-tier model would otherwise block for minutes.</summary>
@@ -33,6 +36,14 @@ public sealed class NimOptions
         if (string.IsNullOrWhiteSpace(ChatModel) || string.IsNullOrWhiteSpace(SmallChatModel) || string.IsNullOrWhiteSpace(EmbeddingModel))
         {
             throw new InvalidOperationException("NIM model ids must be configured: Nim:ChatModel, Nim:SmallChatModel, Nim:EmbeddingModel.");
+        }
+    }
+
+    internal void ValidateEmbeddingDimensions()
+    {
+        if (EmbeddingDimensions <= 0)
+        {
+            throw new InvalidOperationException("Nim:EmbeddingDimensions must be set to the vector size of Nim:EmbeddingModel.");
         }
     }
 }

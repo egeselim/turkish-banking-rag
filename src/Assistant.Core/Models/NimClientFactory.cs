@@ -13,6 +13,8 @@ internal static class NimClientFactory
 {
     public const string HttpClientName = "nim";
 
+    public const string EmbeddingHttpClientName = "nim-embeddings";
+
     public static IChatClient CreateChatClient(NimOptions options, string modelId, HttpClient http)
     {
         var client = new OpenAIClient(

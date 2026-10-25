@@ -2,6 +2,9 @@
 
   <ItemGroup>
     <PackageReference Include="xunit.v3" />
+    <!-- Integration tests run against a real Qdrant in Docker (Category=Integration). -->
+    <PackageReference Include="CommunityToolkit.VectorData.Qdrant" />
+    <PackageReference Include="Testcontainers.Qdrant" />
   </ItemGroup>
 
   <ItemGroup>

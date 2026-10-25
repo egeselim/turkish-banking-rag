@@ -10,8 +10,15 @@ namespace Assistant.Core.Models;
 /// Calls the NIM embeddings endpoint directly. The OpenAI SDK has no supported way to send
 /// NIM's required <c>input_type</c> field, and asymmetric NIM models reject requests without it.
 /// </summary>
+/// <remarks>
+/// Inputs are sent in requests of at most <see cref="MaxCharsPerRequest"/> characters. Measured on the
+/// free tier (2026-10-25): requests above ~5,500 characters in total never get a response (no error,
+/// just a hang); smaller ones return in under a second.
+/// </remarks>
 internal sealed class NimEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>>
 {
+    internal const int MaxCharsPerRequest = 4000;
+
     private const int MaxErrorBodyLength = 500;
 
     private readonly HttpClient _http;
@@ -35,6 +42,51 @@ internal sealed class NimEmbeddingGenerator : IEmbeddingGenerator<string, Embedd
         CancellationToken cancellationToken = default)
     {
         string inputType = GetInputType(options);
+        var result = new GeneratedEmbeddings<Embedding<float>>();
+        int? inputTokens = null, totalTokens = null;
+
+        foreach (var batch in BatchBySize(values))
+        {
+            var (embeddings, usage) = await SendAsync(batch, inputType, options, cancellationToken).ConfigureAwait(false);
+            result.AddRange(embeddings);
+            if (usage is not null)
+            {
+                inputTokens = (inputTokens ?? 0) + (usage.PromptTokens ?? 0);
+                totalTokens = (totalTokens ?? 0) + (usage.TotalTokens ?? 0);
+            }
+        }
+
+        result.Usage = inputTokens is null ? null : new UsageDetails { InputTokenCount = inputTokens, TotalTokenCount = totalTokens };
+        return result;
+    }
+
+    // Consecutive inputs whose total length stays within the limit; a single longer input goes alone.
+    private static IEnumerable<List<string>> BatchBySize(IEnumerable<string> values)
+    {
+        var batch = new List<string>();
+        int chars = 0;
+        foreach (string value in values)
+        {
+            if (batch.Count > 0 && chars + value.Length > MaxCharsPerRequest)
+            {
+                yield return batch;
+                batch = [];
+                chars = 0;
+            }
+
+            batch.Add(value);
+            chars += value.Length;
+        }
+
+        if (batch.Count > 0)
+        {
+            yield return batch;
+        }
+    }
+
+    private async Task<(IEnumerable<Embedding<float>> Embeddings, EmbeddingUsage? Usage)> SendAsync(
+        List<string> values, string inputType, EmbeddingGenerationOptions? options, CancellationToken cancellationToken)
+    {
         var body = new EmbeddingRequest(options?.ModelId ?? _modelId, [.. values], inputType, options?.Dimensions);
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _embeddingsUri) { Content = JsonContent.Create(body) };
@@ -55,16 +107,10 @@ internal sealed class NimEmbeddingGenerator : IEmbeddingGenerator<string, Embedd
 
         var embeddings = payload.Data
             .OrderBy(d => d.Index)
-            .Select(d => new Embedding<float>(d.Embedding) { ModelId = payload.Model });
+            .Select(d => new Embedding<float>(d.Embedding) { ModelId = payload.Model })
+            .ToList();
 
-        return new GeneratedEmbeddings<Embedding<float>>(embeddings)
-        {
-            Usage = payload.Usage is null ? null : new UsageDetails
-            {
-                InputTokenCount = payload.Usage.PromptTokens,
-                TotalTokenCount = payload.Usage.TotalTokens,
-            },
-        };
+        return (embeddings, payload.Usage);
     }
 
     public object? GetService(Type serviceType, object? serviceKey = null) =>
