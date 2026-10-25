@@ -12,4 +12,7 @@
     <Project Path="tests/Assistant.Privacy.Tests/Assistant.Privacy.Tests.csproj" />
     <Project Path="tests/Assistant.Rag.Tests/Assistant.Rag.Tests.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/SourceDocs.Generator/SourceDocs.Generator.csproj" />
+  </Folder>
 </Solution>

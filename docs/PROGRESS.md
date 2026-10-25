@@ -9,11 +9,38 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 1.1 Solution iskeleti | Tamam | Build 0 uyarı/0 hata, 3/3 test yeşil, AppHost'ta Web ve Qdrant sağlıklı |
 | 1.2 NIM kablolaması + model spike | Tamam | ADR-001; çevrimdışı 12/12 ve Live kabul testleri 4/4 yeşil |
 | 1.3 Privacy | Tamam | Çevrimdışı 57/57 (Privacy 38), Live 4/4 maskeleme katmanı arkasında |
-| 1.4 Dokümanlar + PdfPig + chunking | Başlamadı | |
+| 1.4 Dokümanlar + PdfPig + chunking | Tamam | Çevrimdışı 82/82 (Rag 25); 4 doküman, 101 chunk |
 | 1.5 Ingestion + hybrid search | Başlamadı | |
 | 1.6 Blazor sohbet + kaynaklar | Başlamadı | |
 
 ## Günlük
+
+### 2026-10-25 (oturum 4): 1.4
+- **Kaynaklar** ([docs/sources/README.md](sources/README.md)):
+  - Kurgusal ücret tarifesi (12 madde), kredi kartı sözleşmesi (17 madde) ve SSS (15 soru). Markdown kaynaklarından PDF'e üretiliyor.
+  - Gerçek dünyadan bir örnek olarak KVKK (6698) resmî PDF'i (21 sayfa, mevzuat.gov.tr).
+  - Kurgusal metinlerdeki rakamlar eval sorularının cevap anahtarı olacak; dokümanlar birbirine çapraz atıf yapıyor.
+- **Araç:** `tools/SourceDocs.Generator`. PDF üretimi için QuestPDF yerine PdfPig'in kendi yazıcısı seçildi: ek lisans kaydı ve native bağımlılık yok, okuma ve yazma tek kütüphanede. Türkçe karakterler için DejaVu Sans gömülüyor.
+- **Rag/Documents/PdfDocumentReader:** Yapı yalnızca yerleşimden çıkarılıyor.
+  - Satırlar taban çizgisine göre kümeleniyor (font boyutunun %40'ı tolerans).
+  - Başlık: gövdeden büyük punto, ya da gövde boyutunda kalın satır. Kalın satır başlık sayılmıyorsa: fıkra/bent işaretiyle başlıyorsa, `MADDE N-` ile başlıyorsa ya da küçük harfle başlıyorsa.
+  - Başlık seviyesi: büyük punto önce; aynı boyutta ortalanmış başlık, sola dayalıdan üstte.
+  - Paragraf sınırı: satır aralığının 1,35 katından büyük boşluk, `•` ile başlama ya da ilk satır girintisi (madde imli öğelerin içinde girinti sayılmıyor). Sayfa sonundaki paragraf yalnızca cümle ortasında kesildiyse sonraki sayfaya devam ediyor.
+  - Yalnızca rakamdan oluşan satırlar atlanıyor.
+- **Rag/Chunking:**
+  - `StructureAwareChunker`: madde, soru ve başlık bölümleri ayrı birim; birimler birleştirilmiyor. 500 token'a kadar olan birim tek chunk. Uzun birimler Türkçe cümle sınırlarından yaklaşık 400 token'lık pencerelere bölünüyor, pencereler arasında 40 token örtüşme var.
+  - Etiketler: "Madde N", "Geçici Madde N", "Soru N". `ContextualText` = "Doküman > Bölüm > Madde" öneki ve metin.
+  - Chunk kimlikleri deterministik (SHA-256).
+  - `TurkishSentenceSplitter`: kısaltmalar, sayı, tarih ve tutar biçimleri, liste işaretleri.
+- **Sonuç:** sözleşme 18, tarife 13, SSS 16, KVKK 54 chunk. KVKK'nın 33 maddesi ve 3 geçici maddesi doğru etiketleniyor. Selim dokümanlarında en büyük chunk 145 token, KVKK'da 468.
+- **Gerçek PDF'te bulunup düzeltilen hatalar:**
+  - Girintili satırların çoğunlukta olduğu sayfalarda kenar yanlış hesaplanıyordu; Madde 3'ün bentleri tek paragrafa birleşiyordu.
+  - Kalın basılmış "(2) (Mülga…)" notu başlık sanılıyordu; Madde 6 ortadan bölünüyordu.
+  - "MADDE 7-" ile aynı satırdaki metin arasında birkaç puntoluk taban çizgisi farkı vardı; ikisi ayrı satır sayılıyordu.
+  - "MADDE 30-" önceki başlığa ekleniyordu.
+- **Testler (Rag.Tests, 25):** cümle ayırıcı; chunker kuralları; gerçek 4 PDF üzerinde değişmez kurallar (chunk sayıları, etiket sırası, Türkçe metin bütünlüğü, hiçbir chunk'ta iki madde başlangıcı yok, token sınırı). Rag.Tests'teki geçici `--ignore-exit-code 8` kaldırıldı.
+- **Bilinen sınırlar:** KVKK sonundaki tablolar düz metin olarak okunuyor. Sayfa üst/alt bilgisi ayıklanmıyor. Token sayısı tahmini (karakter / 3,5); gerçek tokenizer kullanılmıyor.
+- **Smoke eval:** Proje kuralı, chunking değişikliğinden sonra smoke eval istiyor; ama eval runner henüz yok (3.2). Karşılaştırma 1.5'te arama ilk kez çalıştığında başlayacak.
 
 ### 2026-10-24 (oturum 3): 1.3
 - **Tasarım düzeltmesi (PLAN Bölüm 5 güncellendi):** Maskeleme katmanı en dışta değil, ham istemcinin hemen üstünde. Zincir: `FunctionInvoking (agent ekler) → PiiMaskingChatClient → raw`. En dışta olsaydı, function invocation döngüsünde eklenen araç sonuçları maskelenmeden modele giderdi.
@@ -68,10 +95,14 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
   - FakeBank.Api ve testi 2.1'e bırakıldı; boş proje taşımaya gerek yok.
   - Privacy.Tests ve Rag.Tests'te geçici `--ignore-exit-code 8` (sıfır test). İlk testler gelince kaldırılacak (TODO işaretli).
 
+## Açık işler
+- GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
+
 ## Sıradaki adım
-**1.4: Kaynak dokümanlar, PdfPig okuyucu ve chunking.**
-- Kurgusal Selim Bank dokümanları (ücret tarifesi, kart sözleşmesi, SSS) betikle PDF olarak üretilecek; kamuya açık KVKK metni eklenecek. Telif ve kaynak notu `docs/sources/README.md`'ye yazılacak.
-- Rag'de PdfPig okuyucu: sayfa, başlık ve "Madde N" tespiti.
-- Yapı-farkında chunker: yaklaşık 350–500 token, yaklaşık %10 örtüşme, "Doküman > Bölüm > Madde" öneki; Türkçe cümle ayırıcı kısaltma ve sayı biçimlerine dikkat edecek.
-- Testler: sabit bir PDF'ten beklenen chunk sınırları çıkmalı, madde ortasından bölme olmamalı. Rag.Tests'teki geçici `--ignore-exit-code 8` kaldırılacak.
-- Açık soru: PDF'leri hangi araçla üreteceğiz? Seçenekler .NET'te QuestPDF ya da Markdown'dan dönüştürme; lisans durumu 1.4'ün başında kontrol edilecek.
+**1.5: Ingestion ve hybrid search.**
+- Paketler: `CommunityToolkit.VectorData.Qdrant` (1.0.1) ve `Microsoft.Extensions.VectorData.Abstractions`. API'ler, özellikle `IKeywordHybridSearchable` ve full-text indeks seçenekleri, kurulu sürümün dokümanından doğrulanacak.
+- `ChunkRecord`: vektör (2048 boyut), `IsFullTextIndexed` normalize `SearchText`, filtrelenebilir `DocId`, alıntı için etiket, yol ve sayfa alanları. Collection adı `chunks_{model}_{dim}`.
+- Türkçe normalizer: tr-TR küçük harf (İ/ı) ve basit ek kırpma; aynı normalizer hem indekse hem sorgu anahtar kelimelerine uygulanacak.
+- Idempotent ingestion: deterministik chunk kimlikleri ve içerik hash'i ile upsert; dokümandan silinen chunk'lar collection'dan da silinecek.
+- Test: Testcontainers Qdrant ve deterministik sahte embedding ile hem anahtar kelime hem anlamsal sorguda doğru chunk ilk 5'te olmalı; aynı corpus iki kez yüklendiğinde kayıt sayısı değişmemeli.
+- İlk retrieval ölçümü: 1.6 öncesinde, elle yazılmış 10 soruluk küçük bir set (3.1'deki tam set gelene kadar) gerçek embedding ile denenecek.

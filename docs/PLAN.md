@@ -47,7 +47,9 @@ eval/
   questions.jsonl, injection.jsonl, cache/ (offline embedding önbelleği)
   Eval.Runner                Konsol: --subset smoke|full, --mode retrieval|answer, JSON + Markdown rapor
 docs/
-  sources/ (kaynak PDF'ler + üretim betikleri), decisions/ (ADR), PLAN.md, PROGRESS.md
+  sources/ (kaynak PDF'ler + src/*.md kaynak metinler), decisions/ (ADR), PLAN.md, PROGRESS.md
+tools/
+  SourceDocs.Generator       Kurgusal kaynak PDF'leri Markdown'dan üretir (PdfPig yazıcısı + DejaVu Sans), 1.4'te eklendi
 .github/workflows/ci.yml
 ```
 
