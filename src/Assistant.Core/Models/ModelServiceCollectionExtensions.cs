@@ -30,7 +30,10 @@ public static class ModelServiceCollectionExtensions
                 }
             });
 
-        // Chat: retries come from the OpenAI SDK (NimOptions.MaxRetries); an HTTP retry layer would multiply them.
+        // Resilience is configured per client here, not host-wide (see SelimBank.ServiceDefaults).
+        //
+        // Chat: retries come from the OpenAI SDK (NimOptions.MaxRetries); an HTTP retry layer would multiply
+        // them, and a short attempt timeout would cut long answers.
         services.AddHttpClient(NimClientFactory.HttpClientName, (sp, http) =>
             http.Timeout = sp.GetRequiredService<IOptions<NimOptions>>().Value.RequestTimeout);
 
@@ -41,7 +44,7 @@ public static class ModelServiceCollectionExtensions
             {
                 o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(20);
                 o.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(40); // must be >= 2 x attempt timeout
-                o.Retry.MaxRetryAttempts = 3;
+                o.Retry.MaxRetryAttempts = 5; // exponential backoff 2-4-8-16-32 s rides out short NIM outages (HTTP 500)
                 o.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(90);
             });
 

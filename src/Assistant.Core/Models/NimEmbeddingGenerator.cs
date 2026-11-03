@@ -11,13 +11,17 @@ namespace Assistant.Core.Models;
 /// NIM's required <c>input_type</c> field, and asymmetric NIM models reject requests without it.
 /// </summary>
 /// <remarks>
-/// Inputs are sent in requests of at most <see cref="MaxCharsPerRequest"/> characters. Measured on the
-/// free tier (2026-10-25): requests above ~5,500 characters in total never get a response (no error,
-/// just a hang); smaller ones return in under a second.
+/// Batching limits come from measurements on the free tier, whose behaviour changes over time:
+/// 2026-10-25, requests above ~5,500 characters hung without a response; 2026-11-04, any request with
+/// more than one input failed at once with HTTP 500 (8b and 1b alike) while the same 101 chunks sent one
+/// per request all succeeded. So inputs go one per request (<see cref="MaxInputsPerRequest"/>), and
+/// <see cref="MaxCharsPerRequest"/> stays as a guard should batching be enabled again.
 /// </remarks>
 internal sealed class NimEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>>
 {
     internal const int MaxCharsPerRequest = 4000;
+
+    internal const int MaxInputsPerRequest = 1;
 
     private const int MaxErrorBodyLength = 500;
 
@@ -26,14 +30,16 @@ internal sealed class NimEmbeddingGenerator : IEmbeddingGenerator<string, Embedd
     private readonly string _apiKey;
     private readonly string _modelId;
     private readonly EmbeddingGeneratorMetadata _metadata;
+    private readonly int _maxInputsPerRequest;
 
-    public NimEmbeddingGenerator(HttpClient http, Uri endpoint, string apiKey, string modelId)
+    public NimEmbeddingGenerator(HttpClient http, Uri endpoint, string apiKey, string modelId, int maxInputsPerRequest = MaxInputsPerRequest)
     {
         _http = http;
         _embeddingsUri = new Uri(endpoint, "embeddings");
         _apiKey = apiKey;
         _modelId = modelId;
         _metadata = new EmbeddingGeneratorMetadata("nvidia-nim", endpoint, modelId, defaultModelDimensions: null);
+        _maxInputsPerRequest = maxInputsPerRequest;
     }
 
     public async Task<GeneratedEmbeddings<Embedding<float>>> GenerateAsync(
@@ -60,14 +66,14 @@ internal sealed class NimEmbeddingGenerator : IEmbeddingGenerator<string, Embedd
         return result;
     }
 
-    // Consecutive inputs whose total length stays within the limit; a single longer input goes alone.
-    private static IEnumerable<List<string>> BatchBySize(IEnumerable<string> values)
+    // Consecutive inputs within both limits; a single longer input goes alone.
+    private IEnumerable<List<string>> BatchBySize(IEnumerable<string> values)
     {
         var batch = new List<string>();
         int chars = 0;
         foreach (string value in values)
         {
-            if (batch.Count > 0 && chars + value.Length > MaxCharsPerRequest)
+            if (batch.Count > 0 && (batch.Count >= _maxInputsPerRequest || chars + value.Length > MaxCharsPerRequest))
             {
                 yield return batch;
                 batch = [];

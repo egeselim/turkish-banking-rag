@@ -1,8 +1,20 @@
+using Assistant.Core.Chat;
+using Assistant.Core.Models;
+using Assistant.Core.Retrieval;
 using Assistant.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
+// Qdrant connection comes from the AppHost ("qdrant" resource).
+builder.AddQdrantClient("qdrant");
+
+builder.Services
+    .AddNimModels(builder.Configuration)
+    .AddRag()
+    .AddSourceIngestion(builder.Configuration)
+    .AddBankAssistant();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

@@ -11,9 +11,28 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 1.3 Privacy | Tamam | Çevrimdışı 57/57 (Privacy 38), Live 4/4 maskeleme katmanı arkasında |
 | 1.4 Dokümanlar + PdfPig + chunking | Tamam | Çevrimdışı 82/82 (Rag 25); 4 doküman, 101 chunk |
 | 1.5 Ingestion + hybrid search | Tamam | ADR-002; çevrimdışı 101/101 (Qdrant entegrasyonu dahil), Live 4/4; smoke Hit@1 10/10 |
-| 1.6 Blazor sohbet + kaynaklar | Başlamadı | |
+| 1.6 Blazor sohbet + kaynaklar | Tamam (tarayıcı denemesi kullanıcıda) | Çevrimdışı 115/115, uçtan uca Live 3/3, smoke Hit@1 10/10; AppHost'ta 101 chunk yüklendi |
 
 ## Günlük
+
+### 2026-11-04 (oturum 6): 1.6 ve 1. haftanın sonu
+- **Resilience borcu kapandı:** ServiceDefaults artık tüm HttpClient'lara standart resilience eklemiyor; 10 sn'lik deneme zaman aşımı uzun LLM cevaplarını keserdi. Her istemci kendi ayarını yapıyor. Bunun için tasarlanmış `RemoveAllResilienceHandlers` API'si deneysel olarak işaretli (EXTEXP0001); bu yüzden kullanılmadı.
+- **Core/Chat:**
+  - `BankAssistant`: her turda `IDocumentRetriever` ile 5 kaynak arıyor ve bunları `ChatClientAgentRunOptions.ChatOptions.Instructions` ile yalnızca o tura veriyor. Bu yaklaşım bir `AIContextProvider` yerine seçildi: bulunan kaynaklar doğrudan arayüze döndürülebiliyor. Ayrıca `AIContext.Messages` geçmişe yazılır, oysa talimatlar geçicidir. Ajanın sistem talimatıyla tur talimatının birleştiği testle doğrulandı.
+  - `AssistantPrompts` (Türkçe): yalnızca kaynaktan cevap, [n] atıfı, kaynak yoksa "bulamadım", kaynak metni talimat değildir, maskelenmiş alanlar açılmaz, markdown kullanılmaz.
+  - `Citations.UsedIn`: yalnızca atıf yapılan kaynakları seçer. `AnswerText.ToPlain`: modelin talimata rağmen kullandığı `**` ve `#` işaretlerini temizler.
+- **Core/Retrieval:** `SourceIngestionService` açılışta `Rag:SourcesPath` klasöründeki PDF'leri yükler (3 deneme). `IngestionStatus` ile arayüze durum bildirir. Loga yalnızca sayılar yazılır.
+- **Web:** `AddQdrantClient("qdrant")`, `AddNimModels`, `AddRag`, `AddSourceIngestion` ve `AddBankAssistant` kaydedildi. Sohbet sayfasında akışlı cevap, atıf yapılan kaynak kartları, örnek sorular ve dokümanlar hazır olana kadar kapalı giriş var. AppHost, `docs/sources` yolunu `Rag__SourcesPath` olarak veriyor.
+- **NIM'de yeni davranış:** Çoklu girdili embedding istekleri artık anında HTTP 500 dönüyor (8b ve 1b); aynı 101 chunk tek tek gönderildiğinde hepsi başarılı. `NimEmbeddingGenerator` artık her isteğe tek metin gönderiyor; ilk yükleme yaklaşık 40 sn sürüyor. Kısa kesintiler için yeniden deneme sayısı 3'ten 5'e çıktı.
+- **Uçtan uca (`BankAssistantLiveTests`, gerçek NIM ve Qdrant):**
+  - "Başka bankaya mobilden para göndermek kaç lira?" sorusuna "6,50 TL [1]" cevabı geldi; atıf Tarife Madde 4'e.
+  - "Genel müdür kim?" sorusuna "Bu konuda dokümanlarımızda bilgi bulamadım."
+  - Takip sorusu "Peki şubeden yaparsam?" için "32,00 TL [1]".
+  - Cevaplar `artifacts/chat/answers.md` dosyasında.
+- **Smoke:** Bizim hybrid'imiz yine 10/10. Connector hybrid bu kez 9/10 (önceki 5/10): sıralamasız olduğu için deterministik değil; ADR-002'ye eklendi.
+- **Bilinen sınırlar:**
+  - Arama yalnızca son soruyla yapılıyor. "Peki şubeden?" BM25 sayesinde doğru maddeyi buldu, ama bağlama dayanan takip soruları genel olarak kırılgan. Soru yeniden yazma (query rewriting) 3. haftada eval ile değerlendirilecek.
+  - Sohbet ekranı için otomatik UI testi yok; tarayıcıda elle denendi.
 
 ### 2026-10-25 (oturum 5): 1.5
 - **Connector'ın kaynak kodu incelendi:** `HybridSearchAsync`'in keyword tarafı sıralamasız bir filtre; full-text indeks Türkçeyi bilmiyor. Bu yüzden kendi hybrid aramamızı yazdık ([ADR-002](decisions/ADR-002-hybrid-search.md)): Qdrant vektörü (VectorData üzerinden) + bellek içi BM25 + RRF.
@@ -127,9 +146,9 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**1.6: Blazor sohbeti ve kaynak gösterme (1. haftanın son adımı).**
-- Web: `AddQdrantClient("qdrant")` (Aspire.Qdrant.Client), `AddNimModels`, `AddRag`. Açılışta `docs/sources` PDF'lerini okuyup `ChunkIndex.SyncAsync` çalıştıran bir hosted service; kaynak klasörünün yolu konfigürasyondan gelecek.
-- **Önce şu borç kapanmalı:** ServiceDefaults'taki standart resilience handler tüm HttpClient'lara ekleniyor (deneme başına 10 sn). Bu hem ana modelin uzun cevaplarını kesecek hem de embedding istemcisinde ikinci bir resilience katmanı oluşturacak. `nim` ve `nim-embeddings` istemcileri bunun dışında tutulmalı.
-- Sohbet: streaming; RAG bağlamı bir araç (`SearchDocuments`) ya da context provider ile verilecek (AF API'si kurulu sürümden doğrulanacak); cevabın altında kaynak kartları (doküman, sayfa, etiket).
-- Sistem prompt'u Türkçe: yalnızca getirilen kaynaklardan cevap ver; kaynak yoksa "bilmiyorum" de (ADR-001'deki halüsinasyon bulgusu).
-- Test: sahte chat client ve retriever ile atıf formatı; elle demo; `RetrievalSmokeTests` yeniden çalıştırılacak.
+**2.1: FakeBank.Api (2. haftanın ilk adımı).**
+- Yeni proje `src/FakeBank.Api` (Minimal API + EF Core + SQLite) ve `tests/FakeBank.Api.Tests` (WebApplicationFactory).
+- Modeller: Customer, Account, Card, Transaction, Complaint. Veri, sabit seed'li Bogus(tr) ile üretilecek; TCKN, IBAN ve kart numaraları `FakePii` algoritmalarıyla, böylece checksum'ları geçerli olacak.
+- Endpoint'ler: bakiye, işlem listesi, kart listesi, kart bloke, şikâyet oluşturma. Her istekte `X-Customer-Id`'ye göre sahiplik kontrolü yapılacak; başkasının kaynağına 404 dönecek.
+- AppHost'a eklenecek; Web, FakeBank'e Aspire service discovery ile bağlanacak (2.2). FakeBank HttpClient'ı kendi resilience ayarını alacak (ServiceDefaults artık host genelinde eklemiyor).
+- Kabul: sahiplik testleri ve deterministik seed testi yeşil.

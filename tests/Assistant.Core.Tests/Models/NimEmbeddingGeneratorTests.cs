@@ -33,7 +33,7 @@ public class NimEmbeddingGeneratorTests
     {
         var handler = new RecordingHandler(_ => Json(
             """{"model":"m","data":[{"index":1,"embedding":[2.0]},{"index":0,"embedding":[1.0]}],"usage":{"prompt_tokens":7,"total_tokens":7}}"""));
-        var generator = Create(handler);
+        var generator = Create(handler, maxInputsPerRequest: 2); // batching off by default (free tier), on here
 
         var result = await generator.GenerateAsync(["a", "b"], EmbeddingInputType.ForPassage(), TestContext.Current.CancellationToken);
 
@@ -58,6 +58,11 @@ public class NimEmbeddingGeneratorTests
         var result = await generator.GenerateAsync(texts, EmbeddingInputType.ForPassage(), TestContext.Current.CancellationToken);
 
         Assert.True(handler.Requests.Count >= 3);
+        Assert.All(handler.Requests, r =>
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(r.Body);
+            Assert.InRange(doc.RootElement.GetProperty("input").GetArrayLength(), 1, NimEmbeddingGenerator.MaxInputsPerRequest);
+        });
         Assert.All(handler.Requests, r => Assert.True(r.Body.Length < NimEmbeddingGenerator.MaxCharsPerRequest + 500, $"request body {r.Body.Length} chars"));
         Assert.Equal(texts.Select(t => (float)t[0]), result.Select(e => e.Vector.Span[0]));
         Assert.Equal(handler.Requests.Count, result.Usage!.InputTokenCount);
@@ -98,8 +103,8 @@ public class NimEmbeddingGeneratorTests
     public void Endpoint_gets_trailing_slash_so_v1_segment_is_kept(string input, string expected) =>
         Assert.Equal(expected, NimClientFactory.EnsureTrailingSlash(new Uri(input)).AbsoluteUri);
 
-    private static NimEmbeddingGenerator Create(RecordingHandler handler) =>
-        new(new HttpClient(handler), Endpoint, ApiKey, "test-model");
+    private static NimEmbeddingGenerator Create(RecordingHandler handler, int maxInputsPerRequest = NimEmbeddingGenerator.MaxInputsPerRequest) =>
+        new(new HttpClient(handler), Endpoint, ApiKey, "test-model", maxInputsPerRequest);
 
     private static HttpResponseMessage Json(string json) =>
         new(HttpStatusCode.OK) { Content = new StringContent(json, Encoding.UTF8, "application/json") };

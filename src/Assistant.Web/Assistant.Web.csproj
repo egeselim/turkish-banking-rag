@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Qdrant.Client" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Assistant.Core\Assistant.Core.csproj" />
     <ProjectReference Include="..\SelimBank.ServiceDefaults\SelimBank.ServiceDefaults.csproj" />
   </ItemGroup>

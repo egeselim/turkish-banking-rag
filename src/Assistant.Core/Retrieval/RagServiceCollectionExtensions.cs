@@ -31,7 +31,19 @@ public static partial class RagServiceCollectionExtensions
         services.AddSingleton(sp => new HybridRetriever(
             sp.GetRequiredService<ChunkIndex>(),
             sp.GetRequiredService<Microsoft.Extensions.AI.IEmbeddingGenerator<string, Microsoft.Extensions.AI.Embedding<float>>>()));
+        services.AddSingleton<IDocumentRetriever>(sp => sp.GetRequiredService<HybridRetriever>());
 
+        return services;
+    }
+
+    /// <summary>
+    /// Ingests the PDFs in <c>Rag:SourcesPath</c> at startup (background) and exposes progress as <see cref="IngestionStatus"/>.
+    /// </summary>
+    public static IServiceCollection AddSourceIngestion(this IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration)
+    {
+        services.AddOptions<RagOptions>().Bind(configuration.GetSection(RagOptions.SectionName));
+        services.AddSingleton<IngestionStatus>();
+        services.AddHostedService<SourceIngestionService>();
         return services;
     }
 

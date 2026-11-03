@@ -1,7 +1,143 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@implements IDisposable
+@using Assistant.Core.Chat
+@using Assistant.Core.Retrieval
+@using Microsoft.Agents.AI
+@inject BankAssistant Assistant
+@inject IngestionStatus Ingestion
+@inject ILogger<Home> Logger
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Selim Bank Asistanı</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="chat">
+    <header class="chat-header">
+        <h1>Selim Bank Asistanı</h1>
+        <p>Kurgusal bir banka için hazırlanmış portföy projesi. Gerçek müşteri verisi kullanmayın.</p>
+    </header>
 
-Welcome to your new app.
+    @if (Ingestion.State != IngestionState.Ready)
+    {
+        <div class="status @(Ingestion.State == IngestionState.Failed ? "status-error" : "")" role="status">
+            @(Ingestion.State == IngestionState.Failed ? Ingestion.Error : "Dokümanlar hazırlanıyor, birkaç saniye sürebilir…")
+        </div>
+    }
+
+    <div class="messages" aria-live="polite">
+        @if (_entries.Count == 0)
+        {
+            <div class="empty">
+                <p>Ücretler, kart sözleşmesi, sık sorulan sorular veya KVKK hakkında sorun.</p>
+                <ul>
+                    @foreach (string example in Examples)
+                    {
+                        <li><button type="button" class="example" disabled="@(!CanSend)" @onclick="() => AskExampleAsync(example)">@example</button></li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @foreach (var entry in _entries)
+        {
+            <div class="message @(entry.IsUser ? "user" : "assistant") @(entry.Failed ? "failed" : "")">
+                <div class="text">@(entry.Text.Length == 0 && !entry.IsUser ? "…" : entry.IsUser ? entry.Text : AnswerText.ToPlain(entry.Text))</div>
+                @if (entry.Sources.Count > 0)
+                {
+                    <ol class="sources">
+                        @foreach (var source in entry.Sources)
+                        {
+                            <li>
+                                <span class="source-number">[@source.Number]</span>
+                                <span class="source-doc">@source.DocTitle</span>
+                                <span class="source-location">@source.Location · @source.Pages</span>
+                            </li>
+                        }
+                    </ol>
+                }
+            </div>
+        }
+    </div>
+
+    <form class="composer" @onsubmit="SendAsync">
+        <input @bind="_input" @bind:event="oninput" placeholder="Sorunuzu yazın…" maxlength="1000" disabled="@(!CanSend)" aria-label="Soru" />
+        <button type="submit" disabled="@(!CanSend || string.IsNullOrWhiteSpace(_input))">Gönder</button>
+    </form>
+</div>
+
+@code {
+    private static readonly string[] Examples =
+    [
+        "Başka bankaya mobilden para göndermek kaç lira?",
+        "Asgari ödemeyi yapmazsam ne olur?",
+        "Bankanın hakkımda tuttuğu bilgileri öğrenebilir miyim?",
+    ];
+
+    private readonly List<ChatEntry> _entries = [];
+    private AgentSession? _session;
+    private string _input = "";
+    private bool _busy;
+
+    private bool CanSend => !_busy && Ingestion.State == IngestionState.Ready;
+
+    protected override void OnInitialized() => Ingestion.Changed += OnIngestionChanged;
+
+    private Task AskExampleAsync(string example)
+    {
+        _input = example;
+        return SendAsync();
+    }
+
+    private async Task SendAsync()
+    {
+        string question = _input.Trim();
+        if (question.Length == 0 || !CanSend)
+        {
+            return;
+        }
+
+        _input = "";
+        _busy = true;
+        _entries.Add(new ChatEntry { IsUser = true, Text = question });
+        var reply = new ChatEntry();
+        _entries.Add(reply);
+
+        try
+        {
+            _session ??= await Assistant.CreateSessionAsync();
+            var turn = await Assistant.AskAsync(_session, question);
+            await foreach (string part in turn.Text)
+            {
+                reply.Text += part;
+                StateHasChanged();
+            }
+
+            reply.Sources = Citations.UsedIn(reply.Text, turn.Sources);
+        }
+        catch (Exception ex)
+        {
+            // Never log the question or answer text: only that the turn failed.
+            Logger.LogError(ex, "Chat turn failed");
+            reply.Text = "Şu anda cevap veremiyorum. Lütfen biraz sonra tekrar deneyin.";
+            reply.Failed = true;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void OnIngestionChanged() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Ingestion.Changed -= OnIngestionChanged;
+
+    private sealed class ChatEntry
+    {
+        public bool IsUser { get; init; }
+
+        public string Text { get; set; } = "";
+
+        public IReadOnlyList<CitedSource> Sources { get; set; } = [];
+
+        public bool Failed { get; set; }
+    }
+}

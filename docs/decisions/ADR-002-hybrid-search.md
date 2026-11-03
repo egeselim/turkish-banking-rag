@@ -29,6 +29,7 @@ Sorular dokümandaki kelimeler kullanılmadan, müşteri ağzından yazıldı ("
 | **Bizim hybrid (RRF)** | 5/10 · 9/10 · 0,64 | **10/10 · 10/10 · 1,00** |
 | Connector hybrid | 1/10 · 5/10 · 0,24 | 5/10 · 10/10 · 0,75 |
 
+- **Connector hybrid deterministik değil:** 2026-11-04'teki tekrar ölçümde aynı sorular, aynı model ve aynı chunk'larla Hit@1 9/10 çıktı (önceki ölçümde 5/10). Keyword tarafı sıralamasız olduğu için sonuç, noktaların Qdrant'a yazılma sırasına göre değişiyor. Bizim hybrid'imiz iki ölçümde de 10/10. Ölçülebilir olmayan bir arama, eval'e dayalı geliştirme için uygun değil.
 - Aynı vektörlerle connector hybrid, yalnız vektörden **kötü**. Sıralamasız keyword listesi doğru cevabı ikinci sıraya itiyor (8b'de 5 soruda).
 - Zayıf embedding ile (1b), bizim hybrid'imiz yalnız vektöre göre çok daha dayanıklı: Hit@5 4/10'dan 9/10'a çıkıyor. BM25 bir güvenlik ağı görevi görüyor.
 - 8b ile yalnız vektör ve hybrid ikisi de bu küçük sette tavanda. Hybrid'in katkısı 3. haftadaki yaklaşık 100 soruluk eval setinde, özellikle Türkçe karakter kullanılmadan yazılmış ve kelimesi kelimesine ifadeli sorularda ölçülecek.

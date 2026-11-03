@@ -30,7 +30,7 @@ public sealed record RetrievalOptions
 public sealed class HybridRetriever(
     ChunkIndex index,
     IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
-    RetrievalOptions? options = null)
+    RetrievalOptions? options = null) : IDocumentRetriever
 {
     private readonly RetrievalOptions _options = options ?? new RetrievalOptions();
 

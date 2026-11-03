@@ -28,8 +28,9 @@ public static class Extensions
 
         builder.Services.ConfigureHttpClientDefaults(http =>
         {
-            // Turn on resilience by default
-            http.AddStandardResilienceHandler();
+            // No host-wide resilience handler: its 10 s attempt timeout would cut long LLM answers, and the
+            // NIM chat client already retries in its SDK. Each client configures resilience where it registers
+            // (see Assistant.Core AddNimModels).
 
             // Turn on service discovery by default
             http.AddServiceDiscovery();

@@ -1,0 +1,16 @@
+using Assistant.Rag.Search;
+using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+namespace Assistant.Core.Chat;
+
+public static class ChatServiceCollectionExtensions
+{
+    /// <summary>Registers <see cref="BankAssistant"/> over the (PII-masking) main chat client and the retriever.</summary>
+    public static IServiceCollection AddBankAssistant(this IServiceCollection services) =>
+        services.AddSingleton(sp => new BankAssistant(
+            sp.GetRequiredService<IChatClient>(),
+            sp.GetRequiredService<IDocumentRetriever>(),
+            sp.GetService<ILoggerFactory>()));
+}
