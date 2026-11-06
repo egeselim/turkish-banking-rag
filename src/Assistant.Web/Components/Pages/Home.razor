@@ -74,6 +74,24 @@
                         }
                     </ol>
                 }
+                @foreach (var approval in entry.Approvals)
+                {
+                    @* The text comes from the call's real arguments (BankingTools.DescribeAsync), not from the model. *@
+                    <div class="approval @approval.State.ToString().ToLowerInvariant()" role="group" aria-label="Onay">
+                        <p>@approval.Request.Summary</p>
+                        @if (approval.State == ApprovalState.Pending)
+                        {
+                            <div class="approval-actions">
+                                <button type="button" class="approve" disabled="@_busy" @onclick="() => DecideAsync(approval, true)">Onayla</button>
+                                <button type="button" class="reject" disabled="@_busy" @onclick="() => DecideAsync(approval, false)">Reddet</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="approval-state">@StateText(approval.State)</p>
+                        }
+                    </div>
+                }
             </div>
         }
     </div>
@@ -96,6 +114,7 @@
     [
         "Bakiyem ne kadar?",
         "Son 3 harcamam neler?",
+        "Kartlarım neler?",
     ];
 
     private readonly List<ChatEntry> _entries = [];
@@ -148,15 +167,37 @@
         }
 
         _input = "";
-        _busy = true;
+        // Agent Framework rejects approvals left unanswered when a new message arrives (default behaviour, 2.3 decision).
+        CancelPending(ApprovalState.Cancelled);
         _entries.Add(new ChatEntry { IsUser = true, Text = question });
+        _session ??= await Assistant.CreateSessionAsync(_customerId);
+        var session = _session;
+        await StreamReplyAsync(() => Assistant.AskAsync(session, question));
+    }
+
+    private async Task DecideAsync(ApprovalView approval, bool approve)
+    {
+        if (_busy || _session is null || approval.State != ApprovalState.Pending)
+        {
+            return;
+        }
+
+        // Answering one request rejects the others from the same turn (Agent Framework), so they are closed here too.
+        approval.State = approve ? ApprovalState.Approved : ApprovalState.Rejected;
+        CancelPending(ApprovalState.Cancelled);
+        var session = _session;
+        await StreamReplyAsync(() => Assistant.RespondAsync(session, approval.Request.Id, approve));
+    }
+
+    private async Task StreamReplyAsync(Func<Task<AssistantTurn>> start)
+    {
+        _busy = true;
         var reply = new ChatEntry();
         _entries.Add(reply);
 
         try
         {
-            _session ??= await Assistant.CreateSessionAsync(_customerId);
-            var turn = await Assistant.AskAsync(_session, question);
+            var turn = await start();
             await foreach (string part in turn.Text)
             {
                 reply.Text += part;
@@ -164,6 +205,11 @@
             }
 
             reply.Sources = Citations.UsedIn(reply.Text, turn.Sources);
+            reply.Approvals = [.. turn.Approvals.Select(a => new ApprovalView(a))];
+            if (reply.Text.Length == 0 && reply.Approvals.Count > 0)
+            {
+                reply.Text = "Bu işlem için onayınız gerekiyor:";
+            }
         }
         catch (Exception ex)
         {
@@ -191,5 +237,37 @@
         public IReadOnlyList<CitedSource> Sources { get; set; } = [];
 
         public bool Failed { get; set; }
+
+        public IReadOnlyList<ApprovalView> Approvals { get; set; } = [];
+    }
+
+    private void CancelPending(ApprovalState state)
+    {
+        foreach (var approval in _entries.SelectMany(e => e.Approvals).Where(a => a.State == ApprovalState.Pending))
+        {
+            approval.State = state;
+        }
+    }
+
+    private static string StateText(ApprovalState state) => state switch
+    {
+        ApprovalState.Approved => "Onaylandı.",
+        ApprovalState.Rejected => "Reddedildi; işlem yapılmadı.",
+        _ => "İptal edildi; işlem yapılmadı.",
+    };
+
+    private enum ApprovalState
+    {
+        Pending,
+        Approved,
+        Rejected,
+        Cancelled,
+    }
+
+    private sealed class ApprovalView(PendingApproval request)
+    {
+        public PendingApproval Request { get; } = request;
+
+        public ApprovalState State { get; set; } = ApprovalState.Pending;
     }
 }

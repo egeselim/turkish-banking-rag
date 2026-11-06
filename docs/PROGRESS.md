@@ -14,8 +14,45 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 1.6 Blazor sohbet + kaynaklar | Tamam (kullanıcı 2026-11-05'te tarayıcıda denedi, hata yok) | Çevrimdışı 115/115, uçtan uca Live 3/3, smoke Hit@1 10/10; AppHost'ta 101 chunk yüklendi |
 | 2.1 SelimBank.Api | Tamam | Çevrimdışı 150/150 (Api 35); AppHost'ta selimbank-api sağlıklı, uçlar curl ile denendi |
 | 2.2 Agent araçları (GetBalance, ListTransactions) | Tamam | Çevrimdışı 168/168; Live 6/6 ("son 3 harcamam" → "ikincisi" doğru); smoke Hybrid Hit@1 10/10 (değişmedi) |
+| 2.3 BlockCard, CreateComplaint, ListCards + onay | Tamam (arayüzde onay kartı elle denenmedi) | Çevrimdışı 179/179; POST sayacı 0/0/1, sahte/tekrar/değiştirilmiş onay çalışmıyor; Live 8/8; smoke Hybrid Hit@1 10/10 |
 
 ## Günlük
+
+### 2026-11-06 (oturum 8, devam): 2.3
+- **Kullanıcı kararları:** `ListCards` 2.3'e alındı (PLAN güncellendi). Onay bekleyen bir istek varken yeni mesaj yazılırsa Agent Framework'ün varsayılanı geçerli: istek otomatik reddediliyor, arayüzde "İptal edildi" yazıyor.
+- **Doğrulanan API (MEAI 10.11, AF 1.26 XML dokümanı):**
+  - `ApprovalRequiredAIFunction` ile sarılan araç çalışmıyor; yerine `ToolApprovalRequestContent` (`RequestId`, `ToolCall`) dönüyor. Cevap `CreateResponse(bool, reason)` ile üretilip `RunStreamingAsync(ChatMessage, session, …)` ile gönderiliyor.
+  - `ChatClientAgentOptions.DisableApprovalResponseBinding` varsayılan olarak `false`, yani `ApprovalResponseBindingChatClient` açık. Bu katman sunduğu istekleri oturumun StateBag'ine kaydediyor; yalnızca bunlara verilen onayları, bir kez ve gösterilen argümanlarla kabul ediyor; cevapsız kalanları bir sonraki çalıştırmada reddediyor.
+- **Core/Banking:**
+  - `SelimBankClient`'a `GetCardsAsync`, `BlockCardAsync` ve `CreateComplaintAsync` eklendi.
+  - Yeni araçlar: `ListCards` (salt okunur), `BlockCard(cardId)` ve `CreateComplaint(description, transactionId?)`. Son ikisi `ApprovalRequiredAIFunction` ile sarılı.
+  - `BankingTools.DescribeAsync`, onay kartı metnini çağrının gerçek argümanlarından ve API verisinden üretiyor; modelin yazdığı metne dayanmıyor. Örnek: "•••• 9280 ile biten banka kartı kalıcı olarak bloke edilecek. Bu işlem geri alınamaz." Şikâyette işlemin tarihi, tutarı, yeri ve açıklama gösteriliyor.
+- **Core/Chat:**
+  - `AssistantTurn.Approvals`, akış bitince dolu oluyor.
+  - Onay istekleri sunucuda, `AssistantSession` içinde duruyor; arayüz yalnızca onay kimliğini ve kararı gönderiyor.
+  - `BankAssistant.RespondAsync` bilinmeyen ya da daha önce cevaplanmış kimliği reddediyor. Her çalıştırma bekleyen yerel kopyaları siliyor; AF de bekleyen istekleri reddettiği için ikisi tutarlı.
+  - Onaydan sonraki tur, kaynak içermeyen ayrı bir talimatla (`ApprovalTurn`) çalışıyor; böylece model "bulamadım" demiyor.
+- **Prompt:** onay kuralı prompt'ta yok; yalnızca bir kullanım ipucu eklendi: "aracı doğrudan çağır, yazılı onay isteme, belirsizse sor". Live testte model metin içinde ayrıca onay istemedi.
+- **Web:** asistan mesajının altında, metni sunucuda üretilen Onayla ve Reddet butonlu bir kart çıkıyor. Karar verilince kart kapanıyor. Aynı turdaki diğer istekler ve yeni mesaj gönderilince bekleyenler "İptal edildi" oluyor. Örneklere "Kartlarım neler?" eklendi.
+- **Testler (`ApprovalTests`, 11):**
+  - Gerçek API test içinde çalışıyor; araya POST isteklerini sayan bir handler eklendi.
+  - Onay beklerken 0 POST ve model yeniden çağrılmıyor; Reddet sonrası 0; Onayla sonrası 1.
+  - Tekrar gönderilen onay çalışmıyor (hem arayüz katmanında hem doğrudan AF'ye gönderildiğinde).
+  - Sahte onay sessizce yok sayılıyor. Sahte istek ve onay birlikte gelirse AF çalıştırmayı hatayla durduruyor (fail closed).
+  - Bilinmeyen onay kimliği reddediliyor.
+  - Değiştirilmiş argümanda gösterilen kart bloke ediliyor, diğeri aktif kalıyor.
+  - Yeni mesaj gönderilince bekleyen onay iptal ediliyor.
+  - "İkincisine itiraz et" ile şikâyet doğru işleme bir kez açılıyor.
+  - Yalnızca iki araç onay istiyor; `ListCards` sonucunda tam kart numarası yok.
+- **Live (gerçek NIM), 8/8:**
+  - "9280 ile biten kartımı bloke et" → onay kartı → Onayla → kart bloke.
+  - "Son 3 harcamam" → "İkincisine itiraz etmek istiyorum…" → onay kartı doğru işlemi gösterdi (−894,15 TL, Papatya Market) → Onayla → şikâyet o işleme açıldı.
+  - Önceki 5 sohbet testi yeşil; smoke'ta hybrid Hit@1 10/10 (connector hybrid bu kez 7/10, deterministik değil).
+- **Bilinen sınırlar:**
+  - Arayüzdeki onay kartı tarayıcıda henüz elle denenmedi; yalnızca derleme ve sayfanın sunucuda oluşturulması doğrulandı.
+  - Model aynı turda birden fazla onay isterse birine verilen karar diğerlerini iptal ediyor (AF davranışı).
+  - Şikâyet özeti için işlem, müşterinin son 100 işlemi içinde aranıyor; API'de tek işlem getiren bir uç yok.
+  - Audit kaydı ve ara katmandaki ikinci onay kontrolü 2.4'e kaldı.
 
 ### 2026-11-06 (oturum 8): 2.2
 - **Kullanıcı kararları:** (a) harcama filtresi API'de (`direction=out|in`); (b) Live testte SelimBank.Api test içinde WebApplicationFactory ile çalışıyor; (c) doküman araması her turda sürüyor (yönlendirme stretch hedefinde).
@@ -206,7 +243,6 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**2.3: `BlockCard` ve `CreateComplaint` araçları, onay akışı. Henüz planlanmadı.**
-- PLAN'daki kabul kriteri: Onay olmadan API çağrısı hiç yapılmıyor; Reddet sonrasında da yapılmıyor; Onayla sonrasında tam bir kez yapılıyor. Sahte ya da tekrar oynatılmış bir onay reddediliyor.
-- Hazır olanlar: API'de `POST /cards/{id}/block` (idempotent) ve `POST /complaints` uçları var; SelimBank HttpClient'ı POST isteklerini yeniden denemiyor; işlem listelerinde `transactionId` var (örneğin "ikincisine itiraz et").
-- Planlamadan önce yapılacak: Agent Framework 1.26'da `ApprovalRequiredAIFunction` ve `ToolApprovalRequestContent` ile streaming'de onayın nasıl tamamlandığını kurulu dokümandan doğrulamak.
+**2.4: Audit log ve araç çağrısı ara katmanı. Henüz planlanmadı.**
+- PLAN'daki kabul kriteri: Her araç çağrısı tam bir audit satırı üretiyor (zaman, müşteri takma kimliği, araç, maskelenmiş argüman, sonuç durumu, süre) ve satırda ham PII yok. Onay gerektiren bir araç onaysız gelirse ara katman bunu da reddediyor (derinlemesine savunma). Girdi ve çıktı guard'ları ekleniyor.
+- Planlamadan önce yapılacak: Agent Framework 1.26'da function-calling middleware'inin (`AsBuilder().Use(...)`) imzasını ve onaylı bir çağrının ara katmanda nasıl ayırt edileceğini kurulu dokümandan doğrulamak.

@@ -11,7 +11,8 @@ namespace Assistant.Core.Tests.Banking;
 /// </summary>
 internal static class BankingTestHost
 {
-    public static IServiceCollection AddInMemorySelimBank(this IServiceCollection services, SelimBankApiFactory api)
+    public static IServiceCollection AddInMemorySelimBank(
+        this IServiceCollection services, SelimBankApiFactory api, RequestCounter? counter = null)
     {
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["SelimBank:BaseAddress"] = "http://localhost" })
@@ -19,10 +20,36 @@ internal static class BankingTestHost
 
         services.AddSelimBankClient(configuration);
         services.AddHttpClient(SelimBankClient.HttpClientName)
-            .ConfigurePrimaryHttpMessageHandler(() => api.Server.CreateHandler());
+            .ConfigurePrimaryHttpMessageHandler(() => new CountingHandler(counter ?? new RequestCounter())
+            {
+                InnerHandler = api.Server.CreateHandler(),
+            });
         return services;
     }
 
-    public static SelimBankClient CreateClient(SelimBankApiFactory api) =>
-        new ServiceCollection().AddInMemorySelimBank(api).BuildServiceProvider().GetRequiredService<SelimBankClient>();
+    public static SelimBankClient CreateClient(SelimBankApiFactory api, RequestCounter? counter = null) =>
+        new ServiceCollection().AddInMemorySelimBank(api, counter).BuildServiceProvider().GetRequiredService<SelimBankClient>();
+}
+
+/// <summary>Counts write requests that actually reach the bank API (2.3 acceptance: 0, 0, 1).</summary>
+internal sealed class RequestCounter
+{
+    private int _posts;
+
+    public int Posts => Volatile.Read(ref _posts);
+
+    public void CountPost() => Interlocked.Increment(ref _posts);
+}
+
+internal sealed class CountingHandler(RequestCounter counter) : DelegatingHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        if (request.Method == HttpMethod.Post)
+        {
+            counter.CountPost();
+        }
+
+        return base.SendAsync(request, cancellationToken);
+    }
 }

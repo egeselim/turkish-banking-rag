@@ -43,11 +43,30 @@ public sealed class SelimBankClient(IHttpClientFactory httpClientFactory)
         return await GetAsync<List<BankTransaction>>(customerId, path, cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task<IReadOnlyList<BankCard>> GetCardsAsync(int customerId, CancellationToken cancellationToken = default) =>
+        await GetAsync<List<BankCard>>(customerId, "/cards", cancellationToken).ConfigureAwait(false) ?? [];
+
+    /// <summary>Irreversible: callers must have the customer's approval (see BankingTools).</summary>
+    /// <returns>The blocked card, or <see langword="null"/> if it does not exist or belongs to someone else.</returns>
+    public Task<BankCard?> BlockCardAsync(int customerId, int cardId, CancellationToken cancellationToken = default) =>
+        SendAsync<BankCard>(customerId, HttpMethod.Post, string.Create(CultureInfo.InvariantCulture, $"/cards/{cardId}/block"), null, cancellationToken);
+
+    /// <returns>The complaint, or <see langword="null"/> if the transaction does not exist or belongs to someone else.</returns>
+    public Task<BankComplaint?> CreateComplaintAsync(
+        int customerId, string description, int? transactionId, CancellationToken cancellationToken = default) =>
+        SendAsync<BankComplaint>(
+            customerId, HttpMethod.Post, "/complaints", JsonContent.Create(new { description, transactionId }, options: Json), cancellationToken);
+
     /// <returns><see langword="null"/> on 404 (missing or someone else's record).</returns>
-    private async Task<T?> GetAsync<T>(int? customerId, string path, CancellationToken cancellationToken)
+    private Task<T?> GetAsync<T>(int? customerId, string path, CancellationToken cancellationToken)
+        where T : class =>
+        SendAsync<T>(customerId, HttpMethod.Get, path, null, cancellationToken);
+
+    private async Task<T?> SendAsync<T>(
+        int? customerId, HttpMethod method, string path, HttpContent? content, CancellationToken cancellationToken)
         where T : class
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri(path, UriKind.Relative));
+        using var request = new HttpRequestMessage(method, new Uri(path, UriKind.Relative)) { Content = content };
         if (customerId is { } id)
         {
             request.Headers.Add(CustomerHeader, id.ToString(CultureInfo.InvariantCulture));

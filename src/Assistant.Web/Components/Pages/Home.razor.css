@@ -178,3 +178,57 @@
     opacity: 0.6;
     cursor: default;
 }
+
+.approval {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid #f0b429;
+    border-radius: 8px;
+    background: #fffbea;
+}
+
+.approval p {
+    margin: 0;
+}
+
+.approval-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.approval-actions button {
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 6px;
+    font: inherit;
+    cursor: pointer;
+}
+
+.approval-actions .approve {
+    background: #0b3d6e;
+    color: #fff;
+}
+
+.approval-actions .reject {
+    background: #e4e7eb;
+    color: #1f2933;
+}
+
+.approval-actions button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.approval.approved,
+.approval.rejected,
+.approval.cancelled {
+    border-color: #cbd2d9;
+    background: #f5f7fa;
+}
+
+.approval-state {
+    margin-top: 6px !important;
+    font-size: 0.85rem;
+    color: #616e7c;
+}

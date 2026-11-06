@@ -111,6 +111,68 @@ public sealed class BankAssistantLiveTests : IAsyncLifetime
         Assert.All(accounts, a => Assert.Contains(BankingTools.Money(a.Balance, a.Currency).Replace(" TL", "", StringComparison.Ordinal), answer, StringComparison.Ordinal));
     }
 
+    // Step 2.3 acceptance with the real model: the card is blocked only after approval.
+    [Fact]
+    public async Task Blocks_a_card_only_after_approval()
+    {
+        var session = await _assistant.CreateSessionAsync(1, TestContext.Current.CancellationToken);
+
+        var (_, turn) = await AskTurnAsync(session, "9280 ile biten kartımı bloke et.");
+        var approval = Assert.Single(turn.Approvals);
+        Assert.Equal(BankingTools.BlockCardName, approval.ToolName);
+        Assert.Contains("9280", approval.Summary, StringComparison.Ordinal);
+        Assert.Equal(SelimBank.Api.Data.CardStatus.Active, _api.Query(db => db.Cards.Single(c => c.Id == 1).Status));
+
+        await RespondAsync(session, approval, approve: true);
+
+        Assert.Equal(SelimBank.Api.Data.CardStatus.Blocked, _api.Query(db => db.Cards.Single(c => c.Id == 1).Status));
+    }
+
+    [Fact]
+    public async Task Opens_a_complaint_for_the_second_spending_after_approval()
+    {
+        const int customerId = 1;
+        var expected = await LatestSpendingAsync(customerId, 3);
+        var session = await _assistant.CreateSessionAsync(customerId, TestContext.Current.CancellationToken);
+        await AskAsync(session, "Son 3 harcamam neler?");
+
+        var (_, turn) = await AskTurnAsync(session, "İkincisine itiraz etmek istiyorum, o harcamayı ben yapmadım.");
+        var approval = Assert.Single(turn.Approvals);
+        Assert.Equal(BankingTools.CreateComplaintName, approval.ToolName);
+        Assert.Empty(_api.Query(db => db.Complaints.ToList()));
+
+        await RespondAsync(session, approval, approve: true);
+
+        var complaint = Assert.Single(_api.Query(db => db.Complaints.ToList()));
+        Assert.Equal(expected[1].Id, complaint.TransactionId);
+    }
+
+    private async Task<(string Answer, AssistantTurn Turn)> AskTurnAsync(AssistantSession session, string question)
+    {
+        var turn = await _assistant.AskAsync(session, question, TestContext.Current.CancellationToken);
+        string answer = await ReadAsync(turn);
+        _transcript.Append("## ").Append(question).Append("\n\n").Append(answer).Append('\n')
+            .Append(string.Concat(turn.Approvals.Select(a => $"\n> Onay ({a.ToolName}): {a.Summary}"))).Append("\n\n");
+        return (answer, turn);
+    }
+
+    private async Task RespondAsync(AssistantSession session, PendingApproval approval, bool approve)
+    {
+        string answer = await ReadAsync(await _assistant.RespondAsync(session, approval.Id, approve, TestContext.Current.CancellationToken));
+        _transcript.Append("## [").Append(approve ? "Onayla" : "Reddet").Append("]\n\n").Append(answer).Append("\n\n");
+    }
+
+    private static async Task<string> ReadAsync(AssistantTurn turn)
+    {
+        var answer = new StringBuilder();
+        await foreach (string part in turn.Text)
+        {
+            answer.Append(part);
+        }
+
+        return answer.ToString();
+    }
+
     private async Task<IReadOnlyList<BankTransaction>> LatestSpendingAsync(int customerId, int count)
     {
         var bank = _services.GetRequiredService<SelimBankClient>();

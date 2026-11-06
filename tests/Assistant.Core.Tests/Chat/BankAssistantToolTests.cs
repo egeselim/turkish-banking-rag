@@ -50,7 +50,7 @@ public sealed class BankAssistantToolTests(SelimBankApiFactory api) : IClassFixt
         await DrainAsync(assistant, await assistant.CreateSessionAsync(3, Ct), "Bakiyem ne kadar?");
 
         var tools = model.Calls[0].Options!.Tools!.OfType<AIFunctionDeclaration>().ToList();
-        Assert.Equal(["GetBalance", "ListTransactions"], tools.Select(t => t.Name));
+        Assert.Equal(["GetBalance", "ListTransactions", "ListCards", "BlockCard", "CreateComplaint"], tools.Select(t => t.Name));
         Assert.All(tools, t => Assert.DoesNotContain("customer", t.JsonSchema.GetRawText(), StringComparison.OrdinalIgnoreCase));
 
         using var json = JsonDocument.Parse(Assert.Single(model.ToolResultsSentIn(1)));
