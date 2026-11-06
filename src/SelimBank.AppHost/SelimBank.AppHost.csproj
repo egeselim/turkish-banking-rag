@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Assistant.Web\Assistant.Web.csproj" />
+    <ProjectReference Include="..\SelimBank.Api\SelimBank.Api.csproj" />
   </ItemGroup>
 
 </Project>

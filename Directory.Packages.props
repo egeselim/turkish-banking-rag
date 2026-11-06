@@ -43,9 +43,15 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.13" />
   </ItemGroup>
 
+  <ItemGroup Label="Data">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
+    <!-- SelimBank.Api seed'i ve test verisi (yalnızca sentetik veri). -->
+    <PackageVersion Include="Bogus" Version="35.6.5" />
+  </ItemGroup>
+
   <ItemGroup Label="Test">
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
-    <PackageVersion Include="Bogus" Version="35.6.5" />
     <PackageVersion Include="Testcontainers.Qdrant" Version="4.16.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.14" />
   </ItemGroup>
 </Project>

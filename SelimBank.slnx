@@ -4,6 +4,7 @@
     <Project Path="src/Assistant.Privacy/Assistant.Privacy.csproj" />
     <Project Path="src/Assistant.Rag/Assistant.Rag.csproj" />
     <Project Path="src/Assistant.Web/Assistant.Web.csproj" />
+    <Project Path="src/SelimBank.Api/SelimBank.Api.csproj" />
     <Project Path="src/SelimBank.AppHost/SelimBank.AppHost.csproj" />
     <Project Path="src/SelimBank.ServiceDefaults/SelimBank.ServiceDefaults.csproj" />
   </Folder>
@@ -11,6 +12,7 @@
     <Project Path="tests/Assistant.Core.Tests/Assistant.Core.Tests.csproj" />
     <Project Path="tests/Assistant.Privacy.Tests/Assistant.Privacy.Tests.csproj" />
     <Project Path="tests/Assistant.Rag.Tests/Assistant.Rag.Tests.csproj" />
+    <Project Path="tests/SelimBank.Api.Tests/SelimBank.Api.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/SourceDocs.Generator/SourceDocs.Generator.csproj" />

@@ -7,6 +7,10 @@ var qdrant = builder.AddQdrant("qdrant")
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent);
 
+// Fake bank backend; its in-memory database is recreated and seeded on every start.
+builder.AddProject<Projects.SelimBank_Api>("selimbank-api")
+    .WithHttpHealthCheck("/health");
+
 // The source PDFs live in the repository (docs/sources); the web app ingests them at startup.
 string sourcesPath = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "..", "docs", "sources"));
 

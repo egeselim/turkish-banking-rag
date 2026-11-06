@@ -11,9 +11,35 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 1.3 Privacy | Tamam | Çevrimdışı 57/57 (Privacy 38), Live 4/4 maskeleme katmanı arkasında |
 | 1.4 Dokümanlar + PdfPig + chunking | Tamam | Çevrimdışı 82/82 (Rag 25); 4 doküman, 101 chunk |
 | 1.5 Ingestion + hybrid search | Tamam | ADR-002; çevrimdışı 101/101 (Qdrant entegrasyonu dahil), Live 4/4; smoke Hit@1 10/10 |
-| 1.6 Blazor sohbet + kaynaklar | Tamam (tarayıcı denemesi kullanıcıda) | Çevrimdışı 115/115, uçtan uca Live 3/3, smoke Hit@1 10/10; AppHost'ta 101 chunk yüklendi |
+| 1.6 Blazor sohbet + kaynaklar | Tamam (kullanıcı 2026-11-05'te tarayıcıda denedi, hata yok) | Çevrimdışı 115/115, uçtan uca Live 3/3, smoke Hit@1 10/10; AppHost'ta 101 chunk yüklendi |
+| 2.1 SelimBank.Api | Tamam | Çevrimdışı 150/150 (Api 35); AppHost'ta selimbank-api sağlıklı, uçlar curl ile denendi |
 
 ## Günlük
+
+### 2026-11-05 (oturum 7): 2.1
+- **Yeni proje `src/SelimBank.Api`** (Minimal API + EF Core 10.0.14 SQLite + Bogus tr). Yalnızca ServiceDefaults'a referans veriyor; bunu bir mimari testi koruyor.
+- **Veritabanı:** paylaşımlı bellek içi SQLite (`Mode=Memory;Cache=Shared`). Migration yok; şema `EnsureCreated` ile her açılışta sıfırdan kuruluyor ve seed ediliyor. Bellek içi veritabanı açık bağlantı kaldığı sürece yaşadığı için uygulama kapanana kadar bir bağlantı açık tutuluyor. Sonuç: bloke edilen kart ve açılan şikâyet yeniden başlatmada sıfırlanıyor (bilinçli).
+- **Seed (`SeedData.Generate`):**
+  - Sabit seed, yerel `Randomizer`. Bogus'un global seed'i testler paralel çalıştığı için kullanılmadı.
+  - Tarihler sabit bir "şimdi"ye (`AnchorUtc` = 2026-11-01) göre üretiliyor; Bogus'un tarih yardımcıları duvar saatini okuduğu için kullanılmadı.
+  - 5 müşteri; her birinin 1–2 hesabı, 1–2 kartı (banka/kredi), 3 maaş ve 25–40 harcaması var. Bakiye, açılış bakiyesi ile işlemlerin toplamına eşit. İşlem kimlikleri zaman sırasına göre veriliyor. İş yeri adları kurgusal.
+  - TCKN, IBAN (kurgusal banka kodu 00999) ve kart numarası (Luhn) `Identifiers` ile üretiliyor. Bu, `FakePii`'nin küçük bir kopyası; doğruluğu testte Privacy'nin `Checksums`'ıyla kontrol ediliyor.
+- **Uçlar:** `GET /customers` (başlıksız; yalnızca id ve ad), `GET /accounts`, `GET /accounts/{id}/transactions?take=` (varsayılan 10, 1–100 dışı 400, yeniden eskiye), `GET /cards`, `POST /cards/{id}/block` (idempotent), `POST /complaints` (açıklama 1–1000 karakter; işlem verilirse sahiplik kontrolü yapılıyor; 201 dönüyor, Location başlığı yok çünkü GET ucu yok). Enum'lar JSON'da metin olarak dönüyor.
+- **Güvenlik:**
+  - `RequireCustomer()` endpoint filter'ı `X-Customer-Id` başlığını okuyor. Başlık eksikse, biçimi bozuksa ya da müşteri bilinmiyorsa 401 dönüyor. Geçerliyse kimlik scoped `CurrentCustomer`'a yazılıyor; filtre unutulursa `CurrentCustomer.Id` sessizce 0 dönmek yerine hata fırlatıyor.
+  - Her sorgu `CustomerId` filtresini açıkça içeriyor. Başkasının kaydıyla olmayan kayıt aynı 404 gövdesini alıyor.
+  - DTO'larda yalnızca kimlikler ve son 4 hane var. EF komut logu `Warning` seviyesine çekildi.
+- **AppHost:** `selimbank-api` kaynağı `WithHttpHealthCheck("/health")` ile eklendi; port 5290 (yalnızca http). Web henüz bağlanmıyor (2.2).
+- **Elle deneme:** [src/SelimBank.Api/SelimBank.Api.http](../src/SelimBank.Api/SelimBank.Api.http).
+- **Testler (`SelimBank.Api.Tests`, 35):**
+  - WebApplicationFactory; her test sınıfına ayrı bir bellek içi veritabanı.
+  - Kimlik doğrulama: 401 (5 uç, 5 bozuk başlık); reddedilen bloke isteği kartı değiştirmiyor.
+  - Sahiplik: 404, kaynak değişmiyor, 404 gövdesi olmayan kayıtla aynı.
+  - Seed: iki üretim aynı JSON'u veriyor; iki ayrı açılış aynı yanıtları veriyor; checksum'lar geçiyor.
+  - Bloke: sonraki sorguda bloke görünüyor; ikinci bloke isteği idempotent.
+  - İşlem listesi ve şikâyet doğrulaması.
+  - PII sızıntısı: hiçbir yanıtta TCKN, tam IBAN, tam kart numarası, telefon ya da e-posta geçmiyor.
+- **Not:** .NET 10'da top-level `Program` sınıfı otomatik olarak public; testler için `public partial class Program` gerekmedi.
 
 ### 2026-11-04 (oturum 6): 1.6 ve 1. haftanın sonu
 - **Resilience borcu kapandı:** ServiceDefaults artık tüm HttpClient'lara standart resilience eklemiyor; 10 sn'lik deneme zaman aşımı uzun LLM cevaplarını keserdi. Her istemci kendi ayarını yapıyor. Bunun için tasarlanmış `RemoveAllResilienceHandlers` API'si deneysel olarak işaretli (EXTEXP0001); bu yüzden kullanılmadı.
@@ -139,16 +165,13 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - Plandan sapmalar:
   - `.sln` yerine `.slnx`; .NET 10'un varsayılanı.
   - Testler VSTest yerine MTP ile çalışıyor; .NET 10 SDK, xunit.v3 4.x'i VSTest ile çalıştırmıyor. Filtre: `dotnet test --filter-not-trait "Category=Live"`. Coverlet şimdilik yok.
-  - FakeBank.Api ve testi 2.1'e bırakıldı; boş proje taşımaya gerek yok.
+  - SelimBank.Api ve testi 2.1'e bırakıldı; boş proje taşımaya gerek yok.
   - Privacy.Tests ve Rag.Tests'te geçici `--ignore-exit-code 8` (sıfır test). İlk testler gelince kaldırılacak (TODO işaretli).
 
 ## Açık işler
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**2.1: FakeBank.Api (2. haftanın ilk adımı).**
-- Yeni proje `src/FakeBank.Api` (Minimal API + EF Core + SQLite) ve `tests/FakeBank.Api.Tests` (WebApplicationFactory).
-- Modeller: Customer, Account, Card, Transaction, Complaint. Veri, sabit seed'li Bogus(tr) ile üretilecek; TCKN, IBAN ve kart numaraları `FakePii` algoritmalarıyla, böylece checksum'ları geçerli olacak.
-- Endpoint'ler: bakiye, işlem listesi, kart listesi, kart bloke, şikâyet oluşturma. Her istekte `X-Customer-Id`'ye göre sahiplik kontrolü yapılacak; başkasının kaynağına 404 dönecek.
-- AppHost'a eklenecek; Web, FakeBank'e Aspire service discovery ile bağlanacak (2.2). FakeBank HttpClient'ı kendi resilience ayarını alacak (ServiceDefaults artık host genelinde eklemiyor).
-- Kabul: sahiplik testleri ve deterministik seed testi yeşil.
+**2.2: Core'dan SelimBank.Api'ye bağlantı, `GetBalance` ve `ListTransactions` araçları. Plan kullanıcı onayı bekliyor (2026-11-05).**
+- 2.1'de AppHost'ta açık kalanlar: Web henüz `selimbank-api`'ye `WithReference` ile bağlı değil; SelimBank.Api HttpClient'ının resilience ayarı yapılmadı.
+- Taslak planın ayrıntıları ve açık kararlar oturum notunda; onaydan sonra buraya yazılacak.

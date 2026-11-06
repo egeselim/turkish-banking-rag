@@ -1,0 +1,42 @@
+# SelimBank.Api by hand. VS Code: "REST Client" extension (humao.rest-client), then "Send Request" above each block.
+# Visual Studio and Rider support .http files natively.
+# The data is recreated on every start, so a blocked card becomes active again after a restart.
+
+@host = http://localhost:5290
+@customer = 1
+
+### Demo customers (no header needed)
+GET {{host}}/customers
+
+### Accounts of the customer
+GET {{host}}/accounts
+X-Customer-Id: {{customer}}
+
+### Last 5 transactions of account 1
+GET {{host}}/accounts/1/transactions?take=5
+X-Customer-Id: {{customer}}
+
+### Cards (id and last 4 digits only)
+GET {{host}}/cards
+X-Customer-Id: {{customer}}
+
+### Block card 1
+POST {{host}}/cards/1/block
+X-Customer-Id: {{customer}}
+
+### Complaint about a transaction (182 is a card payment of customer 1; the seed is deterministic)
+POST {{host}}/complaints
+X-Customer-Id: {{customer}}
+Content-Type: application/json
+
+{
+  "description": "Bu harcamayı ben yapmadım.",
+  "transactionId": 182
+}
+
+### 401: no header
+GET {{host}}/accounts
+
+### 404: customer 2 asks for customer 1's account
+GET {{host}}/accounts/1/transactions
+X-Customer-Id: 2

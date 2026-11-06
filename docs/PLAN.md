@@ -31,18 +31,18 @@ Directory.Build.props        (net10.0, Nullable, TreatWarningsAsErrors, LangVers
 Directory.Packages.props     (Central Package Management: tüm sürümler burada sabit)
 global.json                  (SDK 10.0.402, test runner: Microsoft.Testing.Platform)
 src/
-  SelimBank.AppHost          Aspire: Qdrant container, FakeBank.Api, Assistant.Web; NIM anahtarını parametre olarak geçirir
+  SelimBank.AppHost          Aspire: Qdrant container, SelimBank.Api, Assistant.Web; NIM anahtarını parametre olarak geçirir
   SelimBank.ServiceDefaults  OTel (traces/metrics/logs), health checks, service discovery, HTTP resilience, PII scrub processor kaydı
   Assistant.Privacy          Saf kütüphane: dedektörler (TCKN, Luhn kart, IBAN mod-97, TR telefon, e-posta), IPiiMasker
   Assistant.Rag              PdfPig okuma, Türkçe normalizasyon, chunking, ingestion, hybrid search, IReranker arayüzü
-  Assistant.Core             NIM sağlayıcı kablolaması, PII dekoratörleri, agent, araçlar, middleware'ler, audit, FakeBank istemcisi
+  Assistant.Core             NIM sağlayıcı kablolaması, PII dekoratörleri, agent, araçlar, middleware'ler, audit, SelimBank istemcisi
   Assistant.Web              Blazor (Interactive Server) sohbet, streaming, onay butonları, demo müşteri seçimi, açılışta ingestion
-  FakeBank.Api               Minimal API + EF Core SQLite + Bogus(tr) seed, sahiplik kontrolü
+  SelimBank.Api              Minimal API + EF Core SQLite + Bogus(tr) seed, sahiplik kontrolü
 tests/
   Assistant.Privacy.Tests    Birim (algoritma, false-positive)
   Assistant.Rag.Tests        Birim (chunking, normalizasyon) + entegrasyon (Testcontainers Qdrant)
   Assistant.Core.Tests       Sahte IChatClient ile agent, onay, audit, sızıntı (leak) testleri, mimari testleri
-  FakeBank.Api.Tests         WebApplicationFactory ile endpoint ve sahiplik testleri
+  SelimBank.Api.Tests        WebApplicationFactory ile endpoint ve sahiplik testleri
 eval/
   questions.jsonl, injection.jsonl, cache/ (offline embedding önbelleği)
   Eval.Runner                Konsol: --subset smoke|full, --mode retrieval|answer, JSON + Markdown rapor
@@ -60,8 +60,8 @@ Privacy      → (hiçbiri)
 Rag          → MEAI.Abstractions, VectorData.Abstractions, PdfPig      (sağlayıcı SDK'sı YOK, Privacy YOK)
 Core         → Privacy, Rag, Microsoft.Agents.AI, MEAI, MEAI.OpenAI, CommunityToolkit.VectorData.Qdrant
 Web          → Core, ServiceDefaults
-FakeBank.Api → ServiceDefaults                                          (Core'u bilmez; Core onu HTTP ile çağırır)
-AppHost      → Web, FakeBank.Api (proje referansı olarak), Aspire.Hosting.Qdrant
+SelimBank.Api → ServiceDefaults                                          (Core'u bilmez; Core onu HTTP ile çağırır)
+AppHost      → Web, SelimBank.Api (proje referansı olarak), Aspire.Hosting.Qdrant
 Eval.Runner  → Core (aynı DI kompozisyonu), MEAI.Evaluation.*
 ```
 
@@ -87,10 +87,10 @@ Neden böyle:
 | Microsoft.Extensions.AI.Evaluation(.Quality, .Reporting) | 10.11.0 | stabil | Groundedness, Relevance, Retrieval, Completeness gibi evaluator'lar; rapor üretimi |
 | PdfPig | 0.1.16 | stabil | PDF metni, harf konumu ve font boyutu (başlık ve madde tespiti için). 0.1.17 alpha **kullanılmayacak** |
 | Bogus | kurulumda doğrulanacak | — | `tr` locale ile sahte müşteri ve işlem verisi; sabit seed |
-| Microsoft.EntityFrameworkCore.Sqlite | 10.0.x, kurulumda doğrulanacak | — | FakeBank veri katmanı |
+| Microsoft.EntityFrameworkCore.Sqlite | 10.0.x, kurulumda doğrulanacak | — | SelimBank veri katmanı |
 | xunit.v3 | 4.0.2 | stabil | Testler; Microsoft Testing Platform modunda (.NET 10 SDK VSTest ile çalıştırmıyor), filtre: `--filter-not-trait` |
 | Testcontainers.Qdrant | kurulumda doğrulanacak | — | Gerçek Qdrant'a karşı hybrid search entegrasyon testi |
-| Microsoft.AspNetCore.Mvc.Testing | 10.0.x | — | FakeBank.Api testleri |
+| Microsoft.AspNetCore.Mvc.Testing | 10.0.x | — | SelimBank.Api testleri |
 
 **Bilerek eklenmeyen paketler:**
 - `Microsoft.Agents.AI.OpenAI` / `.Hosting` / `.AGUI`: Hosting ve AGUI paketleri preview; `ChatClientAgent` zaten çekirdek pakette var.
@@ -127,9 +127,9 @@ Her adımın sonunda `dotnet build` ve `dotnet test` yeşil olmalı. Adım bitin
 
 | # | Görev | Kabul kriteri | Doğrulama |
 |---|---|---|---|
-| 2.1 | FakeBank.Api: Customer, Account, Card, Transaction, Complaint modelleri; sabit seed ile Bogus(tr); endpoint'ler; `X-Customer-Id`'ye göre **sahiplik kontrolü**; AppHost'a eklenmesi | Başkasının kartına ya da hesabına erişimde 404 dönüyor; seed deterministik | WebApplicationFactory testleri |
+| 2.1 | SelimBank.Api: Customer, Account, Card, Transaction, Complaint modelleri; sabit seed ile Bogus(tr); endpoint'ler; `X-Customer-Id`'ye göre **sahiplik kontrolü**; AppHost'a eklenmesi | Başkasının kartına ya da hesabına erişimde 404 dönüyor; seed deterministik | WebApplicationFactory testleri |
 | 2.2 | Core: `ChatClientAgent`, `GetBalance` ve `ListTransactions` araçları, typed HttpClient (Aspire service discovery). **Müşteri kimliği araç parametresi değil:** sunucu tarafındaki oturumdan enjekte edilir | "Son 3 harcamam" sonrası "ikincisi" doğru işlemi buluyor (aynı `AgentSession`) | Sahte chat client'ın script'lediği tool-call'larla çok turlu test; canlı test (Live) |
-| 2.3 | `BlockCard` ve `CreateComplaint` araçları `ApprovalRequiredAIFunction` ile sarılır; Blazor'da `ToolApprovalRequestContent` gelince Onayla/Reddet kartı gösterilir | Onay olmadan API çağrısı **hiç** yapılmıyor; Reddet sonrasında da yapılmıyor; Onayla sonrasında tam bir kez yapılıyor | Core testi: FakeBank HttpHandler çağrı sayacı 0, 0 ve 1; sahte ya da tekrar oynatılmış onay mesajı reddediliyor |
+| 2.3 | `BlockCard` ve `CreateComplaint` araçları `ApprovalRequiredAIFunction` ile sarılır; Blazor'da `ToolApprovalRequestContent` gelince Onayla/Reddet kartı gösterilir | Onay olmadan API çağrısı **hiç** yapılmıyor; Reddet sonrasında da yapılmıyor; Onayla sonrasında tam bir kez yapılıyor | Core testi: SelimBank HttpHandler çağrı sayacı 0, 0 ve 1; sahte ya da tekrar oynatılmış onay mesajı reddediliyor |
 | 2.4 | Function-calling middleware: **audit** (zaman, müşteri takma kimliği, araç, maskelenmiş argüman, sonuç durumu, süre) ayrı bir SQLite tablosuna yazılır. **Yetki savunması:** onay gerektiren araç onaysız gelirse middleware bunu da reddeder (derinlemesine savunma). Agent-run middleware: girdi guard'ı (injection sezgileri, uzunluk) ve çıktı guard'ı (cevapta PII varsa maskeleme) | Her araç çağrısı tam bir audit satırı üretiyor, satırda ham PII yok | Audit testleri; guard birim testleri |
 | 2.5 | Telemetri ve log garantisi: `UseOpenTelemetry` sensitive-data kapalı; ServiceDefaults'a `PiiScrubbingActivityProcessor` (tag ve event'lerde maskeleme) eklenir; kullanıcı metni hiçbir log şablonuna girmez | Kanarya PII'li uçtan uca bir konuşmada hiçbir log satırında, span tag'inde ya da event'te ve hiçbir LLM/embedding girdisinde kanarya geçmiyor | **Sızıntı testi** (Bölüm 5) |
 | 2.6 | injection.jsonl'ın ilk 20 örneği; `ListCards` (kartlar `cardId` ve son 4 haneyle döner) | Injection örneklerinde araç kötüye kullanılmıyor | Canlı test (Live) |
@@ -175,7 +175,7 @@ Her adımın sonunda `dotnet build` ve `dotnet test` yeşil olmalı. Adım bitin
 - **Yetki:** Üç yerde.
   1. Web: demo müşteri seçimi sunucu tarafındaki oturumda tutulur.
   2. Core: `CustomerContext` araçlara DI ile enjekte edilir; LLM'den gelen kimlik parametresi yoktur.
-  3. FakeBank.Api: her endpoint sahiplik kontrolü yapar, başka müşterinin kaynağı için 404 döner.
+  3. SelimBank.Api: her endpoint sahiplik kontrolü yapar, başka müşterinin kaynağı için 404 döner.
 
   LLM ikna edilse bile başka bir müşterinin verisine erişemez.
 - **Injection:** Doküman içeriği ve araç sonuçları prompt'a "veri" olarak işaretlenmiş bloklarla eklenir. Girdi guard'ı kalır, ama asıl güvence yukarıdaki yapısal kontrollerdir. Sonuç injection eval'iyle ölçülür.

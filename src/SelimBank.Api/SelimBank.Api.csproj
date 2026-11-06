@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Bogus" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Plan: SelimBank.Api knows only ServiceDefaults; Core calls it over HTTP. No Assistant.* references. -->
+    <ProjectReference Include="..\SelimBank.ServiceDefaults\SelimBank.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

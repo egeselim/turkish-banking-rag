@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SelimBank.Api\SelimBank.Api.csproj" />
+    <!-- Test-only: the generated identifiers are verified with the same checksums the masker uses. -->
+    <ProjectReference Include="..\..\src\Assistant.Privacy\Assistant.Privacy.csproj" />
+  </ItemGroup>
+</Project>
