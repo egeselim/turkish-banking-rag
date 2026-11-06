@@ -20,6 +20,14 @@ public class ArchitectureTests
     }
 
     [Fact]
+    public void Core_reaches_the_bank_api_over_http_only()
+    {
+        var references = Assembly.Load("Assistant.Core").GetReferencedAssemblies().Select(a => a.Name!);
+
+        Assert.DoesNotContain("SelimBank.Api", references);
+    }
+
+    [Fact]
     public void Privacy_has_no_project_dependencies()
     {
         var references = Assembly.Load("Assistant.Privacy").GetReferencedAssemblies().Select(a => a.Name!);

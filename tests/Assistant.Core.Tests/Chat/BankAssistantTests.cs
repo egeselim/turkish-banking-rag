@@ -32,7 +32,7 @@ public sealed class BankAssistantTests : IDisposable
         Assert.Equal(["EFT ücreti ne kadar?"], _retriever.Queries);
         Assert.Equal([1, 2], turn.Sources.Select(s => s.Number));
         string instructions = _model.Options!.Instructions!;
-        Assert.Contains("Yalnızca KAYNAKLAR bölümündeki bilgilere dayanarak", instructions, StringComparison.Ordinal);
+        Assert.Contains("yalnızca KAYNAKLAR bölümündeki bilgilere dayanarak", instructions, StringComparison.Ordinal);
         Assert.Contains("[1] Selim Bank Bireysel Ücret ve Komisyon Tarifesi · Madde 4 – EFT Ücretleri · s. 1", instructions, StringComparison.Ordinal);
         Assert.Contains("6,50 TL", instructions, StringComparison.Ordinal);
         Assert.Contains("[2] KİŞİSEL VERİLERİN KORUNMASI KANUNU · Madde 11 – İlgili kişinin hakları · s. 5–6", instructions, StringComparison.Ordinal);
@@ -41,7 +41,7 @@ public sealed class BankAssistantTests : IDisposable
     [Fact]
     public async Task Follow_up_sees_the_earlier_question_but_not_earlier_sources()
     {
-        var session = await _assistant.CreateSessionAsync(TestContext.Current.CancellationToken);
+        var session = await _assistant.CreateSessionAsync(cancellationToken: TestContext.Current.CancellationToken);
         await DrainAsync(await _assistant.AskAsync(session, "EFT ücreti ne kadar?", TestContext.Current.CancellationToken));
         await DrainAsync(await _assistant.AskAsync(session, "Peki şubeden?", TestContext.Current.CancellationToken));
 
@@ -66,7 +66,7 @@ public sealed class BankAssistantTests : IDisposable
     public async Task Streams_the_model_answer()
     {
         var turn = await _assistant.AskAsync(
-            await _assistant.CreateSessionAsync(TestContext.Current.CancellationToken), "EFT?", TestContext.Current.CancellationToken);
+            await _assistant.CreateSessionAsync(cancellationToken: TestContext.Current.CancellationToken), "EFT?", TestContext.Current.CancellationToken);
 
         Assert.Equal("tamam", await DrainAsync(turn));
     }
@@ -75,7 +75,7 @@ public sealed class BankAssistantTests : IDisposable
 
     private async Task<AssistantTurn> AskAsync(string question)
     {
-        var session = await _assistant.CreateSessionAsync(TestContext.Current.CancellationToken);
+        var session = await _assistant.CreateSessionAsync(cancellationToken: TestContext.Current.CancellationToken);
         var turn = await _assistant.AskAsync(session, question, TestContext.Current.CancellationToken);
         await DrainAsync(turn);
         return turn;

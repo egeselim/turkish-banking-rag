@@ -1,3 +1,4 @@
+using Assistant.Core.Banking;
 using Assistant.Rag.Search;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,10 +8,14 @@ namespace Assistant.Core.Chat;
 
 public static class ChatServiceCollectionExtensions
 {
-    /// <summary>Registers <see cref="BankAssistant"/> over the (PII-masking) main chat client and the retriever.</summary>
+    /// <summary>
+    /// Registers <see cref="BankAssistant"/> over the (PII-masking) main chat client and the retriever.
+    /// Banking tools are available when <see cref="SelimBankClient"/> is registered (AddSelimBankClient).
+    /// </summary>
     public static IServiceCollection AddBankAssistant(this IServiceCollection services) =>
         services.AddSingleton(sp => new BankAssistant(
             sp.GetRequiredService<IChatClient>(),
             sp.GetRequiredService<IDocumentRetriever>(),
-            sp.GetService<ILoggerFactory>()));
+            sp.GetService<ILoggerFactory>(),
+            sp.GetService<SelimBankClient>()));
 }

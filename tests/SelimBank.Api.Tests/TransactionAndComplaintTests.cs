@@ -45,6 +45,31 @@ public class TransactionAndComplaintTests(SelimBankApiFactory factory) : IClassF
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    [Theory]
+    [InlineData("out")]
+    [InlineData("in")]
+    public async Task Direction_filters_spending_or_income(string direction)
+    {
+        using var client = factory.CreateClientFor(1);
+        int accountId = (await client.GetJsonAsync<List<AccountDto>>("/accounts"))[0].Id;
+
+        var transactions = await client.GetJsonAsync<List<TransactionDto>>(
+            $"/accounts/{accountId}/transactions?take={BankEndpoints.MaxTake}&direction={direction}");
+
+        Assert.NotEmpty(transactions);
+        Assert.All(transactions, t => Assert.True(direction == "out" ? t.Amount < 0 : t.Amount > 0, $"{t.Id}: {t.Amount}"));
+    }
+
+    [Fact]
+    public async Task Unknown_direction_returns_400()
+    {
+        using var client = factory.CreateClientFor(1);
+
+        using var response = await client.GetAsync(new Uri("/accounts/1/transactions?direction=sideways", UriKind.Relative), Ct);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     [Fact]
     public async Task Card_spending_shows_the_card_last_four_digits()
     {

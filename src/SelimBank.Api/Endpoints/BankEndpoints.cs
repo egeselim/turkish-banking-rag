@@ -37,8 +37,9 @@ public static class BankEndpoints
         return TypedResults.Ok(accounts.Select(a => a.ToDto()).ToList());
     }
 
+    /// <param name="direction"><c>out</c>: spending only, <c>in</c>: income only, omitted: both.</param>
     private static async Task<Results<Ok<List<TransactionDto>>, ValidationProblem, ProblemHttpResult>> ListTransactions(
-        int id, int? take, CurrentCustomer customer, SelimBankDbContext db, CancellationToken ct)
+        int id, int? take, string? direction, CurrentCustomer customer, SelimBankDbContext db, CancellationToken ct)
     {
         int count = take ?? DefaultTake;
         if (count is < 1 or > MaxTake)
@@ -49,14 +50,29 @@ public static class BankEndpoints
             });
         }
 
+        if (direction is not (null or "out" or "in"))
+        {
+            return TypedResults.ValidationProblem(new Dictionary<string, string[]>
+            {
+                ["direction"] = ["direction 'out' (harcama) ya da 'in' (gelir) olmalı."],
+            });
+        }
+
         var account = await db.Accounts.SingleOrDefaultAsync(a => a.Id == id && a.CustomerId == customer.Id, ct);
         if (account is null)
         {
             return NotFound();
         }
 
-        var transactions = await db.Transactions
-            .Where(t => t.AccountId == account.Id)
+        var query = db.Transactions.Where(t => t.AccountId == account.Id);
+        query = direction switch
+        {
+            "out" => query.Where(t => t.Amount < 0),
+            "in" => query.Where(t => t.Amount > 0),
+            _ => query,
+        };
+
+        var transactions = await query
             .OrderByDescending(t => t.TimestampUtc)
             .ThenByDescending(t => t.Id)
             .Take(count)

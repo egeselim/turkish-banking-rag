@@ -1,3 +1,4 @@
+using Assistant.Core.Banking;
 using Assistant.Core.Chat;
 using Assistant.Core.Models;
 using Assistant.Core.Retrieval;
@@ -10,10 +11,12 @@ builder.AddServiceDefaults();
 // Qdrant connection comes from the AppHost ("qdrant" resource).
 builder.AddQdrantClient("qdrant");
 
+// SelimBank.Api is reached through Aspire service discovery ("selimbank-api" resource).
 builder.Services
     .AddNimModels(builder.Configuration)
     .AddRag()
     .AddSourceIngestion(builder.Configuration)
+    .AddSelimBankClient(builder.Configuration)
     .AddBankAssistant();
 
 // Add services to the container.

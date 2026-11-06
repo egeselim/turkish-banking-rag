@@ -1,10 +1,12 @@
-﻿@page "/"
+@page "/"
 @rendermode InteractiveServer
 @implements IDisposable
+@using System.Globalization
+@using Assistant.Core.Banking
 @using Assistant.Core.Chat
 @using Assistant.Core.Retrieval
-@using Microsoft.Agents.AI
 @inject BankAssistant Assistant
+@inject SelimBankClient Bank
 @inject IngestionStatus Ingestion
 @inject ILogger<Home> Logger
 
@@ -14,6 +16,21 @@
     <header class="chat-header">
         <h1>Selim Bank Asistanı</h1>
         <p>Kurgusal bir banka için hazırlanmış portföy projesi. Gerçek müşteri verisi kullanmayın.</p>
+        <label class="customer">
+            Demo müşteri:
+            @* The choice lives in this server-side component (Blazor Server circuit), not in the browser. *@
+            <select @onchange="OnCustomerChanged" disabled="@(_busy || _customers is null)">
+                <option value="" selected="@(_customerId is null)">Seçilmedi (yalnızca doküman soruları)</option>
+                @foreach (var customer in _customers ?? [])
+                {
+                    <option value="@customer.Id" selected="@(_customerId == customer.Id)">@customer.Name</option>
+                }
+            </select>
+        </label>
+        @if (_customersFailed)
+        {
+            <p class="status status-error" role="status">Demo müşteri listesi yüklenemedi; doküman soruları çalışmaya devam ediyor.</p>
+        }
     </header>
 
     @if (Ingestion.State != IngestionState.Ready)
@@ -27,9 +44,12 @@
         @if (_entries.Count == 0)
         {
             <div class="empty">
-                <p>Ücretler, kart sözleşmesi, sık sorulan sorular veya KVKK hakkında sorun.</p>
+                <p>
+                    Ücretler, kart sözleşmesi, sık sorulan sorular veya KVKK hakkında sorun.
+                    @(_customerId is null ? "Hesap soruları için yukarıdan bir demo müşteri seçin." : "Seçili müşterinin bakiyesini ve işlemlerini de sorabilirsiniz.")
+                </p>
                 <ul>
-                    @foreach (string example in Examples)
+                    @foreach (string example in _customerId is null ? Examples : [.. AccountExamples, .. Examples])
                     {
                         <li><button type="button" class="example" disabled="@(!CanSend)" @onclick="() => AskExampleAsync(example)">@example</button></li>
                     }
@@ -72,14 +92,46 @@
         "Bankanın hakkımda tuttuğu bilgileri öğrenebilir miyim?",
     ];
 
+    private static readonly string[] AccountExamples =
+    [
+        "Bakiyem ne kadar?",
+        "Son 3 harcamam neler?",
+    ];
+
     private readonly List<ChatEntry> _entries = [];
-    private AgentSession? _session;
+    private IReadOnlyList<BankCustomer>? _customers;
+    private bool _customersFailed;
+    private int? _customerId;
+    private AssistantSession? _session;
     private string _input = "";
     private bool _busy;
 
     private bool CanSend => !_busy && Ingestion.State == IngestionState.Ready;
 
-    protected override void OnInitialized() => Ingestion.Changed += OnIngestionChanged;
+    protected override async Task OnInitializedAsync()
+    {
+        Ingestion.Changed += OnIngestionChanged;
+        try
+        {
+            _customers = await Bank.GetCustomersAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Loading demo customers failed");
+            _customersFailed = true;
+        }
+    }
+
+    /// <summary>A new customer starts a new conversation: history and tools never mix customers.</summary>
+    private void OnCustomerChanged(ChangeEventArgs e)
+    {
+        _customerId = int.TryParse(e.Value as string, NumberStyles.None, CultureInfo.InvariantCulture, out int id)
+            && _customers?.Any(c => c.Id == id) == true
+                ? id
+                : null;
+        _session = null;
+        _entries.Clear();
+    }
 
     private Task AskExampleAsync(string example)
     {
@@ -103,7 +155,7 @@
 
         try
         {
-            _session ??= await Assistant.CreateSessionAsync();
+            _session ??= await Assistant.CreateSessionAsync(_customerId);
             var turn = await Assistant.AskAsync(_session, question);
             await foreach (string part in turn.Text)
             {

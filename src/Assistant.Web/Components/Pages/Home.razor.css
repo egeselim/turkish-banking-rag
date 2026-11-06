@@ -26,6 +26,21 @@
     color: #616e7c;
 }
 
+.customer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.customer select {
+    padding: 6px 8px;
+    border: 1px solid #cbd2d9;
+    border-radius: 8px;
+    font: inherit;
+}
+
 .status {
     margin-top: 12px;
     padding: 10px 14px;
