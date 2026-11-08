@@ -1,9 +1,11 @@
 using System.Text;
+using Assistant.Core.Audit;
 using Assistant.Core.Banking;
 using Assistant.Core.Chat;
 using Assistant.Core.Models;
 using Assistant.Core.Retrieval;
 using Assistant.Core.Tests.Banking;
+using Assistant.Core.Tests.Safety;
 using Assistant.Rag.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Qdrant.Client;
@@ -21,6 +23,7 @@ public sealed class BankAssistantLiveTests : IAsyncLifetime
 {
     private readonly QdrantContainer _qdrant = new QdrantBuilder("qdrant/qdrant:v1.18.0").Build();
     private readonly SelimBankApiFactory _api = new();
+    private readonly InMemoryAuditLog _audit = new();
     private readonly StringBuilder _transcript = new();
     private ServiceProvider _services = null!;
     private BankAssistant _assistant = null!;
@@ -34,6 +37,8 @@ public sealed class BankAssistantLiveTests : IAsyncLifetime
             .AddSingleton(new QdrantClient(new Uri(_qdrant.GetGrpcConnectionString())))
             .AddRag()
             .AddInMemorySelimBank(_api)
+            .AddSingleton<IAuditLog>(_audit)
+            .AddAuditLog(LiveSettings.Configuration)
             .AddBankAssistant()
             .BuildServiceProvider();
 
@@ -126,6 +131,12 @@ public sealed class BankAssistantLiveTests : IAsyncLifetime
         await RespondAsync(session, approval, approve: true);
 
         Assert.Equal(SelimBank.Api.Data.CardStatus.Blocked, _api.Query(db => db.Cards.Single(c => c.Id == 1).Status));
+
+        // Step 2.4 acceptance with the real model: the approved call left one masked audit row, under a pseudonym.
+        var row = Assert.Single(_audit.Entries, e => e.Action == BankingTools.BlockCardName);
+        Assert.Equal(AuditOutcome.Succeeded, row.Outcome);
+        Assert.Matches("^[0-9a-f]{16}$", row.CustomerPseudonym);
+        Assert.All(_audit.Entries, e => Assert.DoesNotContain(_api.Query(db => db.Cards.Single(c => c.Id == 1).Number), e.MaskedArguments, StringComparison.Ordinal));
     }
 
     [Fact]

@@ -14,7 +14,7 @@ var selimBankApi = builder.AddProject<Projects.SelimBank_Api>("selimbank-api")
 // The source PDFs live in the repository (docs/sources); the web app ingests them at startup.
 string sourcesPath = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "..", "docs", "sources"));
 
-builder.AddProject<Projects.Assistant_Web>("web")
+var web = builder.AddProject<Projects.Assistant_Web>("web")
     .WithReference(qdrant)
     .WaitFor(qdrant)
     .WithReference(selimBankApi)
@@ -22,5 +22,13 @@ builder.AddProject<Projects.Assistant_Web>("web")
     .WithEnvironment("Nim__ApiKey", nimApiKey)
     .WithEnvironment("Rag__SourcesPath", sourcesPath)
     .WithExternalHttpEndpoints();
+
+// Optional (see README): without it the web app uses a random key and logs a warning.
+if (!string.IsNullOrWhiteSpace(builder.Configuration["Audit:PseudonymKey"]))
+{
+    web.WithEnvironment(
+        "Audit__PseudonymKey",
+        builder.AddParameterFromConfiguration("audit-pseudonym-key", "Audit:PseudonymKey", secret: true));
+}
 
 builder.Build().Run();

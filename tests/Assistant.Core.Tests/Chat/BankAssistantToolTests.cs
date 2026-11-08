@@ -2,6 +2,7 @@ using System.Text.Json;
 using Assistant.Core.Banking;
 using Assistant.Core.Chat;
 using Assistant.Core.Tests.Banking;
+using Assistant.Core.Tests.Safety;
 using Assistant.Rag.Search;
 using Microsoft.Extensions.AI;
 using SelimBank.Api.Tests;
@@ -106,7 +107,7 @@ public sealed class BankAssistantToolTests(SelimBankApiFactory api) : IClassFixt
         Assert.Equal("23.10.2026 15:43", BankingTools.LocalTime(new DateTime(2026, 10, 23, 12, 43, 0, DateTimeKind.Utc)));
 
     private BankAssistant CreateAssistant(IChatClient model) =>
-        new(model, new EmptyRetriever(), bank: BankingTestHost.CreateClient(api));
+        new(model, new EmptyRetriever(), bank: BankingTestHost.CreateClient(api), audit: new InMemoryAuditLog().CreateTrail());
 
     private async Task<IReadOnlyList<BankTransaction>> LatestSpendingAsync(int customerId, int count)
     {

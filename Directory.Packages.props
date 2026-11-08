@@ -45,6 +45,8 @@
 
   <ItemGroup Label="Data">
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
+    <!-- Audit kaydı (Assistant.Core): tek tablo, EF gerekmiyor. -->
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.14" />
     <!-- SelimBank.Api seed'i ve test verisi (yalnızca sentetik veri). -->
     <PackageVersion Include="Bogus" Version="35.6.5" />
   </ItemGroup>

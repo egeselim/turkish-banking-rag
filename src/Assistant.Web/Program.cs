@@ -1,3 +1,4 @@
+using Assistant.Core.Audit;
 using Assistant.Core.Banking;
 using Assistant.Core.Chat;
 using Assistant.Core.Models;
@@ -17,6 +18,7 @@ builder.Services
     .AddRag()
     .AddSourceIngestion(builder.Configuration)
     .AddSelimBankClient(builder.Configuration)
+    .AddAuditLog(builder.Configuration)
     .AddBankAssistant();
 
 // Add services to the container.

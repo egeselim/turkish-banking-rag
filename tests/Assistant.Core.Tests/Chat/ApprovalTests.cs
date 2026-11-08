@@ -1,6 +1,7 @@
 using Assistant.Core.Banking;
 using Assistant.Core.Chat;
 using Assistant.Core.Tests.Banking;
+using Assistant.Core.Tests.Safety;
 using Assistant.Rag.Search;
 using Microsoft.Extensions.AI;
 using SelimBank.Api.Tests;
@@ -195,7 +196,8 @@ public sealed class ApprovalTests : IAsyncLifetime
         var turn = await AskAsync(assistant, session, "Kartlarım neler?");
 
         Assert.Empty(turn.Approvals);
-        var approvalRequired = model.Calls[0].Options!.Tools!.OfType<ApprovalRequiredAIFunction>().Select(t => t.Name);
+        // Looked up through GetService: the function middleware wraps each tool in its own delegating function.
+        var approvalRequired = model.Calls[0].Options!.Tools!.Where(t => t.GetService<ApprovalRequiredAIFunction>() is not null).Select(t => t.Name);
         Assert.Equal([BankingTools.BlockCardName, BankingTools.CreateComplaintName], approvalRequired);
         string cards = Assert.Single(model.ToolResultsSentIn(1));
         Assert.Contains("9280", cards, StringComparison.Ordinal);
@@ -204,7 +206,8 @@ public sealed class ApprovalTests : IAsyncLifetime
 
     private async Task<(BankAssistant, AssistantSession)> StartAsync(IChatClient model)
     {
-        var assistant = new BankAssistant(model, new EmptyRetriever(), bank: BankingTestHost.CreateClient(_api, _counter));
+        var assistant = new BankAssistant(
+            model, new EmptyRetriever(), bank: BankingTestHost.CreateClient(_api, _counter), audit: new InMemoryAuditLog().CreateTrail());
         return (assistant, await assistant.CreateSessionAsync(Customer, Ct));
     }
 

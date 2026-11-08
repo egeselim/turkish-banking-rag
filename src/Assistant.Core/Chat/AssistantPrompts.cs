@@ -8,6 +8,13 @@ public static class AssistantPrompts
 {
     public const string NotFoundAnswer = "Bu konuda dokümanlarımızda bilgi bulamadım.";
 
+    /// <summary>Shown when the input guard stops a message; the model is not called.</summary>
+    public const string InputBlockedMessage =
+        "Üzgünüm, bu mesajı güvenlik nedeniyle işleme alamıyorum. Hesaplarınız, kartlarınız veya ücretlerimizle ilgili sorunuzu yazarsanız memnuniyetle yardımcı olurum.";
+
+    public const string InputTooLongMessage =
+        "Üzgünüm, mesajınız çok uzun olduğu için işleme alamıyorum. Sorunuzu kısaltarak yeniden yazarsanız memnuniyetle yardımcı olurum.";
+
     public const string System = $"""
         Sen Selim Bank'ın dijital asistanısın. Selim Bank kurgusal bir bankadır.
 

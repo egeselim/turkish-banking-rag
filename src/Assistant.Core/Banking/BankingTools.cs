@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.ComponentModel;
 using System.Globalization;
 using System.Text.Json;
@@ -21,6 +22,9 @@ internal sealed class BankingTools(SelimBankClient bank, int customerId)
     public const string BlockCardName = "BlockCard";
     public const string CreateComplaintName = "CreateComplaint";
 
+    /// <summary>Tools that need the customer's approval; both the wrapper below and <c>ToolGuard</c> go by this list.</summary>
+    public static readonly FrozenSet<string> IrreversibleTools = FrozenSet.ToFrozenSet([BlockCardName, CreateComplaintName]);
+
     /// <summary>
     /// Irreversible tools are wrapped in <see cref="ApprovalRequiredAIFunction"/>: the function-invoking layer does not
     /// run them but surfaces a <see cref="ToolApprovalRequestContent"/>, and Agent Framework's approval-response
@@ -29,16 +33,22 @@ internal sealed class BankingTools(SelimBankClient bank, int customerId)
     /// </summary>
     public IList<AITool> Create() =>
     [
+        .. CreateFunctions().Select(f => IrreversibleTools.Contains(f.Name) ? new ApprovalRequiredAIFunction(f) : (AITool)f),
+    ];
+
+    /// <summary>The plain functions, without the approval wrapper. Tests use this to prove that ToolGuard stands on its own.</summary>
+    internal IReadOnlyList<AIFunction> CreateFunctions() =>
+    [
         AIFunctionFactory.Create(GetBalanceAsync, "GetBalance",
             "Müşterinin hesaplarını ve güncel bakiyelerini getirir."),
         AIFunctionFactory.Create(ListTransactionsAsync, "ListTransactions",
             "Müşterinin son hesap hareketlerini yeniden eskiye doğru getirir. Sonuçtaki 'number' alanı listedeki sıradır."),
         AIFunctionFactory.Create(ListCardsAsync, "ListCards",
             "Müşterinin kartlarını getirir: cardId, tür, son 4 hane ve durum."),
-        new ApprovalRequiredAIFunction(AIFunctionFactory.Create(BlockCardAsync, BlockCardName,
-            "Müşterinin bir kartını kalıcı olarak bloke eder (geri alınamaz). cardId'yi ListCards'tan al.")),
-        new ApprovalRequiredAIFunction(AIFunctionFactory.Create(CreateComplaintAsync, CreateComplaintName,
-            "Müşteri adına şikâyet veya işlem itirazı kaydı açar. İtiraz bir işlemle ilgiliyse transactionId'yi ListTransactions'tan al.")),
+        AIFunctionFactory.Create(BlockCardAsync, BlockCardName,
+            "Müşterinin bir kartını kalıcı olarak bloke eder (geri alınamaz). cardId'yi ListCards'tan al."),
+        AIFunctionFactory.Create(CreateComplaintAsync, CreateComplaintName,
+            "Müşteri adına şikâyet veya işlem itirazı kaydı açar. İtiraz bir işlemle ilgiliyse transactionId'yi ListTransactions'tan al."),
     ];
 
     /// <summary>

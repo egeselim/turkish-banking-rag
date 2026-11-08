@@ -15,8 +15,35 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 2.1 SelimBank.Api | Tamam | Çevrimdışı 150/150 (Api 35); AppHost'ta selimbank-api sağlıklı, uçlar curl ile denendi |
 | 2.2 Agent araçları (GetBalance, ListTransactions) | Tamam | Çevrimdışı 168/168; Live 6/6 ("son 3 harcamam" → "ikincisi" doğru); smoke Hybrid Hit@1 10/10 (değişmedi) |
 | 2.3 BlockCard, CreateComplaint, ListCards + onay | Tamam (arayüzde onay kartı elle denenmedi) | Çevrimdışı 179/179; POST sayacı 0/0/1, sahte/tekrar/değiştirilmiş onay çalışmıyor; Live 8/8; smoke Hybrid Hit@1 10/10 |
+| 2.4 Audit, ikinci onay kontrolü, girdi/çıktı koruması | Tamam (arayüzde elle denenmedi) | Çevrimdışı 245/245; Live 8/8; smoke Hybrid Hit@1 10/10 (değişmedi) |
 
 ## Günlük
+
+### 2026-11-08 (oturum 9): 2.4
+- **Kullanıcı kararları:**
+  - Takma kimlik HMAC-SHA256 ile üretiliyor. Anahtar `Audit:PseudonymKey`; kullanıcı AppHost'un user-secrets'ına ekleyecek (nasıl yapılacağı README'de). Anahtar yoksa rastgele anahtar ve uyarı.
+  - Injection kalıbı yakalanınca mesaj engelleniyor, model çağrılmıyor, audit'e yazılıyor, kullanıcı nazik bir Türkçe ret mesajı görüyor.
+- **Doğrulanan API (AF 1.26 XML dokümanı):** `AIAgent.AsBuilder().Use(...)` hem araç çağrısı (`FunctionInvocationContext`) hem de çalıştırma (`runStreamingFunc`) middleware'i ekliyor. Middleware araçları kendi sarmalayıcısına alıyor; bu yüzden `ApprovalRequiredAIFunction` artık `OfType` ile değil `GetService` ile bulunuyor. `FunctionInvokingChatClient.AdditionalTools` middleware'den geçmez; kullanmıyoruz, kullanılmamalı.
+- **Audit (`Core/Audit`):**
+  - `AuditTrail` tek yazma yolu: argümanları kendi maskeliyor, müşteriyi kendi takma kimliğe çeviriyor. Değerler JSON'a çevrilmeden önce tek tek maskeleniyor, çünkü kaçışlı metin dedektörden kaçabilir.
+  - `SqliteAuditLog`: asistanın kendi dosyası (`Audit:ConnectionString`, varsayılan `audit.db`, git dışı). Banka veritabanı her açılışta sıfırlandığı için ayrı. EF yerine `Microsoft.Data.Sqlite` (10.0.14).
+  - Sonuç değerleri: `Succeeded`, `NotFound`, `Failed`, `Rejected`, `Cancelled`, `Denied`, `InputBlocked`. Araç sonucu saklanmıyor.
+  - Reddedilen ve iptal edilen çağrılar hiç çalışmadığı için middleware görmüyor; bu satırları `BankAssistant` yazıyor.
+  - Müşteri oturumu audit olmadan açılamıyor (`InvalidOperationException`).
+  - Yazma hatası yutuluyor ve yalnızca işlem adı, sonuç ve hata türüyle loglanıyor: banka işlemi o noktada yapılmış olur, modele "başarısız" demek yanlış olurdu.
+- **İkinci onay kontrolü (`Chat/ToolGuard`):** Her tur için kuruluyor. `BankingTools.IrreversibleTools` listesindeki bir araç, yalnızca bu oturumda sunulan bir isteğe bu turda verilmiş onayla ve gösterilen argümanlarla çalışıyor; onay bir kez harcanıyor. Kontrol ada göre yapıldığı için sarmalayıcı unutulsa da çalışıyor: test sarmalayıcısız kaydedilen `BlockCard`'ın POST sayısını 0 olarak gösteriyor.
+- **Girdi koruması (`Safety/InputGuard`):** 2000 karakter sınırı ve kısa bir kalıp listesi (Türkçe, İngilizce, sahte rol etiketleri); Türkçe harfler, büyük/küçük harf ve görünmez karakterler sadeleştirilerek eşleşiyor. "Otomatik ödeme talimatımı iptal et" ve "şifremi unuttum" gibi cümlelerin geçtiği test ediliyor.
+  - **Plandan sapma:** Middleware'de değil `AskAsync`'in başında çalışıyor, çünkü retrieval soruyu agent çalışmadan önce embedding modeline gönderiyor. Middleware'de olsaydı engellenen mesaj yine dışarı çıkardı.
+  - Engellenen mesaj geçmişe girmiyor; audit'e metni değil yalnızca kural adı yazılıyor.
+- **Çıktı koruması (`Safety/PiiStreamFilter` + çalıştırma middleware'i):** Cevabın son 64 karakteri, bir sonraki parça gelene kadar bekletiliyor; kesim boşlukta yapılıyor. Test, kart numarasını her olası noktadan ikiye bölüyor. Onay kartı metni de maskeleniyor, çünkü modelin yazdığı şikâyet açıklamasını içeriyor.
+- **AppHost:** Anahtar varsa `Audit__PseudonymKey` ortam değişkeni olarak gizli parametreyle geçiyor; yoksa parametre hiç eklenmiyor, dashboard eksik parametre için durmuyor.
+- **Test (çevrimdışı 245/245, öncekinden +66):** `AuditPseudonymizerTests`, `AuditTrailTests`, `SqliteAuditLogTests`, `InputGuardTests`, `PiiStreamFilterTests`, `AssistantSafetyTests`. Testler koddan önce yazıldı (ilk durum: derleme hatası).
+- **Canlı:** Live 8/8; gerçek modelle bloke akışında tek `Succeeded` satırı, takma kimlikle. Smoke: Hybrid Hit@1 10/10, connector 6/10 (daha önce 9/10 ve 7/10; connector oynak, bizim hybrid değişmedi). Sistem prompt'u değişmedi.
+- **Bilinen sınırlar:**
+  - Arayüzde engelleme mesajı ve gerçek `audit.db` satırları elle denenmedi; SQLite yazımı DI üzerinden testle doğrulandı.
+  - Model var olmayan bir araç adı çağırırsa çağrı middleware'e ulaşmıyor, audit satırı oluşmuyor (çalışan bir şey de yok).
+  - Onay beklerken kullanıcı demo müşteriyi değiştirirse oturum bırakılıyor, `Cancelled` satırı yazılmıyor (işlem çalışmıyor).
+  - Audit yazımı başarısız olursa satır kaybolur, yalnızca hata logu kalır.
 
 ### 2026-11-06 (oturum 8, devam): 2.3
 - **Kullanıcı kararları:** `ListCards` 2.3'e alındı (PLAN güncellendi). Onay bekleyen bir istek varken yeni mesaj yazılırsa Agent Framework'ün varsayılanı geçerli: istek otomatik reddediliyor, arayüzde "İptal edildi" yazıyor.
@@ -243,6 +270,6 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**2.4: Audit log ve araç çağrısı ara katmanı. Henüz planlanmadı.**
-- PLAN'daki kabul kriteri: Her araç çağrısı tam bir audit satırı üretiyor (zaman, müşteri takma kimliği, araç, maskelenmiş argüman, sonuç durumu, süre) ve satırda ham PII yok. Onay gerektiren bir araç onaysız gelirse ara katman bunu da reddediyor (derinlemesine savunma). Girdi ve çıktı guard'ları ekleniyor.
-- Planlamadan önce yapılacak: Agent Framework 1.26'da function-calling middleware'inin (`AsBuilder().Use(...)`) imzasını ve onaylı bir çağrının ara katmanda nasıl ayırt edileceğini kurulu dokümandan doğrulamak.
+**2.5: Telemetri ve log garantisi. Henüz planlanmadı.**
+- PLAN'daki kabul kriteri: Kanarya PII'li uçtan uca bir konuşmada hiçbir log satırında, span tag'inde veya event'inde ve hiçbir LLM/embedding girdisinde kanarya geçmiyor (sızıntı testi).
+- Planlamadan önce yapılacak: Agent Framework ve MEAI telemetri ayarlarını (`UseOpenTelemetry`, sensitive data) ve OpenTelemetry işlemci API'sini kurulu paket dokümanından doğrulamak.

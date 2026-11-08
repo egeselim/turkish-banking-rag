@@ -16,6 +16,9 @@ public sealed class AssistantSession
 {
     private readonly Dictionary<string, ToolApprovalRequestContent> _pending = [];
 
+    // Everything surfaced in the last turn, answered or not; the second approval check (ToolGuard) compares against it.
+    private readonly Dictionary<string, ToolApprovalRequestContent> _issued = [];
+
     internal AssistantSession(AgentSession agentSession, int? customerId)
     {
         AgentSession = agentSession;
@@ -27,7 +30,11 @@ public sealed class AssistantSession
 
     internal AgentSession AgentSession { get; }
 
-    internal void AddPending(ToolApprovalRequestContent request) => _pending[request.RequestId] = request;
+    internal void AddPending(ToolApprovalRequestContent request)
+    {
+        _pending[request.RequestId] = request;
+        _issued[request.RequestId] = request;
+    }
 
     /// <summary>A request can be answered once; afterwards (or for an unknown id) this returns false.</summary>
     internal bool TryTakePending(string id, out ToolApprovalRequestContent request)
@@ -43,8 +50,27 @@ public sealed class AssistantSession
     }
 
     /// <summary>
-    /// Agent Framework rejects every unanswered request on the next run (a new message, or an answer to another
-    /// request); the local copies are dropped at the same time.
+    /// Starts a new run. Agent Framework rejects every unanswered request on the next run (a new message, or an answer
+    /// to another request), so all requests end here. Returns the calls approved by <paramref name="message"/> (only for
+    /// requests issued in this session, with the arguments shown, keyed by call id) and the requests left unanswered.
     /// </summary>
-    internal void ClearPending() => _pending.Clear();
+    internal (Dictionary<string, FunctionCallContent> Approved, IReadOnlyList<ToolApprovalRequestContent> Abandoned) BeginRun(ChatMessage message)
+    {
+        var approved = new Dictionary<string, FunctionCallContent>();
+        foreach (var response in message.Contents.OfType<ToolApprovalResponseContent>().Where(r => r.Approved))
+        {
+            if (_issued.TryGetValue(response.RequestId, out var issued) && issued.ToolCall is FunctionCallContent call)
+            {
+                approved[call.CallId] = call;
+            }
+        }
+
+        // A request answered through the message (below the UI layer) is not abandoned either.
+        var answered = message.Contents.OfType<ToolApprovalResponseContent>().Select(r => r.RequestId).ToHashSet();
+        IReadOnlyList<ToolApprovalRequestContent> abandoned = [.. _pending.Values.Where(r => !answered.Contains(r.RequestId))];
+
+        _pending.Clear();
+        _issued.Clear();
+        return (approved, abandoned);
+    }
 }
