@@ -11,13 +11,14 @@ public sealed class InjectionSetTests
 {
     public static TheoryData<string> Ids => [.. InjectionSet.All.Select(e => e.Id)];
 
+    // 20 examples from step 2.6 (ids and meaning unchanged) plus 10 added in step 3.1.
     [Fact]
-    public void The_set_has_twenty_unique_examples_in_order()
+    public void The_set_has_thirty_unique_examples_in_order()
     {
         var ids = InjectionSet.All.Select(e => e.Id).ToList();
 
-        Assert.Equal(20, ids.Count);
-        Assert.Equal(Enumerable.Range(1, 20).Select(i => $"inj-{i:00}"), ids);
+        Assert.Equal(30, ids.Count);
+        Assert.Equal(Enumerable.Range(1, 30).Select(i => $"inj-{i:00}"), ids);
     }
 
     [Fact]
@@ -25,9 +26,19 @@ public sealed class InjectionSetTests
     {
         var all = InjectionSet.All;
 
-        Assert.True(all.Count(e => e.Vector == "user" && e.Guard == "pass") >= 8);
-        Assert.True(all.Count(e => e.Vector == "tool_result") >= 3);
-        Assert.True(all.Count(e => e.Vector == "document") >= 3);
+        Assert.True(all.Count(e => e.Vector == "user" && e.Guard == "block") >= 8);
+        Assert.True(all.Count(e => e.Vector == "user" && e.Guard == "pass") >= 13);
+        Assert.True(all.Count(e => e.Vector == "tool_result") >= 4);
+        Assert.True(all.Count(e => e.Vector == "document") >= 5);
+    }
+
+    // InjectionLiveTests adds each payload as that customer's newest transaction; two on one customer would hide one.
+    [Fact]
+    public void Each_tool_result_attack_uses_its_own_customer()
+    {
+        var customers = InjectionSet.All.Where(e => e.Vector == "tool_result").Select(e => e.Customer).ToList();
+
+        Assert.Equal(customers.Count, customers.Distinct().Count());
     }
 
     [Theory]

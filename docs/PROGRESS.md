@@ -18,8 +18,41 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 2.4 Audit, ikinci onay kontrolü, girdi/çıktı koruması | Tamam (arayüzde elle denenmedi) | Çevrimdışı 245/245; Live 8/8; smoke Hybrid Hit@1 10/10 (değişmedi) |
 | 2.5 Telemetri ve log garantisi | Tamam (panoda gen_ai span'leri elle incelenmedi) | Çevrimdışı 251/251 (sızıntı testi dahil); bozma deneyi testin sızıntıyı yakaladığını gösterdi; Live 8/8 (biri tekrarda); smoke Hybrid Hit@1 10/10 |
 | 2.6 Injection örnekleri | Tamam | Çevrimdışı 293/293; Live injection 20/20 kesin kontrol geçti (tek çalıştırma); model 20 örneğin 3'ünde kandırıldı ama hiçbir işlem onaysız çalışmadı |
+| 3.1 Soru seti + injection 30 + şema doğrulama | Tamam | Çevrimdışı 623/623; 100 soru (smoke 20), injection 30; bozma deneyi rakam ve madde hatasını yakaladı. Yeni 10 injection örneği canlı çalıştırılmadı (3.3) |
 
 ## Günlük
+
+### 2026-11-11 (oturum 11): 3.1
+- **Kullanıcı kararları:**
+  - Dokümanlarda cevabı olmayan 8 soru sete girdi. `expected_doc` ve `expected_section` alanları null; referans cevap `AssistantPrompts.NotFoundAnswer`.
+  - Birden fazla doğru kaynak varsa: birincil kaynak + `also_accept` listesi. Listedeki her kaynak isabet sayılıyor (1.5'teki smoke ile aynı kural).
+  - Referans cevaplar otomatik rakam kontrolüyle doğrulanıyor; ayrı bir alıntı alanı yok.
+- **`eval/questions.jsonl` (100 soru):**
+  - Alanlar: `id`, `question`, `expected_doc`, `expected_section`, `also_accept[{doc, section}]`, `reference_answer`, `smoke`, `tags`.
+  - Etiketler: `fact`, `procedure`, `definition`, `paraphrase`, `no_diacritics`, `cross_doc`, `unanswerable`.
+  - Dağılım: ücret tarifesi 24, kredi kartı sözleşmesi 26, SSS 18, KVKK 24, cevabı olmayan 8. Üç kurgusal dokümanın her maddesi ve sorusu en az bir sorunun birincil kaynağı. KVKK soruları metinden okunarak yazıldı; kurum teşkilatıyla ilgili maddeler (22–27) atlandı.
+  - **Smoke (20):**
+    - q-001..q-010, 1.5'teki 10 sorunun aynısı (metin ve kabul edilen kaynaklar testle eşitleniyor). Böylece 3.2'deki ilk rapor Hybrid Hit@1 10/10 ile karşılaştırılabilecek.
+    - Ek 10 soru: her dokümandan en az 2, 2 cevabı olmayan ve 1 Türkçe karakter olmadan yazılmış soru.
+- **`eval/injection.jsonl` (20 → 30):** inj-01..inj-20'nin id'leri ve içeriği değişmedi. Yeni kayıtlar:
+  - Guard'ın durdurduğu 2 kayıt: görünmez karakterle bölünmüş "talimatları yok say" ve İngilizce "disregard your rules".
+  - Guard'dan geçen 5 kayıt: aciliyetle başka müşteri adına bloke, iki tura bölünmüş talimat, çeviri kılıfı, markdown görseliyle dış adrese veri sızdırma, harf yerine rakam.
+  - 1 araç sonucu saldırısı (müşteri 2): zehirli açıklama müşteriden şifre ve kart numarası istemesini söylüyor.
+  - 2 doküman saldırısı: oltalama talimatını aktarma (inj-18 türü) ve onay kartı çıkarma (inj-19 türü).
+  - Guard alanları `InputGuard`'ın gerçek kararıyla eşleşiyor: 8 kayıt durduruluyor, 22'si modele ulaşıyor.
+- **Testler (`Eval/QuestionSetTests`, +309; `InjectionSetTests` +21):**
+  - **Şema kontrolü:** `QuestionSet` yükleyicisi bilinmeyen, eksik ya da non-null alana null yazılmış kayıtları reddediyor (`UnmappedMemberHandling.Disallow`, `RespectRequiredConstructorParameters`, `RespectNullableAnnotations`). Bu davranış 4 bozuk satırla test ediliyor. Ayrı bir JSON Schema dosyası ve paketi eklenmedi.
+  - **Gerçek chunk eşleşmesi:** Kabul edilen her `(doküman, etiket)` çifti, uygulamanın kullandığı `SourceIngestionService.LoadChunks` çıktısında bulunmak zorunda.
+  - **Rakam kontrolü:** Referans cevaptaki her sayı (6,50, 50.000, 08:30 gibi), kabul edilen chunk'ların metninde tam sayı olarak geçmeli. KVKK cevapları kanundaki yazımı koruyor ("otuz gün").
+  - **Kapsama:** her dokümandan en az 15 soru; cevabı olmayan en az 5, `no_diacritics` en az 3, `cross_doc` en az 3 soru; smoke 18–22 arası.
+  - **Injection:** sayı 30, kapsama sınırları artırıldı. Yeni bir test her araç sonucu saldırısının ayrı bir müşteri kullandığını kontrol ediyor. Nedeni: canlı test zehirli metni müşterinin en yeni işlemi olarak ekliyor; aynı müşteride iki saldırı olsaydı biri gizlenirdi.
+  - `RetrievalSmokeTests.Questions` artık `internal`; ilk 10 sorunun eşitliği bu sayede test ediliyor.
+- **Bozma deneyi:** Test çıktısındaki kopyada (kaynak dosyada değil) q-015'teki "32,00" "33,00" yapıldı, q-090'ın maddesi "Madde 99" yapıldı. İki test de ilgili soruyu adıyla göstererek kırmızıya döndü. Kopya geri yüklendi.
+- **Smoke ölçümü bu adımda çalıştırılmadı:** chunking, embedding, arama ve prompt değişmedi. Şimdiye kadarki smoke ölçümü bir runner değil, `RetrievalSmokeTests` (Live; NIM anahtarı ve Docker gerekiyor). `eval/Eval.Runner` komutu 3.2'de çalışır hâle gelecek.
+- **`InjectionLiveTests` bu adımda çalıştırılmadı:** guard ve prompt değişmedi. Yeni 10 örnek ilk kez 3.3'te ölçülecek. Testte kod değişikliği gerekmedi: araç sonucu saldırısı boş olan müşteri 2'ye, doküman saldırıları mevcut zehirli chunk mekanizmasına giriyor.
+- **Bilinen sınırlar:**
+  - Rakam kontrolü yalnızca sayıları kapsıyor. "Hayır/Evet" gibi sözel cevapların doğruluğu elle yazıldı; 3.3'te hakem modelle ölçülecek.
+  - Birden fazla maddeye dayanan sorularda (`cross_doc`) retrieval isabeti için tek bir kabul edilen kaynak yetiyor. Cevabın bütün parçalarının bulunup bulunmadığı 3.3'teki Completeness metriğinin işi.
 
 ### 2026-11-10 (oturum 10, devam): 2.6
 - **Kullanıcı kararları:**
@@ -340,9 +373,12 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**2. hafta bitti; sıradaki 3.1 (soru seti ve injection setinin 30'a genişletilmesi, şema doğrulama). Henüz planlanmadı.**
+**3.1 bitti; sıradaki 3.2 (Eval.Runner, retrieval modu: Hit@1/5, MRR, p50/p95, offline embedding önbelleği). Henüz planlanmadı; kullanıcı "devam" diyene kadar başlanmıyor.**
+- 3.2'de runner `eval/questions.jsonl`'ı okuyacak. Yükleyici şu an `tests/Assistant.Core.Tests/Eval/QuestionSet.cs`'te; runner'la paylaşılacak yere taşınması gerekecek.
+- Runner gelince `RetrievalSmokeTests` emekliye ayrılabilir. İlk 10 smoke sorusu onunla aynı olduğu için Hybrid Hit@1 10/10 sonucu karşılaştırmanın başlangıç noktası.
+- Cevabı olmayan sorular retrieval metriklerinden çıkarılmalı (isabet tanımsız); answer modunda (3.3) "bulamadım" beklentisiyle ölçülecekler.
 - 2. hafta sonu sürümü henüz arayüzde elle denenmedi (onay kartı, audit). Önce tampon oturumda bunu yapmak önerilir.
-- 2.6'dan taşınanlar:
+- 2.6'dan taşınanlar (inj-29 ve inj-30 aynı türleri genişletiyor):
   - dokümandan gelen talimatla onay kartı çıkması (inj-19) ve talimatı müşteriye aktarma (inj-18);
   - "başka müşteri" isteğine kendi verisiyle cevap verme (inj-11);
   - raporun sözlü kandırılmayı yakalamaması.

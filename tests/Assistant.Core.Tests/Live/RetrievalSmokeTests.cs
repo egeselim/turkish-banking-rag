@@ -23,8 +23,8 @@ namespace Assistant.Core.Tests.Live;
 [Trait("Category", "Live")]
 public sealed class RetrievalSmokeTests : IAsyncLifetime
 {
-    // Any listed (document, label) counts as a correct source.
-    private static readonly (string Question, (string Doc, string Label)[] Accept)[] Questions =
+    // Any listed (document, label) counts as a correct source. Also q-001..q-010 in eval/questions.jsonl (QuestionSetTests).
+    internal static readonly (string Question, (string Doc, string Label)[] Accept)[] Questions =
     [
         ("Başka bankaya mobilden para göndermek kaç lira?", [("ucret-tarifesi", "Madde 4"), ("sss", "Soru 10")]),
         ("Gece yarısı acil para yollamam lazım, anında gitmesi için ne kullanmalıyım?", [("ucret-tarifesi", "Madde 5"), ("sss", "Soru 10"), ("sss", "Soru 11")]),

@@ -140,7 +140,7 @@ Her adımın sonunda `dotnet build` ve `dotnet test` yeşil olmalı. Adım bitin
 
 | # | Görev | Kabul kriteri | Doğrulama |
 |---|---|---|---|
-| 3.1 | `questions.jsonl` (yaklaşık 100 soru; her biri `expected_doc`, `expected_section`, `reference_answer` ve `smoke` bayrağı taşır) ve `injection.jsonl` (yaklaşık 30); şema doğrulama | Her soru gerçek bir chunk'a eşleniyor; smoke alt kümesi yaklaşık 20 soru | Şema ve eşleşme testi |
+| 3.1 | `questions.jsonl` (yaklaşık 100 soru; her biri `expected_doc`, `expected_section`, `reference_answer` ve `smoke` bayrağı taşır) ve `injection.jsonl` (yaklaşık 30); şema doğrulama. 2026-11-11 kararları: `also_accept` (birden fazla doğru kaynak), `tags`, 8 cevabı olmayan soru (`expected_doc` null), referans cevaptaki rakamlar chunk metninde aranır | Her soru gerçek bir chunk'a eşleniyor; smoke alt kümesi yaklaşık 20 soru | Şema ve eşleşme testi (`QuestionSetTests`) |
 | 3.2 | Eval.Runner, retrieval modu: Hit@1/5, MRR, p50/p95 gecikme. Diskte embedding önbelleği (model + metin hash'i, `eval/cache` altında, commit edilir) sayesinde **offline** çalışır. JSON + Markdown rapor; önceki raporla fark | `--subset smoke --mode retrieval` anahtarsız çalışıyor | Runner birim testleri; baseline raporu commit edilir |
 | 3.3 | Answer modu: MEAI.Evaluation ile Groundedness, Relevance ve Completeness (hakem: NIM modeli); token ve maliyet; injection geçme oranı | Tam baseline raporu var | Raporun kendisi; `docs/eval/baseline.md` |
 | 3.4 | **Optimizasyon: re-ranking.** `NimReranker : IReranker`; hybrid top-20 → rerank → top-5. Konfigürasyonla açılıp kapatılabilir. Öncesi/sonrası tablosu ve ADR | Hit@1 ve MRR'deki değişim ile gecikme maliyeti ölçülmüş | Aynı soru setinde iki rapor ve fark tablosu |

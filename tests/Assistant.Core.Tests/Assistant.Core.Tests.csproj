@@ -23,6 +23,7 @@
   <ItemGroup>
     <None Include="..\..\docs\sources\*.pdf" Link="Sources\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\eval\injection.jsonl" Link="Eval\injection.jsonl" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\eval\questions.jsonl" Link="Eval\questions.jsonl" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
