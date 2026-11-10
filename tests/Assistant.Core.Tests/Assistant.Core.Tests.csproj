@@ -26,6 +26,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Assistant.Core\Assistant.Core.csproj" />
+    <!-- The real telemetry setup (PII scrubbers, OTLP exporter) for TelemetryLeakTests. -->
+    <ProjectReference Include="..\..\src\SelimBank.ServiceDefaults\SelimBank.ServiceDefaults.csproj" />
     <!-- Test-only: Core itself reaches the API over HTTP and must not reference it (ArchitectureTests). -->
     <ProjectReference Include="..\..\src\SelimBank.Api\SelimBank.Api.csproj" />
   </ItemGroup>

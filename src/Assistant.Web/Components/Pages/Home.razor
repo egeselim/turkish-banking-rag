@@ -9,6 +9,7 @@
 @inject SelimBankClient Bank
 @inject IngestionStatus Ingestion
 @inject ILogger<Home> Logger
+@inject Assistant.Privacy.IPiiMasker Masker
 
 <PageTitle>Selim Bank Asistanı</PageTitle>
 
@@ -136,7 +137,7 @@
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Loading demo customers failed");
+            WebLogMessages.CustomersFailed(Logger, Masker.Mask(ex.ToString()));
             _customersFailed = true;
         }
     }
@@ -213,8 +214,8 @@
         }
         catch (Exception ex)
         {
-            // Never log the question or answer text: only that the turn failed.
-            Logger.LogError(ex, "Chat turn failed");
+            // Never log the question or answer text; the exception's details are masked first (its message may quote them).
+            WebLogMessages.ChatTurnFailed(Logger, Masker.Mask(ex.ToString()));
             reply.Text = "Şu anda cevap veremiyorum. Lütfen biraz sonra tekrar deneyin.";
             reply.Failed = true;
         }

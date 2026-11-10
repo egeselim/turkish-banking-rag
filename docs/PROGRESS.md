@@ -16,8 +16,40 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 2.2 Agent araçları (GetBalance, ListTransactions) | Tamam | Çevrimdışı 168/168; Live 6/6 ("son 3 harcamam" → "ikincisi" doğru); smoke Hybrid Hit@1 10/10 (değişmedi) |
 | 2.3 BlockCard, CreateComplaint, ListCards + onay | Tamam (arayüzde onay kartı elle denenmedi) | Çevrimdışı 179/179; POST sayacı 0/0/1, sahte/tekrar/değiştirilmiş onay çalışmıyor; Live 8/8; smoke Hybrid Hit@1 10/10 |
 | 2.4 Audit, ikinci onay kontrolü, girdi/çıktı koruması | Tamam (arayüzde elle denenmedi) | Çevrimdışı 245/245; Live 8/8; smoke Hybrid Hit@1 10/10 (değişmedi) |
+| 2.5 Telemetri ve log garantisi | Tamam (panoda gen_ai span'leri elle incelenmedi) | Çevrimdışı 251/251 (sızıntı testi dahil); bozma deneyi testin sızıntıyı yakaladığını gösterdi; Live 8/8 (biri tekrarda); smoke Hybrid Hit@1 10/10 |
 
 ## Günlük
+
+### 2026-11-10 (oturum 10): 2.5
+- **Kullanıcı kararları:**
+  - PII içeren event'i olan span panoya hiç gönderilmiyor (fail closed); bu yalnızca sayaçla izleniyor (`DroppedSpans`).
+  - `ServiceDefaults`, saf `Assistant.Privacy` kütüphanesine referans veriyor. Böylece filtre iki serviste de çalışıyor. `SelimBank.Api` hâlâ hiçbir Assistant.* projesine doğrudan referans vermiyor.
+- **Doğrulanan API (MEAI 10.11, AF 1.26, OpenTelemetry 1.17 XML dokümanı ve küçük bir deneme):**
+  - `EnableSensitiveData` varsayılan olarak kapalı, ama `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=true` onu açıyor. Kodda açıkça verilen değer değişkeni geçersiz kılıyor.
+  - Bitmiş bir span'in adı, etiketleri ve durumu değiştirilebiliyor; event'leri ve link'leri değiştirilemiyor. Etiketler iç listeye kopyalanıyor ve silme API'si yok.
+  - `LogRecord` alanları (mesaj, gövde, alanlar, exception) değiştirilebiliyor; scope'lar değiştirilemiyor.
+- **Core:** Model zinciri `PiiMasking → OpenTelemetry (sensitive=false, kaynak "SelimBank.Assistant") → ham NIM`; embedding için de aynısı. Panoda model çağrıları (model adı, token, süre) ve araç span'leri görünüyor, içerik görünmüyor.
+- **ServiceDefaults:**
+  - `PiiScrubbingActivityProcessor` ve `PiiScrubbingLogProcessor` exporter'dan önce kaydediliyor. Log tarafında exception, maskelenmiş bir `ScrubbedException` ile değiştiriliyor.
+  - `SelimBank.*` kaynakları ve metrikleri dinleniyor.
+- **Web:** `Home.razor`'daki iki hata logu artık exception'ın maskelenmiş ayrıntısını yazıyor. Konsol logu filtreden geçmediği için ham exception oraya gitmiyor.
+- **Sızıntı testi (`Telemetry/TelemetryLeakTests`):**
+  - Gerçek kompozisyonla çalışıyor: ServiceDefaults telemetrisi ve OTLP exporter'ı, NIM SDK'sı, maskeleme, agent, onay, araç, audit. Yalnızca dış uçlar sahte: NIM sunucusu (HTTP) ve OTLP alıcısı (Kestrel).
+  - Kanaryalar `FakePii` ile üretiliyor: TCKN, kart, IBAN, telefon, e-posta ve NIM anahtarı. Model bilerek ham PII'yi araç argümanına ve cevabına koyuyor.
+  - Kontrol edilen yerler: NIM'e giden istekler, Trace seviyesindeki tüm loglar (scope'lar dahil), OTLP izleri, logları ve metrikleri, audit ve kullanıcıya giden cevap. Her kanarya üç biçimde aranıyor: olduğu gibi, yalnızca rakamları ve JSON kaçışlı hali.
+  - Testin gerçekten çalıştığı da kontrol ediliyor: NIM'e `[TCKN]` gitti, panoya chat ve `execute_tool` span'leri ile `gen_ai.client` metrikleri ulaştı.
+  - **Bozma deneyi:**
+    - `EnableSensitiveData = true` yapılınca test yeşil kaldı (span filtresi maskeledi).
+    - Buna ek olarak span filtresi kaldırılınca test kırmızıya döndü ("A canary (11 chars) leaked into OTLP traces").
+    - İki değişiklik de geri alındı.
+  - **Bulgu:** Host kapatılırken log ihracatı yarıda kalıyordu, OTLP'ye hiç log gelmiyordu. Testte üç sağlayıcı kapatmadan önce açıkça boşaltılıyor (`ForceFlush`).
+- **Diğer testler:** Filtrelerin birim testleri (`ScrubbingProcessorTests`); ortam değişkeni açık olsa bile içerik kaydının kapalı kaldığını gösteren `ModelTelemetryTests`.
+- **Canlı:** Live 8/8, ama "Son 3 harcamam" testi ilk çalıştırmada kırmızıydı. Model `kind=all` çağırdı ve listeye maaş girişi girdi. Tekrar çalıştırmada geçti. Telemetriyle ilgisi yok; modelin oynaklığı. 3. haftadaki eval'de izlenmeli. Smoke: Hybrid Hit@1 10/10 (değişmedi), connector 7/10.
+- **AppHost:** Web (müşteri listesi API'den geliyor) ve API sağlıklı açılıyor.
+- **Bilinen sınırlar:**
+  - Panoda gen_ai span'lerini tarayıcıda incelemedim; ihracatı sızıntı testi OTLP üzerinden kanıtlıyor.
+  - Konsol logu filtrelenmiyor. Framework kendi exception'ında PII yazarsa konsolda görünür; panoya giden kopyası maskeleniyor.
+  - Log scope'ları maskelenemiyor; bizimkiler yalnızca istek bilgisi taşıyor.
 
 ### 2026-11-08 (oturum 9): 2.4
 - **Kullanıcı kararları:**
@@ -270,6 +302,6 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**2.5: Telemetri ve log garantisi. Henüz planlanmadı.**
-- PLAN'daki kabul kriteri: Kanarya PII'li uçtan uca bir konuşmada hiçbir log satırında, span tag'inde veya event'inde ve hiçbir LLM/embedding girdisinde kanarya geçmiyor (sızıntı testi).
-- Planlamadan önce yapılacak: Agent Framework ve MEAI telemetri ayarlarını (`UseOpenTelemetry`, sensitive data) ve OpenTelemetry işlemci API'sini kurulu paket dokümanından doğrulamak.
+**2.6: Injection örnekleri (injection.jsonl'ın ilk 20 örneği). Henüz planlanmadı.**
+- PLAN'daki kabul kriteri: Injection örneklerinde araç kötüye kullanılmıyor (canlı test).
+- Planlamadan önce yapılacak: `InputGuard`'ın hangi örnekleri yakaladığını ve hangilerinin modele ulaştığını ayırmak; asıl ölçü, modele ulaşan örneklerde araçların kötüye kullanılmaması.

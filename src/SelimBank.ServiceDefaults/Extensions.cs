@@ -1,3 +1,4 @@
+using Assistant.Privacy;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.ServiceDiscovery;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using SelimBank.ServiceDefaults.Telemetry;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -45,12 +47,20 @@ public static class Extensions
         return builder;
     }
 
+    /// <summary>Our own activity sources and meters (the assistant's model calls: "SelimBank.Assistant").</summary>
+    public const string SelimBankTelemetryPrefix = "SelimBank.*";
+
     public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
+        // The PII scrubbers are added here, before AddOpenTelemetryExporters: processors run in registration order,
+        // so they must come before the exporter (TelemetryLeakTests proves it end to end with a fake OTLP receiver).
+        var masker = new PiiMasker();
+
         builder.Logging.AddOpenTelemetry(logging =>
         {
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
+            logging.AddProcessor(new PiiScrubbingLogProcessor(masker));
         });
 
         builder.Services.AddOpenTelemetry()
@@ -58,11 +68,13 @@ public static class Extensions
             {
                 metrics.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
+                    .AddRuntimeInstrumentation()
+                    .AddMeter(SelimBankTelemetryPrefix);
             })
             .WithTracing(tracing =>
             {
-                tracing.AddSource(builder.Environment.ApplicationName)
+                tracing.AddProcessor(new PiiScrubbingActivityProcessor(masker))
+                    .AddSource(builder.Environment.ApplicationName, SelimBankTelemetryPrefix)
                     .AddAspNetCoreInstrumentation(tracing =>
                         // Exclude health check requests from tracing
                         tracing.Filter = context =>

@@ -16,4 +16,10 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Pure library with no dependencies: the telemetry safety net masks PII in every service (2.5 decision).
+         SelimBank.Api still references no Assistant.* project directly (SelimBank.Api.Tests/ArchitectureTests). -->
+    <ProjectReference Include="..\Assistant.Privacy\Assistant.Privacy.csproj" />
+  </ItemGroup>
+
 </Project>

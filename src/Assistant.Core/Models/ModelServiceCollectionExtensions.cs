@@ -56,17 +56,25 @@ public static class ModelServiceCollectionExtensions
         {
             var (options, http) = Resolve(sp, NimClientFactory.EmbeddingHttpClientName);
             var raw = NimClientFactory.CreateEmbeddingGenerator(options, options.EmbeddingModel, http);
-            return new PiiMaskingEmbeddingGenerator(raw, sp.GetRequiredService<IPiiMasker>());
+            var instrumented = new OpenTelemetryEmbeddingGenerator<string, Embedding<float>>(raw, logger: null, AssistantTelemetry.SourceName)
+            {
+                EnableSensitiveData = false,
+            };
+            return new PiiMaskingEmbeddingGenerator(instrumented, sp.GetRequiredService<IPiiMasker>());
         });
 
         return services;
     }
 
+    // Chain: (function invocation, added by the agent) → PII masking → OpenTelemetry → raw NIM client.
+    // EnableSensitiveData is set explicitly: its default flips to true when OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT
+    // is "true", and an explicit value overrides that variable. Spans then carry model, tokens and timing, never content.
     private static PiiMaskingChatClient CreateChatClient(IServiceProvider sp, Func<NimOptions, string> modelSelector)
     {
         var (options, http) = Resolve(sp, NimClientFactory.HttpClientName);
         var raw = NimClientFactory.CreateChatClient(options, modelSelector(options), http);
-        return new PiiMaskingChatClient(raw, sp.GetRequiredService<IPiiMasker>());
+        var instrumented = new OpenTelemetryChatClient(raw, logger: null, AssistantTelemetry.SourceName) { EnableSensitiveData = false };
+        return new PiiMaskingChatClient(instrumented, sp.GetRequiredService<IPiiMasker>());
     }
 
     private static (NimOptions Options, HttpClient Http) Resolve(IServiceProvider sp, string httpClientName)
