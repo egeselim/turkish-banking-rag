@@ -38,6 +38,9 @@ internal sealed class RequestCounter
 
     public int Posts => Volatile.Read(ref _posts);
 
+    /// <summary>Every request that reached the API: method, path and the customer header it carried.</summary>
+    public System.Collections.Concurrent.ConcurrentQueue<(string Method, string Path, string? Customer)> Requests { get; } = new();
+
     public void CountPost() => Interlocked.Increment(ref _posts);
 }
 
@@ -49,6 +52,11 @@ internal sealed class CountingHandler(RequestCounter counter) : DelegatingHandle
         {
             counter.CountPost();
         }
+
+        string? customer = request.Headers.TryGetValues(SelimBank.Api.Customers.CustomerHeader.Name, out var values)
+            ? string.Join(",", values)
+            : null;
+        counter.Requests.Enqueue((request.Method.Method, request.RequestUri?.AbsolutePath ?? "", customer));
 
         return base.SendAsync(request, cancellationToken);
     }
