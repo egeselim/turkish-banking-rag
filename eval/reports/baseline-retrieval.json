@@ -1,0 +1,2421 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-11-10T21:41:14.1043148+00:00",
+  "subset": "full",
+  "embedding_model": "nvidia/nemotron-3.5-embed-8b",
+  "embedding_dimensions": 4096,
+  "chunk_count": 101,
+  "cache_hits": 303,
+  "cache_added": 0,
+  "questions": [
+    {
+      "id": "q-001",
+      "question": "Ba\u015Fka bankaya mobilden para g\u00F6ndermek ka\u00E7 lira?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.77,
+        "KeywordOnly": 0.13,
+        "Hybrid": 3.37
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 4",
+        "ucret-tarifesi:Madde 12",
+        "sss:Soru 12"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-002",
+      "question": "Gece yar\u0131s\u0131 acil para yollamam laz\u0131m, an\u0131nda gitmesi i\u00E7in ne kullanmal\u0131y\u0131m?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "procedure",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.6,
+        "KeywordOnly": 0.08,
+        "Hybrid": 3.17
+      },
+      "hybrid_top3": [
+        "sss:Soru 11",
+        "sss:Soru 10",
+        "sss:Soru 12"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-003",
+      "question": "Kart\u0131m \u00E7al\u0131nd\u0131, ben fark edene kadar yap\u0131lan harcamalardan ne kadar sorumluyum?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.54,
+        "KeywordOnly": 0.14,
+        "Hybrid": 3.4
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 8",
+        "sss:Soru 1",
+        "kredi-karti-sozlesmesi:Madde 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-004",
+      "question": "Ekstremde tan\u0131mad\u0131\u011F\u0131m bir harcama var, itiraz i\u00E7in ne kadar vaktim var?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.88,
+        "KeywordOnly": 0.36,
+        "Hybrid": 3.46
+      },
+      "hybrid_top3": [
+        "sss:Soru 6",
+        "kredi-karti-sozlesmesi:Madde 9",
+        "sss:Soru 7"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-005",
+      "question": "Platinum kart\u0131n senelik \u00FCcreti ne kadar?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.4,
+        "KeywordOnly": 0.08,
+        "Hybrid": 3.01
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 7",
+        "kredi-karti-sozlesmesi:Madde 15",
+        "sss:Soru 4"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-006",
+      "question": "Asgariyi \u00F6deyemezsem ba\u015F\u0131ma ne gelir?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 2,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.89,
+        "KeywordOnly": 0.06,
+        "Hybrid": 3.48
+      },
+      "hybrid_top3": [
+        "sss:Soru 8",
+        "kredi-karti-sozlesmesi:Madde 13",
+        "sss:Soru 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-007",
+      "question": "Ba\u015Fka bankan\u0131n bankamati\u011Finden para \u00E7ekersem kesinti olur mu?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.64,
+        "KeywordOnly": 0.09,
+        "Hybrid": 3.98
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 9",
+        "sss:Soru 12",
+        "ucret-tarifesi:Madde 4"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-008",
+      "question": "Bilgilerim yurt d\u0131\u015F\u0131ndaki bir \u015Firkete g\u00F6nderilebilir mi?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "procedure",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 2,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 4.68,
+        "KeywordOnly": 0.07,
+        "Hybrid": 4.28
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 9",
+        "kvkk-6698:Madde 9",
+        "kvkk-6698:Madde 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-009",
+      "question": "A\u00E7\u0131k r\u0131za ne anlama geliyor?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "definition"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 3,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 4.87,
+        "KeywordOnly": 0.1,
+        "Hybrid": 3.98
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 3",
+        "kvkk-6698:Madde 9",
+        "kvkk-6698:Madde 5"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-010",
+      "question": "Tatile gittim, kart\u0131m d\u0131\u015Far\u0131da \u00E7al\u0131\u015Fm\u0131yor",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "procedure",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.69,
+        "KeywordOnly": 0.08,
+        "Hybrid": 3.29
+      },
+      "hybrid_top3": [
+        "sss:Soru 5",
+        "kredi-karti-sozlesmesi:Madde 6",
+        "sss:Soru 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-011",
+      "question": "Tarifede yazmayan bir hizmet i\u00E7in benden \u00FCcret al\u0131nabilir mi?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.66,
+        "KeywordOnly": 0.15,
+        "Hybrid": 3.15
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 1",
+        "ucret-tarifesi:Madde 3",
+        "ucret-tarifesi:Madde 11"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-012",
+      "question": "Banka \u00FCcretlere zam yapacaksa beni ne kadar \u00F6nceden haberdar etmek zorunda?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.92,
+        "KeywordOnly": 0.09,
+        "Hybrid": 2.64
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 2",
+        "ucret-tarifesi:Madde 9",
+        "ucret-tarifesi:Madde 12"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-013",
+      "question": "\u00DCcret art\u0131\u015F\u0131n\u0131 kabul etmezsem \u00FCr\u00FCn\u00FCm\u00FC \u00FCcretsiz kapatabilir miyim?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.76,
+        "KeywordOnly": 0.1,
+        "Hybrid": 3.05
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 2",
+        "kredi-karti-sozlesmesi:Madde 15",
+        "sss:Soru 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-014",
+      "question": "Hesab\u0131mda para yoksa i\u015Flem \u00FCcreti nereden kesilir?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": null,
+        "Hybrid": 2
+      },
+      "latency_ms": {
+        "VectorOnly": 3.16,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.71
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 9",
+        "ucret-tarifesi:Madde 3",
+        "ucret-tarifesi:Madde 4"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-015",
+      "question": "\u015Eubeden EFT yaparsam ne kadar \u00F6derim?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.42,
+        "KeywordOnly": 0.04,
+        "Hybrid": 2.45
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 4",
+        "sss:Soru 10",
+        "sss:Soru 11"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-016",
+      "question": "ATM\u0027den ba\u015Fka bankaya EFT \u00FCcreti ne kadar?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.81,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.39
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 4",
+        "ucret-tarifesi:Madde 9",
+        "sss:Soru 10"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-017",
+      "question": "Di\u011Fer bankadaki kendi hesab\u0131ma mobilden para atarsam \u00FCcret \u00F6der miyim?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.88,
+        "KeywordOnly": 0.09,
+        "Hybrid": 2.55
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 4",
+        "ucret-tarifesi:Madde 9",
+        "ucret-tarifesi:Madde 5"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-018",
+      "question": "eft saat kaca kadar yapilabiliyor",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "no_diacritics"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.26,
+        "KeywordOnly": 0.05,
+        "Hybrid": 3.31
+      },
+      "hybrid_top3": [
+        "sss:Soru 11",
+        "ucret-tarifesi:Madde 4",
+        "sss:Soru 10"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-019",
+      "question": "FAST ile en fazla ne kadar para g\u00F6nderebilirim?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 2,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.44,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.59
+      },
+      "hybrid_top3": [
+        "sss:Soru 10",
+        "sss:Soru 11",
+        "ucret-tarifesi:Madde 5"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-020",
+      "question": "Selim Bank i\u00E7indeki ba\u015Fka bir hesaba havale yapmak \u00FCcretli mi?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.61,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.37
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 5",
+        "ucret-tarifesi:Madde 4",
+        "sss:Soru 10"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-021",
+      "question": "Yurt d\u0131\u015F\u0131na para g\u00F6nderirsem komisyon ne olur?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.04,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.7
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 6",
+        "ucret-tarifesi:Madde 4",
+        "sss:Soru 11"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-022",
+      "question": "Yurt d\u0131\u015F\u0131ndan bana gelen paraya kesinti yap\u0131l\u0131yor mu?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.93,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.9
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 6",
+        "sss:Soru 5",
+        "kvkk-6698:Madde 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-023",
+      "question": "Gold kart\u0131n y\u0131ll\u0131k \u00FCcreti ne kadar?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.34,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.83
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 7",
+        "sss:Soru 4",
+        "kredi-karti-sozlesmesi:Madde 15"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-024",
+      "question": "Kart\u0131mla y\u0131lda ne kadar harcarsam aidat \u00F6demem?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 3,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.48,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.91
+      },
+      "hybrid_top3": [
+        "sss:Soru 4",
+        "sss:Soru 9",
+        "kredi-karti-sozlesmesi:Madde 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-025",
+      "question": "Kredi kart\u0131yla nakit avans \u00E7ekersem ne kadar masraf \u00E7\u0131kar?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "cross_doc"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.64,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.34
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 14",
+        "ucret-tarifesi:Madde 8",
+        "ucret-tarifesi:Madde 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-026",
+      "question": "Kart\u0131m k\u0131r\u0131ld\u0131, yenisini istersem \u00FCcret var m\u0131?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": null,
+        "Hybrid": 3
+      },
+      "latency_ms": {
+        "VectorOnly": 2.9,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.63
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 7",
+        "ucret-tarifesi:Madde 9",
+        "ucret-tarifesi:Madde 8"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-027",
+      "question": "Banka kart\u0131 i\u00E7in y\u0131ll\u0131k \u00FCcret al\u0131yor musunuz?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 3,
+        "KeywordOnly": 1,
+        "Hybrid": 2
+      },
+      "latency_ms": {
+        "VectorOnly": 2.48,
+        "KeywordOnly": 0.1,
+        "Hybrid": 3.24
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 7",
+        "ucret-tarifesi:Madde 9",
+        "sss:Soru 4"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-028",
+      "question": "Uzun s\u00FCredir kullanmad\u0131\u011F\u0131m hesab\u0131mdan \u00FCcret kesilir mi?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": null,
+        "Hybrid": 4
+      },
+      "latency_ms": {
+        "VectorOnly": 2.42,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.75
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 12",
+        "kredi-karti-sozlesmesi:Madde 15",
+        "ucret-tarifesi:Madde 3"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-029",
+      "question": "hesap ozetini postayla istersem ucret var mi",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "no_diacritics"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.74,
+        "KeywordOnly": 0.09,
+        "Hybrid": 3.86
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 11",
+        "ucret-tarifesi:Madde 3",
+        "ucret-tarifesi:Madde 10"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-030",
+      "question": "SMS bildirim paketi ayl\u0131k ka\u00E7 lira?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.6,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.3
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 12",
+        "ucret-tarifesi:Madde 2",
+        "kredi-karti-sozlesmesi:Madde 8"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-031",
+      "question": "Kredi kart\u0131 s\u00F6zle\u015Fmesinin taraflar\u0131 kimler?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "definition"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.01,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.55
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 1",
+        "kredi-karti-sozlesmesi:Madde 2",
+        "kredi-karti-sozlesmesi:Madde 3"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-032",
+      "question": "Son \u00F6deme tarihi hesap kesiminden ka\u00E7 g\u00FCn sonra?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.64,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.59
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 2",
+        "kredi-karti-sozlesmesi:Madde 12",
+        "kredi-karti-sozlesmesi:Madde 13"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-033",
+      "question": "Banka benim haberim olmadan limitimi y\u00FCkseltebilir mi?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.41,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.76
+      },
+      "hybrid_top3": [
+        "sss:Soru 3",
+        "kredi-karti-sozlesmesi:Madde 3",
+        "sss:Soru 12"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-034",
+      "question": "Yeni gelen kart\u0131m\u0131 aktif etmezsem ne olur?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": null,
+        "Hybrid": null
+      },
+      "latency_ms": {
+        "VectorOnly": 2.49,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.32
+      },
+      "hybrid_top3": [
+        "sss:Soru 8",
+        "sss:Soru 1",
+        "kredi-karti-sozlesmesi:Madde 7"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-035",
+      "question": "Kart\u0131m\u0131 nas\u0131l aktifle\u015Ftiririm?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 5,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.87,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.49
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 4",
+        "kredi-karti-sozlesmesi:Madde 7",
+        "sss:Soru 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-036",
+      "question": "Kart \u015Fifremi bir yere not alabilir miyim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.05,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.49
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 5",
+        "sss:Soru 2",
+        "sss:Soru 13"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-037",
+      "question": "Yeni kart\u0131mla internetten al\u0131\u015Fveri\u015F yapabilir miyim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.42,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.89
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 6",
+        "kredi-karti-sozlesmesi:Madde 5",
+        "sss:Soru 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-038",
+      "question": "Kart\u0131m \u00E7al\u0131nd\u0131, kart\u0131 nas\u0131l kapat\u0131r\u0131m?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.33,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.39
+      },
+      "hybrid_top3": [
+        "sss:Soru 1",
+        "kredi-karti-sozlesmesi:Madde 7",
+        "sss:Soru 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-039",
+      "question": "Kal\u0131c\u0131 olarak kapatt\u0131\u011F\u0131m kart\u0131 tekrar a\u00E7t\u0131rabilir miyim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 2,
+        "KeywordOnly": 3,
+        "Hybrid": 2
+      },
+      "latency_ms": {
+        "VectorOnly": 2.73,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.31
+      },
+      "hybrid_top3": [
+        "sss:Soru 2",
+        "sss:Soru 1",
+        "sss:Soru 4"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-040",
+      "question": "Kay\u0131p bildirimi yapt\u0131ktan sonra kart\u0131mla yap\u0131lan harcamalardan sorumlu muyum?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.64,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.49
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 8",
+        "sss:Soru 1",
+        "kredi-karti-sozlesmesi:Madde 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-041",
+      "question": "Harcama itiraz\u0131m ka\u00E7 g\u00FCnde sonu\u00E7lan\u0131r?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.44,
+        "KeywordOnly": 0.05,
+        "Hybrid": 2.99
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 9",
+        "sss:Soru 6",
+        "sss:Soru 7"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-042",
+      "question": "Ayn\u0131 al\u0131\u015Fveri\u015F kart\u0131mdan iki kere \u00E7ekildi, param\u0131 ne zaman geri al\u0131r\u0131m?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.32,
+        "KeywordOnly": 0.09,
+        "Hybrid": 2.49
+      },
+      "hybrid_top3": [
+        "sss:Soru 7",
+        "sss:Soru 4",
+        "kredi-karti-sozlesmesi:Madde 10"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-043",
+      "question": "Limitim 80.000 TL, asgari \u00F6deme oran\u0131m ne olur?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.79,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.41
+      },
+      "hybrid_top3": [
+        "sss:Soru 9",
+        "kredi-karti-sozlesmesi:Madde 11",
+        "sss:Soru 8"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-044",
+      "question": "Borcumun tamam\u0131n\u0131 \u00F6demezsem hangi faiz uygulan\u0131r?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.95,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.6
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 12",
+        "kredi-karti-sozlesmesi:Madde 11",
+        "kredi-karti-sozlesmesi:Madde 13"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-045",
+      "question": "Kredi kart\u0131 faiz oranlar\u0131n\u0131n bir \u00FCst s\u0131n\u0131r\u0131 var m\u0131?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.85,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.97
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 12",
+        "kredi-karti-sozlesmesi:Madde 13",
+        "kredi-karti-sozlesmesi:Madde 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-046",
+      "question": "Asgari \u00F6demeyi \u00FC\u00E7 ay \u00FCst \u00FCste yapmazsam kart\u0131ma ne olur?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.32,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.75
+      },
+      "hybrid_top3": [
+        "sss:Soru 8",
+        "kredi-karti-sozlesmesi:Madde 13",
+        "kredi-karti-sozlesmesi:Madde 17"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-047",
+      "question": "Limitimin ne kadar\u0131n\u0131 nakit avans olarak \u00E7ekebilirim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.54,
+        "KeywordOnly": 0.05,
+        "Hybrid": 2.38
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 14",
+        "ucret-tarifesi:Madde 8",
+        "sss:Soru 12"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-048",
+      "question": "Aidat ekstreme yans\u0131d\u0131ktan iki ay sonra kart\u0131 kapat\u0131rsam \u00FCcreti geri al\u0131r m\u0131y\u0131m?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.74,
+        "KeywordOnly": 0.09,
+        "Hybrid": 2.59
+      },
+      "hybrid_top3": [
+        "sss:Soru 4",
+        "kredi-karti-sozlesmesi:Madde 15",
+        "sss:Soru 1"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-049",
+      "question": "Kredi kart\u0131 s\u00F6zle\u015Fmemi nas\u0131l feshedebilirim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 2,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.59,
+        "KeywordOnly": 0.22,
+        "Hybrid": 2.57
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 16",
+        "kredi-karti-sozlesmesi:Madde 17",
+        "kredi-karti-sozlesmesi:Madde 7"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-050",
+      "question": "Kart\u0131m\u0131 iptal ettirme bildirimim ne zaman ge\u00E7erli olur?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.28,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.83
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 16",
+        "kredi-karti-sozlesmesi:Madde 4",
+        "kredi-karti-sozlesmesi:Madde 8"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-051",
+      "question": "Banka hangi durumlarda kart\u0131m\u0131 kapat\u0131p s\u00F6zle\u015Fmeyi feshedebilir?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.66,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.68
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 17",
+        "kredi-karti-sozlesmesi:Madde 16",
+        "kredi-karti-sozlesmesi:Madde 7"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-052",
+      "question": "Banka s\u00F6zle\u015Fmeyi feshederse bana nas\u0131l haber verir?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.79,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.53
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 17",
+        "kredi-karti-sozlesmesi:Madde 16",
+        "kredi-karti-sozlesmesi:Madde 1"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-053",
+      "question": "Kart\u0131m\u0131 kaybettim, ilk ne yapmal\u0131y\u0131m?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.54,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.5
+      },
+      "hybrid_top3": [
+        "sss:Soru 1",
+        "kredi-karti-sozlesmesi:Madde 7",
+        "sss:Soru 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-054",
+      "question": "\u00C7al\u0131nt\u0131 y\u00FCz\u00FCnden yenilenen kart i\u00E7in para \u00F6deyecek miyim?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.22,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.76
+      },
+      "hybrid_top3": [
+        "sss:Soru 1",
+        "ucret-tarifesi:Madde 8",
+        "kredi-karti-sozlesmesi:Madde 8"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-055",
+      "question": "Kart\u0131m\u0131 bulana kadar sadece dondurmak istiyorum, m\u00FCmk\u00FCn m\u00FC?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.41,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.25
+      },
+      "hybrid_top3": [
+        "sss:Soru 2",
+        "kredi-karti-sozlesmesi:Madde 7",
+        "sss:Soru 1"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-056",
+      "question": "Ge\u00E7ici kapatt\u0131\u011F\u0131m kart\u0131n numaras\u0131 de\u011Fi\u015Fir mi?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.58,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.51
+      },
+      "hybrid_top3": [
+        "sss:Soru 2",
+        "kredi-karti-sozlesmesi:Madde 7",
+        "sss:Soru 1"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-057",
+      "question": "Limit art\u0131\u015F\u0131n\u0131 uygulaman\u0131n hangi men\u00FCs\u00FCnden isterim?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.6,
+        "KeywordOnly": 0.1,
+        "Hybrid": 3.06
+      },
+      "hybrid_top3": [
+        "sss:Soru 3",
+        "kredi-karti-sozlesmesi:Madde 3",
+        "sss:Soru 12"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-058",
+      "question": "Y\u0131ll\u0131k kart aidat\u0131m\u0131 geri alabilir miyim?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "cross_doc"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.55,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.91
+      },
+      "hybrid_top3": [
+        "sss:Soru 4",
+        "ucret-tarifesi:Madde 7",
+        "sss:Soru 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-059",
+      "question": "Yurt d\u0131\u015F\u0131 kullan\u0131m\u0131n\u0131 uygulamada nereden a\u00E7ar\u0131m?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.82,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.92
+      },
+      "hybrid_top3": [
+        "sss:Soru 5",
+        "kredi-karti-sozlesmesi:Madde 6",
+        "kvkk-6698:Madde 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-060",
+      "question": "Tan\u0131mad\u0131\u011F\u0131m bir harcama g\u00F6r\u00FCnce ilk olarak ne yapmal\u0131y\u0131m?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.53,
+        "KeywordOnly": 0.05,
+        "Hybrid": 3.19
+      },
+      "hybrid_top3": [
+        "sss:Soru 6",
+        "kredi-karti-sozlesmesi:Madde 9",
+        "sss:Soru 7"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-061",
+      "question": "M\u00FCkerrer \u00E7ekim i\u00E7in nereye ba\u015Fvururum?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.96,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.76
+      },
+      "hybrid_top3": [
+        "sss:Soru 7",
+        "kredi-karti-sozlesmesi:Madde 10",
+        "kvkk-6698:Madde 13"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-062",
+      "question": "asgari odemeyi geciktirirsem gecikme faizi yuzde kac",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "no_diacritics"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.21,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.83
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 13",
+        "sss:Soru 8",
+        "sss:Soru 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-063",
+      "question": "Asgari \u00F6deme tutar\u0131m nas\u0131l hesaplan\u0131yor?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.69,
+        "KeywordOnly": 0.1,
+        "Hybrid": 3.13
+      },
+      "hybrid_top3": [
+        "sss:Soru 9",
+        "sss:Soru 8",
+        "kredi-karti-sozlesmesi:Madde 11"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-064",
+      "question": "EFT ile FAST aras\u0131ndaki fark nedir?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "cross_doc"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.25,
+        "KeywordOnly": 0.05,
+        "Hybrid": 2.57
+      },
+      "hybrid_top3": [
+        "sss:Soru 10",
+        "sss:Soru 11",
+        "ucret-tarifesi:Madde 5"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-065",
+      "question": "Cuma ak\u015Fam\u0131 g\u00F6nderdi\u011Fim EFT ne zaman hesaba ge\u00E7er?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.4,
+        "KeywordOnly": 0.05,
+        "Hybrid": 2.29
+      },
+      "hybrid_top3": [
+        "sss:Soru 11",
+        "ucret-tarifesi:Madde 4",
+        "sss:Soru 10"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-066",
+      "question": "G\u00FCnl\u00FCk para \u00E7ekme limitimi y\u00FCkseltebilir miyim?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.8,
+        "KeywordOnly": 0.06,
+        "Hybrid": 2.43
+      },
+      "hybrid_top3": [
+        "sss:Soru 12",
+        "ucret-tarifesi:Madde 9",
+        "sss:Soru 3"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-067",
+      "question": "Bankadan arad\u0131klar\u0131n\u0131 s\u00F6yleyen biri kart \u015Fifremi istedi, vermeli miyim?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.2,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.83
+      },
+      "hybrid_top3": [
+        "sss:Soru 13",
+        "kredi-karti-sozlesmesi:Madde 5",
+        "sss:Soru 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-068",
+      "question": "Bankan\u0131n hakk\u0131mda tuttu\u011Fu bilgileri nas\u0131l \u00F6\u011Frenirim?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure",
+        "cross_doc"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.46,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.89
+      },
+      "hybrid_top3": [
+        "sss:Soru 14",
+        "kvkk-6698:Madde 11",
+        "sss:Soru 13"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-069",
+      "question": "Sohbette yazd\u0131\u011F\u0131m kimlik numaram yapay zek\u00E2ya gidiyor mu?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.84,
+        "KeywordOnly": 0.05,
+        "Hybrid": 2.74
+      },
+      "hybrid_top3": [
+        "sss:Soru 15",
+        "sss:Soru 13",
+        "kvkk-6698:Madde 10"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-070",
+      "question": "Asistan benim onay\u0131m olmadan kart\u0131m\u0131 bloke edebilir mi?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.7,
+        "KeywordOnly": 0.08,
+        "Hybrid": 2.3
+      },
+      "hybrid_top3": [
+        "sss:Soru 15",
+        "kredi-karti-sozlesmesi:Madde 3",
+        "sss:Soru 3"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-071",
+      "question": "Ki\u015Fisel Verilerin Korunmas\u0131 Kanunu\u0027nun amac\u0131 nedir?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "definition"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 2,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.11,
+        "KeywordOnly": 0.15,
+        "Hybrid": 3.07
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 1",
+        "kvkk-6698:Madde 12",
+        "kvkk-6698:Madde 22"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-072",
+      "question": "KVKK kimlere uygulan\u0131r?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": null,
+        "Hybrid": 3
+      },
+      "latency_ms": {
+        "VectorOnly": 3.2,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.06
+      },
+      "hybrid_top3": [
+        "sss:Soru 14",
+        "kvkk-6698:Madde 31",
+        "kvkk-6698:Madde 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-073",
+      "question": "Veri sorumlusu kime denir?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "definition"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": null,
+        "Hybrid": 3
+      },
+      "latency_ms": {
+        "VectorOnly": 3.23,
+        "KeywordOnly": 0.08,
+        "Hybrid": 3.66
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 13",
+        "kvkk-6698:Madde 12",
+        "kvkk-6698:Madde 3"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-074",
+      "question": "Ki\u015Fisel veriler i\u015Flenirken hangi ilkelere uyulmal\u0131?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.48,
+        "KeywordOnly": 0.15,
+        "Hybrid": 3.96
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 4",
+        "kvkk-6698:Madde 5",
+        "kvkk-6698:Madde 7"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-075",
+      "question": "A\u00E7\u0131k r\u0131zam olmadan bilgilerim i\u015Flenebilir mi?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": null,
+        "Hybrid": 2
+      },
+      "latency_ms": {
+        "VectorOnly": 3.53,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.22
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 3",
+        "kvkk-6698:Madde 5",
+        "kvkk-6698:Madde 8"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-076",
+      "question": "Sa\u011Fl\u0131k bilgilerim \u00F6zel nitelikli veri say\u0131l\u0131r m\u0131?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "definition"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.29,
+        "KeywordOnly": 0.08,
+        "Hybrid": 3.34
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 6",
+        "kvkk-6698:Madde 30",
+        "kvkk-6698:Madde 6"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-077",
+      "question": "Verilerimin silinmesini isteyebilir miyim?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 2,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.15,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.28
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 7",
+        "sss:Soru 14",
+        "kvkk-6698:Madde 11"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-078",
+      "question": "Banka bilgilerimi ba\u015Fka bir \u015Firkete aktarabilir mi?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 3,
+        "KeywordOnly": null,
+        "Hybrid": null
+      },
+      "latency_ms": {
+        "VectorOnly": 2.77,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.53
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 9",
+        "sss:Soru 14",
+        "sss:Soru 13"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-079",
+      "question": "Yeterlilik karar\u0131 yoksa verilerim yurt d\u0131\u015F\u0131na hangi g\u00FCvencelerle aktar\u0131labilir?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.29,
+        "KeywordOnly": 0.09,
+        "Hybrid": 3.77
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 9",
+        "kvkk-6698:Madde 9",
+        "kvkk-6698:Madde 9"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-080",
+      "question": "Veri sorumlusu bilgilerimi toplarken bana neyi bildirmek zorunda?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 3,
+        "Hybrid": 2
+      },
+      "latency_ms": {
+        "VectorOnly": 3.95,
+        "KeywordOnly": 0.08,
+        "Hybrid": 3.43
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 16",
+        "kvkk-6698:Madde 10",
+        "kvkk-6698:Madde 12"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-081",
+      "question": "KVKK\u0027ya g\u00F6re ki\u015Fisel verilerimle ilgili hangi haklar\u0131m var?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.37,
+        "KeywordOnly": 0.11,
+        "Hybrid": 3.23
+      },
+      "hybrid_top3": [
+        "sss:Soru 14",
+        "kvkk-6698:Madde 11",
+        "kvkk-6698:Madde 10"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-082",
+      "question": "Verilerim \u00E7al\u0131n\u0131rsa \u015Firket ne yapmak zorunda?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.84,
+        "KeywordOnly": 0.1,
+        "Hybrid": 3.35
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 12",
+        "kredi-karti-sozlesmesi:Madde 7",
+        "kvkk-6698:Madde 5"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-083",
+      "question": "Veri sorumlusuna yapt\u0131\u011F\u0131m ba\u015Fvuru ne kadar s\u00FCrede cevaplanmal\u0131?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.18,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.71
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 13",
+        "kvkk-6698:Madde 14",
+        "kvkk-6698:Madde 15"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-084",
+      "question": "Ba\u015Fvurum reddedilirse Kurula ne zamana kadar \u015Fik\u00E2yet edebilirim?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.3,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.84
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 14",
+        "kvkk-6698:Madde 15",
+        "kvkk-6698:Madde 13"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-085",
+      "question": "Bankaya ba\u015Fvurmadan do\u011Frudan Kurula \u015Fik\u00E2yette bulunabilir miyim?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "procedure"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 2.88,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.42
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 14",
+        "sss:Soru 14",
+        "kvkk-6698:Madde 15"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-086",
+      "question": "Kurul \u015Fik\u00E2yetime iki ay i\u00E7inde cevap vermezse ne olur?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 2,
+        "KeywordOnly": 1,
+        "Hybrid": 2
+      },
+      "latency_ms": {
+        "VectorOnly": 3.36,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.83
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 14",
+        "kvkk-6698:Madde 15",
+        "kvkk-6698:Madde 22"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-087",
+      "question": "Veri Sorumlular\u0131 Siciline kimler kaydolmak zorunda?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 4.2,
+        "KeywordOnly": 0.08,
+        "Hybrid": 3.64
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 16",
+        "kvkk-6698:Madde 10",
+        "kvkk-6698:Madde 12"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-088",
+      "question": "Ki\u015Fisel verileri silmemek su\u00E7 mu?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.45,
+        "KeywordOnly": 0.08,
+        "Hybrid": 3.36
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 17",
+        "kvkk-6698:Madde 28",
+        "kvkk-6698:Madde 11"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-089",
+      "question": "Ayd\u0131nlatma y\u00FCk\u00FCml\u00FCl\u00FC\u011F\u00FCne uymayan \u015Firkete ne ceza verilir?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 5,
+        "Hybrid": 2
+      },
+      "latency_ms": {
+        "VectorOnly": 2.99,
+        "KeywordOnly": 0.18,
+        "Hybrid": 3.25
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 10",
+        "kvkk-6698:Madde 18",
+        "kvkk-6698:Madde 28"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-090",
+      "question": "Ki\u015Fisel Verileri Koruma Kurumu\u0027nun merkezi nerede?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.21,
+        "KeywordOnly": 0.17,
+        "Hybrid": 3.95
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 19",
+        "kvkk-6698:Madde 20",
+        "kvkk-6698:Madde 26"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-091",
+      "question": "Ki\u015Fisel Verileri Koruma Kurulu ka\u00E7 \u00FCyeden olu\u015Fuyor?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 1,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.72,
+        "KeywordOnly": 0.09,
+        "Hybrid": 3.82
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 21",
+        "kvkk-6698:Madde 19",
+        "kvkk-6698:Madde 21"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-092",
+      "question": "Evde ailemle ilgili tuttu\u011Fum notlar KVKK kapsam\u0131nda m\u0131?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "ranks": {
+        "VectorOnly": 1,
+        "KeywordOnly": 3,
+        "Hybrid": 1
+      },
+      "latency_ms": {
+        "VectorOnly": 3.68,
+        "KeywordOnly": 0.11,
+        "Hybrid": 3.52
+      },
+      "hybrid_top3": [
+        "kvkk-6698:Madde 28",
+        "sss:Soru 14",
+        "kvkk-6698:Madde 2"
+      ],
+      "answerable": true
+    },
+    {
+      "id": "q-093",
+      "question": "Selim Bank\u0027\u0131n genel m\u00FCd\u00FCr\u00FC kim?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "ranks": {},
+      "latency_ms": {
+        "VectorOnly": 3.61,
+        "KeywordOnly": 0.1,
+        "Hybrid": 2.79
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 1",
+        "sss:-",
+        "sss:Soru 13"
+      ],
+      "answerable": false
+    },
+    {
+      "id": "q-094",
+      "question": "Konut kredisi faiz oran\u0131n\u0131z ka\u00E7?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "ranks": {},
+      "latency_ms": {
+        "VectorOnly": 3.21,
+        "KeywordOnly": 0.07,
+        "Hybrid": 3.26
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 12",
+        "kredi-karti-sozlesmesi:Madde 14",
+        "kredi-karti-sozlesmesi:Madde 13"
+      ],
+      "answerable": false
+    },
+    {
+      "id": "q-095",
+      "question": "Vadeli mevduata y\u0131ll\u0131k ne kadar faiz veriyorsunuz?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "ranks": {},
+      "latency_ms": {
+        "VectorOnly": 3.07,
+        "KeywordOnly": 0.08,
+        "Hybrid": 13.4
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 12",
+        "kredi-karti-sozlesmesi:Madde 15",
+        "sss:Soru 4"
+      ],
+      "answerable": false
+    },
+    {
+      "id": "q-096",
+      "question": "En yak\u0131n \u015Fubeniz nerede, ka\u00E7ta kapan\u0131yor?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "ranks": {},
+      "latency_ms": {
+        "VectorOnly": 3.77,
+        "KeywordOnly": 0.4,
+        "Hybrid": 3.36
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 16",
+        "sss:Soru 11",
+        "sss:Soru 1"
+      ],
+      "answerable": false
+    },
+    {
+      "id": "q-097",
+      "question": "Bug\u00FCn dolar kuru ka\u00E7?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "ranks": {},
+      "latency_ms": {
+        "VectorOnly": 3.12,
+        "KeywordOnly": 0.44,
+        "Hybrid": 3.24
+      },
+      "hybrid_top3": [
+        "sss:Soru 12",
+        "ucret-tarifesi:-",
+        "ucret-tarifesi:Madde 9"
+      ],
+      "answerable": false
+    },
+    {
+      "id": "q-098",
+      "question": "Kredi kart\u0131 ba\u015Fvurusu i\u00E7in hangi belgeleri getirmem gerekiyor?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "ranks": {},
+      "latency_ms": {
+        "VectorOnly": 3,
+        "KeywordOnly": 0.09,
+        "Hybrid": 2.42
+      },
+      "hybrid_top3": [
+        "kredi-karti-sozlesmesi:Madde 1",
+        "kredi-karti-sozlesmesi:Madde 3",
+        "kredi-karti-sozlesmesi:Madde 17"
+      ],
+      "answerable": false
+    },
+    {
+      "id": "q-099",
+      "question": "M\u00FC\u015Fteri \u0130leti\u015Fim Merkezi\u0027nin telefon numaras\u0131 nedir?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "ranks": {},
+      "latency_ms": {
+        "VectorOnly": 2.98,
+        "KeywordOnly": 0.07,
+        "Hybrid": 2.6
+      },
+      "hybrid_top3": [
+        "sss:Soru 13",
+        "sss:Soru 15",
+        "kredi-karti-sozlesmesi:Madde 7"
+      ],
+      "answerable": false
+    },
+    {
+      "id": "q-100",
+      "question": "Selim Bank\u0027\u0131n hisseleri borsada i\u015Flem g\u00F6r\u00FCyor mu?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "ranks": {},
+      "latency_ms": {
+        "VectorOnly": 2.25,
+        "KeywordOnly": 0.16,
+        "Hybrid": 3.32
+      },
+      "hybrid_top3": [
+        "ucret-tarifesi:Madde 9",
+        "ucret-tarifesi:Madde 1",
+        "sss:Soru 12"
+      ],
+      "answerable": false
+    }
+  ]
+}

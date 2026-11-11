@@ -34,6 +34,22 @@ Sorular dokümandaki kelimeler kullanılmadan, müşteri ağzından yazıldı ("
 - Zayıf embedding ile (1b), bizim hybrid'imiz yalnız vektöre göre çok daha dayanıklı: Hit@5 4/10'dan 9/10'a çıkıyor. BM25 bir güvenlik ağı görevi görüyor.
 - 8b ile yalnız vektör ve hybrid ikisi de bu küçük sette tavanda. Hybrid'in katkısı 3. haftadaki yaklaşık 100 soruluk eval setinde, özellikle Türkçe karakter kullanılmadan yazılmış ve kelimesi kelimesine ifadeli sorularda ölçülecek.
 
+## Güncelleme, 2026-11-11 (3.2): 100 soruluk eval hybrid'in aleyhine
+
+Eval.Runner, `eval/questions.jsonl` (92 cevaplı soru), embed-8b, aynı 101 chunk. Rapor: `eval/reports/baseline-retrieval.md`.
+
+| Yöntem | Hit@1 | Hit@5 | MRR |
+|---|---|---|---|
+| Yalnız vektör | **88/92** | **92/92** | **0,97** |
+| Yalnız BM25 | 71/92 | 84/92 | 0,83 |
+| Bizim hybrid (RRF) | 79/92 | 90/92 | 0,91 |
+
+- 1.5'teki 10 soru (q-001..q-010) birebir aynı sonucu verdi (vektör ve hybrid 10/10, BM25 7/10). Fark, yeni sorulardan geliyor.
+- Hybrid 11 soruda vektörden farklı sıra veriyor. Bunlardan **10'unda kötüleştiriyor**, 1'inde (q-027) iyileştiriyor. İki soruyu (q-034, q-078) ilk 5'ten tamamen düşürüyor.
+- **Mekanizma:** Bu soruların çoğunda BM25 doğru chunk'ı ilk 5'te bulamıyor, ama 20 yanlış adayı eşit ağırlıkla RRF'e giriyor. Vektörün 1. sıradaki doğru cevabı 2.–4. sıraya itiliyor. En çok KVKK (Hit@1 17/24) ve dokümandaki kelimeleri kullanmayan sorular (paraphrase 26/33) etkileniyor.
+- 1.5'teki "BM25 güvenlik ağı" gerekçesi zayıf embedding (1b) içindi. 8b ile bu sette ağ işe yaramıyor, zarar veriyor.
+- **Karar henüz değişmedi.** Seçenekler: (a) yalnız vektör, (b) vektöre daha çok ağırlık veren RRF, (c) hybrid adayları + re-ranker (3.4). Arama değişikliği olduğu için kullanıcı kararı ve aynı baseline'la öncesi/sonrası ölçümü gerekiyor.
+
 ## Sınırlar ve riskler
 
 - **10 soru küçük bir örnek** ve soruları dokümanları bilen kişi yazdı. Bu sonuçlar bir duman testi; asıl karar verici 3.2'deki eval.

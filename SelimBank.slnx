@@ -8,7 +8,11 @@
     <Project Path="src/SelimBank.AppHost/SelimBank.AppHost.csproj" />
     <Project Path="src/SelimBank.ServiceDefaults/SelimBank.ServiceDefaults.csproj" />
   </Folder>
+  <Folder Name="/eval/">
+    <Project Path="eval/Eval.Runner/Eval.Runner.csproj" />
+  </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Eval.Runner.Tests/Eval.Runner.Tests.csproj" />
     <Project Path="tests/Assistant.Core.Tests/Assistant.Core.Tests.csproj" />
     <Project Path="tests/Assistant.Privacy.Tests/Assistant.Privacy.Tests.csproj" />
     <Project Path="tests/Assistant.Rag.Tests/Assistant.Rag.Tests.csproj" />

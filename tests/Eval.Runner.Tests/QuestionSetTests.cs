@@ -3,10 +3,9 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Assistant.Core.Chat;
 using Assistant.Core.Retrieval;
-using Assistant.Core.Tests.Live;
 using Assistant.Rag.Chunking;
 
-namespace Assistant.Core.Tests.Eval;
+namespace Eval.Runner.Tests;
 
 /// <summary>
 /// Step 3.1: eval/questions.jsonl is well formed, every accepted source is a real chunk of the source PDFs, and the
@@ -19,14 +18,21 @@ public sealed partial class QuestionSetTests
 
     // The same chunks the app indexes (SourceIngestionService), from the PDFs copied next to the tests.
     private static readonly Lazy<List<DocumentChunk>> Chunks =
-        new(() => SourceIngestionService.LoadChunks(Path.Combine(AppContext.BaseDirectory, "Sources")));
+        new(() => SourceDocuments.LoadChunks(Path.Combine(AppContext.BaseDirectory, "Sources")));
 
-    public static TheoryData<string> Ids => [.. QuestionSet.All.Select(q => q.Id)];
+    private static readonly Lazy<IReadOnlyList<EvalQuestion>> LazyAll =
+        new(() => QuestionSet.Load(Path.Combine(AppContext.BaseDirectory, "Eval", "questions.jsonl")));
+
+    private static IReadOnlyList<EvalQuestion> All => LazyAll.Value;
+
+    public static TheoryData<string> Ids => [.. All.Select(q => q.Id)];
+
+    private static EvalQuestion Get(string id) => All.Single(q => q.Id == id);
 
     [Fact]
     public void The_set_has_about_a_hundred_unique_questions_in_order()
     {
-        var all = QuestionSet.All;
+        var all = All;
 
         Assert.InRange(all.Count, 90, 110);
         Assert.Equal(Enumerable.Range(1, all.Count).Select(i => $"q-{i:000}"), all.Select(q => q.Id));
@@ -38,7 +44,7 @@ public sealed partial class QuestionSetTests
     [MemberData(nameof(Ids))]
     public void Question_is_well_formed(string id)
     {
-        var q = QuestionSet.Get(id);
+        var q = Get(id);
 
         Assert.False(string.IsNullOrWhiteSpace(q.Question));
         Assert.False(string.IsNullOrWhiteSpace(q.ReferenceAnswer));
@@ -69,7 +75,7 @@ public sealed partial class QuestionSetTests
     [MemberData(nameof(Ids))]
     public void Every_accepted_source_is_a_real_chunk(string id)
     {
-        var q = QuestionSet.Get(id);
+        var q = Get(id);
 
         Assert.All(q.AcceptedSources, s =>
             Assert.True(Chunks.Value.Any(c => c.DocId == s.Doc && c.Label == s.Section), $"{id}: no chunk {s.Doc} / {s.Section}"));
@@ -80,7 +86,7 @@ public sealed partial class QuestionSetTests
     [MemberData(nameof(Ids))]
     public void Numbers_in_the_reference_answer_come_from_an_accepted_chunk(string id)
     {
-        var q = QuestionSet.Get(id);
+        var q = Get(id);
         string sourceText = string.Join("\n", Chunks.Value
             .Where(c => q.AcceptedSources.Any(s => s.Doc == c.DocId && s.Section == c.Label))
             .Select(c => c.Text));
@@ -96,7 +102,7 @@ public sealed partial class QuestionSetTests
     [Fact]
     public void Every_article_and_question_of_the_fictional_documents_has_a_question()
     {
-        var asked = QuestionSet.All.Where(q => q.Answerable).Select(q => (q.ExpectedDoc, q.ExpectedSection)).ToHashSet();
+        var asked = All.Where(q => q.Answerable).Select(q => (q.ExpectedDoc, q.ExpectedSection)).ToHashSet();
 
         var unasked = Chunks.Value
             .Where(c => c.DocId != "kvkk-6698" && c.Label is not null)
@@ -110,7 +116,7 @@ public sealed partial class QuestionSetTests
     [Fact]
     public void Every_document_and_unanswerable_questions_are_covered()
     {
-        var all = QuestionSet.All;
+        var all = All;
 
         Assert.All(Documents, d => Assert.True(all.Count(q => q.ExpectedDoc == d) >= 15, d));
         Assert.True(all.Count(q => !q.Answerable) >= 5);
@@ -121,7 +127,7 @@ public sealed partial class QuestionSetTests
     [Fact]
     public void Smoke_subset_has_about_twenty_questions_from_every_source()
     {
-        var smoke = QuestionSet.All.Where(q => q.Smoke).ToList();
+        var smoke = All.Where(q => q.Smoke).ToList();
 
         Assert.InRange(smoke.Count, 18, 22);
         Assert.All(Documents, d => Assert.True(smoke.Count(q => q.ExpectedDoc == d) >= 2, d));
@@ -129,19 +135,12 @@ public sealed partial class QuestionSetTests
         Assert.Contains(smoke, q => q.Tags.Contains("no_diacritics"));
     }
 
-    // Keeps the step 1.5 baseline (Hybrid Hit@1 10/10) comparable with the first runner report in step 3.2.
+    // q-001..q-010 are the hand-written questions of the retired step 1.5 smoke test (Hybrid Hit@1 10/10 there);
+    // keeping them in the smoke subset keeps that history comparable.
     [Fact]
-    public void The_first_ten_are_the_step_1_5_smoke_questions()
+    public void The_first_ten_step_1_5_questions_stay_in_the_smoke_subset()
     {
-        var legacy = RetrievalSmokeTests.Questions;
-
-        for (int i = 0; i < legacy.Length; i++)
-        {
-            var q = QuestionSet.All[i];
-            Assert.True(q.Smoke, q.Id);
-            Assert.Equal(legacy[i].Question, q.Question);
-            Assert.Equal(legacy[i].Accept.Select(a => new AcceptedSource(a.Doc, a.Label)), q.AcceptedSources);
-        }
+        Assert.All(All.Take(10), q => Assert.True(q.Smoke, q.Id));
     }
 
     [Theory]

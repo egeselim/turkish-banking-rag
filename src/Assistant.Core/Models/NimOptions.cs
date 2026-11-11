@@ -21,6 +21,15 @@ public sealed class NimOptions
     /// <summary>Vector size of <see cref="EmbeddingModel"/>; part of the vector collection name.</summary>
     public int EmbeddingDimensions { get; set; }
 
+    /// <summary>
+    /// Folder of the on-disk embedding cache (<c>Nim:EmbeddingCachePath</c>). Unset in the app; the eval runner sets
+    /// it to <c>eval/cache/embeddings</c> so retrieval can be measured without an API key.
+    /// </summary>
+    public string? EmbeddingCachePath { get; set; }
+
+    /// <summary>With the cache on: never call NIM; a text missing from the cache is an error.</summary>
+    public bool EmbeddingCacheOffline { get; set; }
+
     public TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(120);
 
     /// <summary>Chat SDK retries per request. Kept low: a stuck free-tier model would otherwise block for minutes.</summary>

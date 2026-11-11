@@ -19,8 +19,55 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 2.5 Telemetri ve log garantisi | Tamam (panoda gen_ai span'leri elle incelenmedi) | Çevrimdışı 251/251 (sızıntı testi dahil); bozma deneyi testin sızıntıyı yakaladığını gösterdi; Live 8/8 (biri tekrarda); smoke Hybrid Hit@1 10/10 |
 | 2.6 Injection örnekleri | Tamam | Çevrimdışı 293/293; Live injection 20/20 kesin kontrol geçti (tek çalıştırma); model 20 örneğin 3'ünde kandırıldı ama hiçbir işlem onaysız çalışmadı |
 | 3.1 Soru seti + injection 30 + şema doğrulama | Tamam | Çevrimdışı 623/623; 100 soru (smoke 20), injection 30; bozma deneyi rakam ve madde hatasını yakaladı. Yeni 10 injection örneği canlı çalıştırılmadı (3.3) |
+| 3.2 Eval.Runner, retrieval modu | Tamam | Çevrimdışı 652/652; anahtarsız offline smoke çalışıyor; baseline: Hybrid Hit@1 79/92, vektör 88/92 (hybrid vektörden kötü, ADR-002'ye eklendi, karar bekliyor) |
 
 ## Günlük
+
+### 2026-11-11 (oturum 11, devam): 3.2
+- **Kullanıcı kararları:**
+  - 3.1 ayrı commit olarak atıldı (`fbfdfe9`); NIM anahtar öneki taraması 0 eşleşme.
+  - Runner gerçek Qdrant kullanıyor (Testcontainers ya da `--qdrant`).
+  - Runner aynı sonucu verdikten sonra `RetrievalSmokeTests` silindi.
+  - bge-m3 karşılaştırması tampon oturuma ertelendi (Ollama kurulu değil).
+- **Core:**
+  - `DiskEmbeddingCache`: Zincir `PiiMasking → OpenTelemetry → DiskCache → ham NIM`. Önbellek maskelemenin altında olduğu için yalnızca maskelenmiş metni görüyor, ve onu da saklamıyor: anahtar model, boyut, `input_type` ve metnin SHA-256 karması.
+    - Dosya model ve boyut başına bir JSONL (`eval/cache/embeddings/nvidia_nemotron_3_5_embed_8b_4096.jsonl`, 201 kayıt, 4,5 MB). Vektörler base64 float32 (little-endian); satır sonu her işletim sisteminde `\n`.
+    - Yeni kayıtlar dosyanın sonuna ekleniyor.
+    - Offline modda ya da anahtar yoksa, önbellekte olmayan bir metin "N embedding(s) missing" hatası veriyor.
+    - Sayaçlar `GetService<EmbeddingCacheStats>()` ile okunuyor.
+  - `NimOptions.EmbeddingCachePath` ve `EmbeddingCacheOffline` eklendi; uygulamada ayarlanmıyor, yalnızca runner açıyor. Önbellekle anahtarsız DI çözümü test edildi.
+  - `SourceDocuments.LoadChunks` (public): ingestion ve runner aynı chunk'ları kullanıyor.
+- **`eval/Eval.Runner`:**
+  - Uygulamanın kompozisyonunu kullanıyor (`AddNimModels` + `AddRag`). Model kimlikleri Web'in appsettings.json'ından okunuyor; anahtar user-secrets ya da ortam değişkeninden geliyor, offline modda hiç okunmuyor.
+  - Her soru Vektör, BM25 ve Hybrid ile aranıyor (ilk 5, ölçülmeyen bir ısınma çağrısından sonra).
+  - Metrikler: Hit@1, Hit@5, MRR ve p50/p95 gecikme (en yakın sıra yöntemi). Cevabı olmayan sorular isabet metriklerine girmiyor, yalnızca gecikmeye.
+  - Rapor JSON ve Markdown. Kırılımlar: dokümana göre, etikete göre, sırası değişen sorular, ilk 5'te bulunamayanlar, cevabı olmayan soruların ilk 3 sonucu.
+  - Karşılaştırma yalnızca ortak sorular üzerinden yapılıyor. Böylece smoke çalıştırması tam baseline'la karşılaştırılabiliyor.
+  - Seçenekler: `--subset`, `--mode`, `--offline`, `--qdrant`, `--out`, `--compare`/`--no-compare`, `--baseline` (yalnızca full ile), `--fail-under-hit5` (3.5'teki CI için).
+- **Ölçüm:**
+  - İlk çalıştırma anahtarla önbelleği doldurdu: 201 yeni embedding.
+  - Baseline offline yazıldı: 303 isabet, 0 yeni, aynı metrikler.
+  - Anahtarsız offline smoke (ortam değişkenleri de boşaltılarak) baseline'la birebir aynı: Hybrid 17/18, çıkış kodu 0.
+
+  | Yöntem (92 cevaplı soru) | Hit@1 | Hit@5 | MRR | p50 ms |
+  |---|---|---|---|---|
+  | Vektör | 88 | 92 | 0,97 | 2,9 |
+  | BM25 | 71 | 84 | 0,83 | 0,1 |
+  | Hybrid | 79 | 90 | 0,91 | 2,9 |
+
+  - 1.5 ile denklik: q-001..q-010'da vektör ve hybrid 10/10, BM25 7/10, yani eski testin sonucunun aynısı.
+  - **Bulgu:** Hybrid 10 soruda vektörü kötüleştiriyor, 1 soruda iyileştiriyor. BM25'in doğru chunk'ı bulamadığı sorularda yanlış adayları eşit ağırlıkla RRF'e giriyor. En çok KVKK (Hit@1 17/24) ve paraphrase soruları etkileniyor. İlk 5'e giremeyen iki soru var: q-034 ("aktif etmezsem" / "aktive edilmeyen") ve q-078 (Madde 8 yerine Madde 9). Ayrıntı [ADR-002](decisions/ADR-002-hybrid-search.md#güncelleme-2026-11-11-32-100-soruluk-eval-hybridin-aleyhine). Arama bu adımda değiştirilmedi.
+  - Gecikme önbellekle yalnızca yerel aramayı ölçüyor. Önbellek doldurulan çalıştırmalarda rapor bunu ayrıca uyarıyor (ilk çalıştırmada vektör p50 157 ms'ydi, çünkü NIM süresi dahildi).
+- **Testler (+29):**
+  - `DiskEmbeddingCacheTests` (8): diskten tekrar okuma, yalnızca eksik metinlerin modele gitmesi, query ve passage'ın ayrı kayıt olması, offline eksik kayıt hatası, dosyada metin değil karma olması, `input_type` zorunluluğu, dosya adı, gerçek DI.
+  - `tests/Eval.Runner.Tests`: `RunnerOptionsTests`, `ReportTests` (elle hesaplanmış metrikler, percentile, JSON gidiş-dönüş, şema sürümü, ortak sorularla karşılaştırma), `RetrievalEvaluatorIntegrationTests` (Integration, sahte embedding ve Qdrant) ve Core.Tests'ten taşınan `QuestionSetTests`.
+  - **Kodda bulunan hata:** Aynı istekte tekrarlanan bir metin önbellek isabeti sayılıyordu. Test yakaladı, düzeltildi.
+- **Silinenler:** `RetrievalSmokeTests` ve 3.1'deki "ilk 10 soru eski testle aynı" kontrolü. Yerine "ilk 10 soru smoke'ta kalır" kontrolü geldi.
+- **Bilinen sınırlar:**
+  - Runner Docker istiyor (Qdrant).
+  - Önbellek bayatlayan kayıtları silmiyor; soru metni değişince eski kayıt dosyada kalıyor. Gerekirse temizleme seçeneği eklenecek.
+  - Raporda Hit@20 (re-ranker'a giden adayların kapsaması) yok; 3.4'te gerekecek.
+  - Smoke ve tam set ayrı ölçülüyor; CI eşiği (`--fail-under-hit5`) 3.5'te bağlanacak.
 
 ### 2026-11-11 (oturum 11): 3.1
 - **Kullanıcı kararları:**
@@ -373,10 +420,10 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**3.1 bitti; sıradaki 3.2 (Eval.Runner, retrieval modu: Hit@1/5, MRR, p50/p95, offline embedding önbelleği). Henüz planlanmadı; kullanıcı "devam" diyene kadar başlanmıyor.**
-- 3.2'de runner `eval/questions.jsonl`'ı okuyacak. Yükleyici şu an `tests/Assistant.Core.Tests/Eval/QuestionSet.cs`'te; runner'la paylaşılacak yere taşınması gerekecek.
-- Runner gelince `RetrievalSmokeTests` emekliye ayrılabilir. İlk 10 smoke sorusu onunla aynı olduğu için Hybrid Hit@1 10/10 sonucu karşılaştırmanın başlangıç noktası.
-- Cevabı olmayan sorular retrieval metriklerinden çıkarılmalı (isabet tanımsız); answer modunda (3.3) "bulamadım" beklentisiyle ölçülecekler.
+**3.2 bitti; sıradaki 3.3 (answer modu: MEAI.Evaluation ile Groundedness, Relevance, Completeness; token ve maliyet; injection geçme oranı). Henüz planlanmadı; kullanıcı "devam" diyene kadar başlanmıyor.**
+- **Açık karar (kullanıcı):** Hybrid vektörden kötü (ADR-002 güncellemesi). Seçenekler: yalnız vektör, ağırlıklı RRF, ya da 3.4'te re-ranker ile birlikte ele almak. Answer baseline'ı (3.3) hangi aramayla alınacak, önce bu belirlenmeli.
+- Cevabı olmayan sorular answer modunda "bulamadım" beklentisiyle ölçülecek.
+- Injection geçme oranı için yeni 10 örnek dahil 30 örnek canlı çalıştırılacak.
 - 2. hafta sonu sürümü henüz arayüzde elle denenmedi (onay kartı, audit). Önce tampon oturumda bunu yapmak önerilir.
 - 2.6'dan taşınanlar (inj-29 ve inj-30 aynı türleri genişletiyor):
   - dokümandan gelen talimatla onay kartı çıkması (inj-19) ve talimatı müşteriye aktarma (inj-18);

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Assistant.Core.Tests.Eval;
+namespace Eval.Runner;
 
 /// <summary>A source that counts as a correct retrieval hit: document id and citation label ("Madde 4", "Soru 10").</summary>
 public sealed record AcceptedSource(string Doc, string Section);
@@ -27,12 +27,14 @@ public sealed record EvalQuestion(
     public IReadOnlyList<AcceptedSource> AcceptedSources =>
         Answerable ? [new AcceptedSource(ExpectedDoc!, ExpectedSection!), .. AlsoAccept] : [];
 
+    public bool Accepts(string docId, string? label) => AcceptedSources.Any(s => s.Doc == docId && s.Section == label);
+
     public override string ToString() => Id;
 }
 
 /// <summary>
-/// Loads eval/questions.jsonl. The serializer is the schema check: unknown fields, missing fields and nulls in
-/// non-nullable fields all throw. The eval runner (step 3.2) reads the same file.
+/// Reads eval/questions.jsonl. The serializer is the schema check: unknown fields, missing fields and nulls in
+/// non-nullable fields all throw.
 /// </summary>
 public static class QuestionSet
 {
@@ -47,17 +49,9 @@ public static class QuestionSet
         RespectRequiredConstructorParameters = true,
     };
 
-    private static readonly Lazy<IReadOnlyList<EvalQuestion>> LazyAll = new(Load);
-
-    public static IReadOnlyList<EvalQuestion> All => LazyAll.Value;
-
-    public static string FilePath => Path.Combine(AppContext.BaseDirectory, "Eval", "questions.jsonl");
-
-    public static EvalQuestion Get(string id) => All.Single(q => q.Id == id);
-
     public static EvalQuestion Parse(string line) =>
         JsonSerializer.Deserialize<EvalQuestion>(line, Json) ?? throw new InvalidDataException("Empty line in questions.jsonl.");
 
-    private static List<EvalQuestion> Load() =>
-        [.. File.ReadLines(FilePath).Where(line => !string.IsNullOrWhiteSpace(line)).Select(Parse)];
+    public static IReadOnlyList<EvalQuestion> Load(string path) =>
+        [.. File.ReadLines(path).Where(line => !string.IsNullOrWhiteSpace(line)).Select(Parse)];
 }

@@ -55,18 +55,7 @@ internal sealed partial class SourceIngestionService(
         }
     }
 
-    internal static List<DocumentChunk> LoadChunks(string sourcesPath)
-    {
-        if (string.IsNullOrWhiteSpace(sourcesPath) || !Directory.Exists(sourcesPath))
-        {
-            throw new InvalidOperationException($"Rag:SourcesPath '{sourcesPath}' is not an existing folder.");
-        }
-
-        var chunker = new StructureAwareChunker();
-        return [.. Directory.EnumerateFiles(sourcesPath, "*.pdf")
-            .Order(StringComparer.Ordinal)
-            .SelectMany(path => chunker.Chunk(PdfDocumentReader.Read(path)))];
-    }
+    internal static List<DocumentChunk> LoadChunks(string sourcesPath) => SourceDocuments.LoadChunks(sourcesPath);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Source ingestion done: {Chunks} chunks ({Added} added, {Unchanged} unchanged, {Removed} removed)")]
     private partial void LogIngested(int chunks, int added, int unchanged, int removed);

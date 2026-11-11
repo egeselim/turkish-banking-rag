@@ -52,11 +52,18 @@ public static class ModelServiceCollectionExtensions
 
         services.AddChatClient(sp => CreateChatClient(sp, o => o.ChatModel));
         services.AddKeyedChatClient(SmallChatClientKey, sp => CreateChatClient(sp, o => o.SmallChatModel));
+        // Chain: PII masking → OpenTelemetry → (disk cache, eval runner only) → raw NIM client.
         services.AddEmbeddingGenerator(sp =>
         {
-            var (options, http) = Resolve(sp, NimClientFactory.EmbeddingHttpClientName);
-            var raw = NimClientFactory.CreateEmbeddingGenerator(options, options.EmbeddingModel, http);
-            var instrumented = new OpenTelemetryEmbeddingGenerator<string, Embedding<float>>(raw, logger: null, AssistantTelemetry.SourceName)
+            var options = sp.GetRequiredService<IOptions<NimOptions>>().Value;
+            var inner = string.IsNullOrWhiteSpace(options.EmbeddingCachePath)
+                ? CreateRawEmbeddingGenerator(sp)
+                : new DiskEmbeddingCache(
+                    options.EmbeddingCachePath,
+                    options.EmbeddingModel,
+                    options.EmbeddingDimensions,
+                    options.EmbeddingCacheOffline || string.IsNullOrWhiteSpace(options.ApiKey) ? null : () => CreateRawEmbeddingGenerator(sp));
+            var instrumented = new OpenTelemetryEmbeddingGenerator<string, Embedding<float>>(inner, logger: null, AssistantTelemetry.SourceName)
             {
                 EnableSensitiveData = false,
             };
@@ -75,6 +82,12 @@ public static class ModelServiceCollectionExtensions
         var raw = NimClientFactory.CreateChatClient(options, modelSelector(options), http);
         var instrumented = new OpenTelemetryChatClient(raw, logger: null, AssistantTelemetry.SourceName) { EnableSensitiveData = false };
         return new PiiMaskingChatClient(instrumented, sp.GetRequiredService<IPiiMasker>());
+    }
+
+    private static IEmbeddingGenerator<string, Embedding<float>> CreateRawEmbeddingGenerator(IServiceProvider sp)
+    {
+        var (options, http) = Resolve(sp, NimClientFactory.EmbeddingHttpClientName);
+        return NimClientFactory.CreateEmbeddingGenerator(options, options.EmbeddingModel, http);
     }
 
     private static (NimOptions Options, HttpClient Http) Resolve(IServiceProvider sp, string httpClientName)
