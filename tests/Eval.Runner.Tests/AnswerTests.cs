@@ -81,8 +81,22 @@ public sealed class AnswerTests
 
         var result = Assert.Single(await evaluator.RunAsync([Eft], null, TestContext.Current.CancellationToken));
 
-        Assert.Equal("Hakem: HttpRequestException", result.Error);
+        Assert.Equal("Hakem: 3 metrik 3 denemede puanlanamadı (HttpRequestException)", result.Error);
         Assert.All(AnswerReport.Metrics, m => Assert.Null(result.Scores[m]));
+    }
+
+    // The small judge sometimes leaves out its score tag; the metric is asked again instead of being lost.
+    [Fact]
+    public async Task A_metric_without_a_score_is_retried()
+    {
+        var judge = new RecordingJudge { MissingOnFirstCall = "Groundedness" };
+        var evaluator = Evaluator(new ScriptedModel("Mobil EFT 6,50 TL'dir [1]."), judge);
+
+        var result = Assert.Single(await evaluator.RunAsync([Eft], null, TestContext.Current.CancellationToken));
+
+        Assert.Null(result.Error);
+        Assert.Equal(5, result.Scores["Groundedness"]);
+        Assert.Equal(2, judge.Calls);
     }
 
     [Fact]
@@ -141,7 +155,7 @@ public sealed class AnswerTests
         var assistantMeter = new UsageMeter(model);
         var judgeMeter = new UsageMeter(model);
         var assistant = new BankAssistant(assistantMeter, new FixedRetriever());
-        return new AnswerEvaluator(assistant, assistantMeter, judge, new ChatConfiguration(judgeMeter), judgeMeter);
+        return new AnswerEvaluator(assistant, assistantMeter, [judge], new ChatConfiguration(judgeMeter), judgeMeter);
     }
 
     private static AnswerReport Report(params AnswerResult[] results) =>
@@ -199,6 +213,8 @@ public sealed class AnswerTests
     {
         public bool Fail { get; init; }
 
+        public string? MissingOnFirstCall { get; init; }
+
         public int Calls { get; private set; }
 
         public string? Question { get; private set; }
@@ -223,7 +239,8 @@ public sealed class AnswerTests
             var contexts = additionalContext!.ToList();
             Grounding = string.Concat(contexts.OfType<Microsoft.Extensions.AI.Evaluation.Quality.GroundednessEvaluatorContext>().Single().GroundingContext);
             GroundTruth = contexts.OfType<Microsoft.Extensions.AI.Evaluation.Quality.CompletenessEvaluatorContext>().Single().GroundTruth;
-            return ValueTask.FromResult(new EvaluationResult(AnswerReport.Metrics.Select(m => (EvaluationMetric)new NumericMetric(m, 5))));
+            return ValueTask.FromResult(new EvaluationResult(AnswerReport.Metrics.Select(m =>
+                (EvaluationMetric)new NumericMetric(m, Calls == 1 && m == MissingOnFirstCall ? null : 5))));
         }
     }
 }

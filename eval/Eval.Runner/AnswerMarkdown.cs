@@ -22,7 +22,9 @@ internal static class AnswerMarkdown
         sb.Append(baseline is null
             ? "- Karşılaştırma: yok\n"
             : string.Create(Inv, $"- Karşılaştırma: {baselineName} ({baseline.CreatedUtc:yyyy-MM-dd}), ortak {common!.Count} soru üzerinden; parantez içi fark\n"));
-        sb.Append("\n> Hakem, asistanla aynı model (ADR-001). Kendi cevabını puanlayan model iyimser olabilir; puanlar mutlak değil, karşılaştırma içindir.\n\n");
+        sb.Append(report.JudgeModel == report.ChatModel
+            ? "\n> Hakem, asistanla aynı model. Kendi cevabını puanlayan model iyimser olabilir; puanlar mutlak değil, karşılaştırma içindir.\n\n"
+            : "\n> Hakem asistandan farklı bir model (bkz. ADR-001). Puanlar mutlak değil; yalnızca aynı hakemle alınmış raporlar karşılaştırılabilir.\n\n");
 
         sb.Append("## Hakem puanları (1–5, cevaplı sorular)\n\n| Metrik | Ortalama | ≥4 oranı |\n|---|---|---|\n");
         foreach (string metric in AnswerReport.Metrics)

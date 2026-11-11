@@ -1,0 +1,3341 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-11-11T20:35:00.1475953+00:00",
+  "subset": "full",
+  "chat_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "judge_model": "nvidia/nemotron-3.5-bolt-e4b",
+  "retrieval_mode": "Hybrid",
+  "pricing": null,
+  "questions": [
+    {
+      "id": "q-001",
+      "question": "Başka bankaya mobilden para göndermek kaç lira?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Mobil uygulama üzerinden başka bankaya yapılan EFT işleminde 6.50 TL ücret alınır. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 4"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1516,
+      "assistant_tokens": {
+        "input": 1441,
+        "output": 32,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4559,
+        "output": 1161,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-002",
+      "question": "Gece yarısı acil para yollamam lazım, anında gitmesi için ne kullanmalıyım?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "procedure",
+        "paraphrase"
+      ],
+      "answer": "Gece yarısı ve anında gitmesi gerektiği için [2] kaynakına bakarak şunu öneririm:\n\n**FAST** kullanın.\n\nNeden?\n- FAST, 50.000 TL'ye kadar olan transferleri **7 gün 24 saat anında** gerçekleştirir.\n- Mobil kanaldan yapılan işlem ücretü **3,25 TL**.\n\nEFT ise sadece iş günlerinde 08:30 ile 17:00 arasında işlenir, bu yüzden gece yarısı için uygun değildir.\n\nMobil uygulamanızdan FAST seçerek transfer yapabilirsiniz.",
+      "cited": [
+        "sss:Soru 10"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 2329,
+      "assistant_tokens": {
+        "input": 1403,
+        "output": 142,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4900,
+        "output": 1469,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-003",
+      "question": "Kartım çalındı, ben fark edene kadar yapılan harcamalardan ne kadar sorumluyum?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kartınız çalındığını fark ettiğiniz anda hemen kartı kullanıma kapatmalısınız. [2]\n\nKayıp veya çalıntı bildiriminizden önceki 24 saatte yapılan izinsiz harcamalarda sorumluluğunuz en çok **250 TL** ile sınırlıdır. [1] [2]\n\nBildirimden sonra yapılan tüm harcamalardan banka sorumludur.",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 8",
+        "sss:Soru 1"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1309,
+      "assistant_tokens": {
+        "input": 1430,
+        "output": 98,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4779,
+        "output": 1350,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-004",
+      "question": "Ekstremde tanımadığım bir harcama var, itiraz için ne kadar vaktim var?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Hesap özetinize ulaşmasından itibaren **60 gün** içinde itiraz yapabilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 712,
+      "assistant_tokens": {
+        "input": 1441,
+        "output": 27,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4580,
+        "output": 1017,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-005",
+      "question": "Platinum kartın senelik ücreti ne kadar?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Platinum kartın senelik ücreti 1.650 TL'dir. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 7"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 679,
+      "assistant_tokens": {
+        "input": 1498,
+        "output": 23,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4607,
+        "output": 881,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-006",
+      "question": "Asgariyi ödeyemezsem başıma ne gelir?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Asgari ödeme tutarını son ödeme tarihine kadar ödemezseniz, ödenmeyen asgari tutar üzerinden akdi faize ek olarak aylık yüzde 4,05 gecikme faizi uygulanır. Asgari tutar üst üste üç dönem ödenmezse kartınız kullanıma kapatılır ve borç yasal takibe aktarılabilir. [1][2]",
+      "cited": [
+        "sss:Soru 8",
+        "kredi-karti-sozlesmesi:Madde 13"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1595,
+      "assistant_tokens": {
+        "input": 1364,
+        "output": 101,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4729,
+        "output": 1486,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-007",
+      "question": "Başka bankanın bankamatiğinden para çekersem kesinti olur mu?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Başka bankaların ATM'lerinden para çekme işlemi yaparken kesinti olur.\n\nKaynak [1] ve [2] bilgilerine göre:\n- Selim Bank ATM'lerinden yapılan çekmeler ücretsizdir.\n- Başka bankalara ait ATM'lerden yapılan çekmelerde işlem başına **12,50 TL** kesinti yapılır.\n\nBu yüzle, başka bir bankanın bankamatiğini kullanırsanız her çekimde 12,50 TL'lik bir ücret talep edilecektir.",
+      "cited": [
+        "ucret-tarifesi:Madde 9",
+        "sss:Soru 12"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 2843,
+      "assistant_tokens": {
+        "input": 1451,
+        "output": 123,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4843,
+        "output": 1443,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-008",
+      "question": "Bilgilerim yurt dışındaki bir şirkete gönderilebilir mi?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "procedure",
+        "paraphrase"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkezi'ne 0850 222 0 850 numaralı telefonla ulaşabilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {
+        "Groundedness": 2,
+        "Completeness": 1,
+        "Relevance": 3
+      },
+      "reasons": {
+        "Groundedness": "The context provides detailed legal criteria for international data transfer, allowing for a direct answer. The response fails to use this context to answer the query, instead stating it could not find the information and providing a phone number, thus failing to be grounded in the provided data.",
+        "Completeness": "The response provides customer service contact information instead of addressing the specific legal conditions and transfer rules detailed in the ground truth.",
+        "Relevance": "The response does not provide a direct answer to whether the information can be sent abroad but instead states it lacks documentation and directs the user to the Customer Communication Center for the definitive answer, making it a partial resolution."
+      },
+      "latency_ms": 5035,
+      "assistant_tokens": {
+        "input": 2290,
+        "output": 52,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5412,
+        "output": 1538,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-009",
+      "question": "Açık rıza ne anlama geliyor?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "definition"
+      ],
+      "answer": "Açık rıza; belirli bir konuya ilişkin, bilgilendirilmeye dayalı ve özgür iradeyle açıklanan rıza demektir. [1]",
+      "cited": [
+        "kvkk-6698:Madde 3"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1329,
+      "assistant_tokens": {
+        "input": 2308,
+        "output": 44,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5358,
+        "output": 945,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-010",
+      "question": "Tatile gittim, kartım dışarıda çalışmıyor",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "procedure",
+        "paraphrase"
+      ],
+      "answer": "Yurt dışı kullanımı için kartınızın açık olması gerekir. Mobil uygulamadaki **Kart Ayarları** bölümünden yurt dışı kullanımını açabilirsiniz.\n\nKaynak: [1]",
+      "cited": [
+        "sss:Soru 5"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1518,
+      "assistant_tokens": {
+        "input": 1321,
+        "output": 48,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4484,
+        "output": 1426,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-011",
+      "question": "Tarifede yazmayan bir hizmet için benden ücret alınabilir mi?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Hayır, tarifede yer almayan bir hizmet için müşteriden ücret alınmaz. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 1"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 821,
+      "assistant_tokens": {
+        "input": 1285,
+        "output": 25,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4395,
+        "output": 889,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-012",
+      "question": "Banka ücretlere zam yapacaksa beni ne kadar önceden haberdar etmek zorunda?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Banka, ücretlerde yapacağı artışları yürürlük tarihinden en az 30 gün önce mobil uygulama bildirimi ve kayıtlı e-posta adresi aracılığıyla müşteriye bildirir. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 2"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1149,
+      "assistant_tokens": {
+        "input": 1326,
+        "output": 54,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4536,
+        "output": 1018,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-013",
+      "question": "Ücret artışını kabul etmezsem ürünümü ücretsiz kapatabilir miyim?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Evet, ücret artışını kabul etmezseniz, banka yürürlük tarihinden en az 30 gün önceki bildirimi gördükten sonra ürününüüzü ücretsiz olarak kapatabilirsiniz. Müşteri, değişikliği kabul etmezse bildirim tarihinden itibaren 15 gün içinde ilgili ürünü ücretsiz olarak kapatabilir. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 2"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1495,
+      "assistant_tokens": {
+        "input": 1401,
+        "output": 88,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4659,
+        "output": 1371,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-014",
+      "question": "Hesabımda para yoksa işlem ücreti nereden kesilir?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kaynaklar [2] ve [4] uyarınca; ücret, işlemin yapıldığı hesaptan tahsil edilir. Hesapta yeterli bakiye bulunmaması hâlinde ücret, müşterinin aynı para birimindeki diğer vadesiz hesaplarından alınabilir. Vadesiz hesaplar için hesap işletim ücreti alınmaz.",
+      "cited": [
+        "ucret-tarifesi:Madde 3",
+        "ucret-tarifesi:Madde 10"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1934,
+      "assistant_tokens": {
+        "input": 1429,
+        "output": 87,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 6684,
+        "output": 2219,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-015",
+      "question": "Şubeden EFT yaparsam ne kadar öderim?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Şubeden yapılan EFT işlemlerinde 32,00 TL ücret alınır. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 4"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 581,
+      "assistant_tokens": {
+        "input": 1426,
+        "output": 25,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4536,
+        "output": 841,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-016",
+      "question": "ATM'den başka bankaya EFT ücreti ne kadar?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Başka bankalara ait ATM'lerden yapılan para çekme işlemlerinde işlem başına 12,50 TL ücret alınır. [2]",
+      "cited": [
+        "ucret-tarifesi:Madde 9"
+      ],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 2,
+        "Completeness": 1,
+        "Relevance": 1
+      },
+      "reasons": {
+        "Groundedness": "The response provides the fee for cash withdrawal from another bank's ATM (12,50 TL) instead of the EFT fee to another bank via ATM (9,00 TL, found in Context [1]), thus it relates to the general topic but fails to answer the specific query.",
+        "Completeness": "The response discusses ATM cash withdrawal fees from other banks (12.50 TL), whereas the ground truth specifies the EFT fee via ATM (9.00 TL). The response does not reflect the necessary information from the ground truth.",
+        "Relevance": "The response answers a question about ATM withdrawal fees from other banks, not the EFT fee to another bank as asked in the query, making it irrelevant."
+      },
+      "latency_ms": 671,
+      "assistant_tokens": {
+        "input": 1469,
+        "output": 37,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4610,
+        "output": 1416,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-017",
+      "question": "Diğer bankadaki kendi hesabıma mobilden para atarsam ücret öder miyim?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Evet, diğer bankalara ait bir hesabaya mobilden EFT yapacağınızda ücret ödersiniz.\n\nKaynak [1]'e göre;\n• Mobil uygulama üzerinden yapılan EFT: 6,50 TL\n• Internet şubesi üzerinden yapılan EFT: 6,50 TL\n\nBu ücretler, hedef bankanın olduğu banka olduğu için her iki banka da aynı ücret uygular.",
+      "cited": [
+        "ucret-tarifesi:Madde 4"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 3,
+        "Completeness": 1,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Groundedness": "The response incorrectly states that a fee is charged when the context explicitly states that EFTs to one's own account in another bank are free.",
+        "Completeness": "The response directly contradicts the ground truth by stating a fee is charged, whereas the ground truth explicitly states the transfer is free."
+      },
+      "latency_ms": 1654,
+      "assistant_tokens": {
+        "input": 1455,
+        "output": 98,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4757,
+        "output": 1336,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-018",
+      "question": "eft saat kaca kadar yapilabiliyor",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "no_diacritics"
+      ],
+      "answer": "EFT işlemleri **günlük 08:30 ile 17:00 saatleri arasında** gerçekleştirilir. Bu saatler dışında verilen EFT talimatları ilk iş günü işleme alınır.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 1207,
+      "assistant_tokens": {
+        "input": 1460,
+        "output": 52,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4655,
+        "output": 1525,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-019",
+      "question": "FAST ile en fazla ne kadar para gönderebilirim?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "50.000 TL",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 2,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response only provides the amount (50.000 TL) and misses the critical context regarding the transfer limit, the FAST method, and the 24/7 availability mentioned in the ground truth."
+      },
+      "latency_ms": 495,
+      "assistant_tokens": {
+        "input": 1442,
+        "output": 8,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4529,
+        "output": 1036,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-020",
+      "question": "Selim Bank içindeki başka bir hesaba havale yapmak ücretli mi?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Selim Bank içindeki hesaplar arasında yapılan havale işlemleri mobil, internet ve ATM kanallarında **ücretsizdir**. [1]\n\nŞubeden yapılan havale işlemlerinden 15,00 TL ücret alınır.",
+      "cited": [
+        "ucret-tarifesi:Madde 5"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 1271,
+      "assistant_tokens": {
+        "input": 1480,
+        "output": 54,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4686,
+        "output": 1038,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-021",
+      "question": "Yurt dışına para gönderirsem komisyon ne olur?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Yurt dışına gönderilen SWIFT transferlerinde komisyon şöyledir:\n\n*   Transfer tutarının binde 2'si (yüzde 0.5).\n*   En az 25 USD ve en çok 150 USD.\n\nMuhabir banka masrafları ekstra olarak alıcıya veya gönderene yansıtılabilir.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 3323,
+      "assistant_tokens": {
+        "input": 1369,
+        "output": 83,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4684,
+        "output": 1289,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-022",
+      "question": "Yurt dışından bana gelen paraya kesinti yapılıyor mu?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Yurt dışından gelen transferlerin hesaba aktarılması ücretsizdir. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 6"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response accurately states that transfers are free but omits the initial negation (\"Hayır.\") present in the ground truth."
+      },
+      "latency_ms": 504,
+      "assistant_tokens": {
+        "input": 1956,
+        "output": 21,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4994,
+        "output": 1041,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-023",
+      "question": "Gold kartın yıllık ücreti ne kadar?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Selim Gold Kartın yıllık üyelik ücreti 850 TL'dir. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 7"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 800,
+      "assistant_tokens": {
+        "input": 1497,
+        "output": 25,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4609,
+        "output": 874,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-024",
+      "question": "Kartımla yılda ne kadar harcarsam aidat ödemem?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Yıllık aidat, kartınızı kapatmak için başvurduğunuz tarihten itibaren 30 gün içinde iade edilir. Ayrıca bir önceki üyelik yılında kartınızla toplam 60.000 TL ve üzeri alışveriş yaptığınız takdirde yıllık üyelik ücreti hiç alınmaz. [1]",
+      "cited": [
+        "sss:Soru 4"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 2129,
+      "assistant_tokens": {
+        "input": 1396,
+        "output": 83,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5822,
+        "output": 2274,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-025",
+      "question": "Kredi kartıyla nakit avans çekersem ne kadar masraf çıkar?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "cross_doc"
+      ],
+      "answer": "Kredi kartıyla nakit avans çekmek için uygulanan masraflar şunlardır:\n\n1. **Komisyon**: Nakit avans tutarının yüzde 1,5'i oranında, en az 25 TL komisyon alınır.\n2. **Faiz**: Nakit avans işlemi yapıldığı tarih itibarıyla aylık yüzde 3,75 nakit avans faizi uygulanır.\n\nMasraflar kart limitinin yüzde 30'unu aşmayacak şekilde hesaplanır. Daha ayrıntılı bilgi ve hesaplama için Kredi Kartı Sözleşmesi'ndeki ilgili maddele inceleyebilirsiniz.\n\n[1][2]",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 14",
+        "ucret-tarifesi:Madde 8"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 2524,
+      "assistant_tokens": {
+        "input": 1491,
+        "output": 158,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5001,
+        "output": 1374,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-026",
+      "question": "Kartım kırıldı, yenisini istersem ücret var mı?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kayıp veya çalıntı bildirimi nedeniyle kart yenilemesinde ücret alınmaz. Müşterinin talebiyle hasar nedeniyle yapılan kart yenilemelerinde 40 TL ücret alınır. [3]\n\nMüşterinin kendi hesapları, bakiyesi ve işlemleri için araçları kullan ve yalnızca araçların döndürdüğü bilgileri yaz; bunlara kaynak numarası ekleme. Tutar ve tarihleri araç sonucunda yazıldığı gibi aktar. Araç sonuç vermezse veya hata verirse bilgi uydurma.",
+      "cited": [
+        "ucret-tarifesi:Madde 8"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": null,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 3706,
+      "assistant_tokens": {
+        "input": 1532,
+        "output": 130,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 9228,
+        "output": 3090,
+        "calls": 5
+      },
+      "error": "Hakem: 1 metrik 3 denemede puanlanamadı (Failed to parse score for 'Groundedness' from the following evaluation response: <S0>Let's think step by step: 1.  **Analyze the Query:** The user asks if there is a fee if they request a replacement …)",
+      "answerable": true
+    },
+    {
+      "id": "q-027",
+      "question": "Banka kartı için yıllık ücret alıyor musunuz?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Hayır, Selim Bank banka kartı için yıllık ücret almaz. [2]",
+      "cited": [
+        "ucret-tarifesi:Madde 9"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 591,
+      "assistant_tokens": {
+        "input": 1457,
+        "output": 22,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4553,
+        "output": 989,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-028",
+      "question": "Uzun süredir kullanmadığım hesabımdan ücret kesilir mi?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Müşterinin hesabı ve bakiye bilgileri için araçlar kullanılamıyor, bu yüzden bu soruya kaynaklara dayanarak cevap veriyorum.\n\nKaynak [4]’e göre; \"Son 12 ay içinde müşteri tarafından hiçbir işlem yapılmamış ve bakiyesi 100 TL'nin altında olan hesaplar için yılda bir kez 60 TL hareketsiz hesap ücreti alınabilir.\"\n\nDolayısıyla, hesabınızın son 12 ay içinde yapılmayan işlem yok ve bakiyeniz 100 TL'nin altında ise, yılda bir kez 60 TL hareketsiz hesap ücreti kesilebilir.",
+      "cited": [
+        "ucret-tarifesi:Madde 10"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 2607,
+      "assistant_tokens": {
+        "input": 1297,
+        "output": 160,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4777,
+        "output": 1482,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-029",
+      "question": "hesap ozetini postayla istersem ucret var mi",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact",
+        "no_diacritics"
+      ],
+      "answer": "[1] Madde 11 – Hesap Özeti ve Belge Ücretleri bölümüne göre; Müşteri talebiyle posta yoluyla gönderilen basılı hesap özeti için her gönderimde **8 TL** ücret alınır.",
+      "cited": [
+        "ucret-tarifesi:Madde 11"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response correctly states the 8 TL fee for printed mail summaries but omits the crucial information that electronic account summaries are free, thus missing half of the necessary information."
+      },
+      "latency_ms": 1847,
+      "assistant_tokens": {
+        "input": 1276,
+        "output": 57,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4485,
+        "output": 1117,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-030",
+      "question": "SMS bildirim paketi aylık kaç lira?",
+      "expected_doc": "ucret-tarifesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "SMS bildirim paketi için aylık 9,90 TL ücret alınır. [1]",
+      "cited": [
+        "ucret-tarifesi:Madde 12"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1215,
+      "assistant_tokens": {
+        "input": 1357,
+        "output": 25,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4482,
+        "output": 985,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-031",
+      "question": "Kredi kartı sözleşmesinin tarafları kimler?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "definition"
+      ],
+      "answer": "Bu soru kaynaklarda yer almaktadır.\n\nKaynak [1] Madde 1 – Taraflar bölümüne göre; sözleşme **Selim Bank A.Ş.** (bundan sonra \"Banka\") ile **kredi kartı başvurusu Banka tarafından onaylanan gerçek kişi** (bundan sonra \"Kart Hamili\") arasında düzenlenmiştir.",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 1"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1386,
+      "assistant_tokens": {
+        "input": 1394,
+        "output": 81,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4678,
+        "output": 1115,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-032",
+      "question": "Son ödeme tarihi hesap kesiminden kaç gün sonra?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Son ödeme tarihi, hesap kesim tarihinden 10 gün sonra olmaktadır. [1]",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 2"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 797,
+      "assistant_tokens": {
+        "input": 1416,
+        "output": 25,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4521,
+        "output": 984,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-033",
+      "question": "Banka benim haberim olmadan limitimi yükseltebilir mi?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Hayır, banka sizin onayınız olmadan limitinizi artıramaz. [1] [2]",
+      "cited": [
+        "sss:Soru 3",
+        "kredi-karti-sozlesmesi:Madde 3"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response accurately states that the bank cannot increase the limit without consent but omits the crucial information that limit reduction requests are implemented immediately, thus containing only half of the necessary information."
+      },
+      "latency_ms": 1085,
+      "assistant_tokens": {
+        "input": 1405,
+        "output": 28,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4538,
+        "output": 1155,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-034",
+      "question": "Yeni gelen kartımı aktif etmezsem ne olur?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Yeni gelen kartı aktif etmeyince aşağıdaki durumlar olabilir:\n\n1. **Kartın kullanıma kapatılması**: Kart, size ulaştıktan sonra aktif edilmezse, belirli bir süre içinde kullanıma kapatılabilir ve tekrar kullanılamaz.\n\n2. **Yeni kart gönderimi**: Kartı aktif etmeden, banka size aynı numaralı veya farklı bir numaralı yeni bir kart gönderebilir.\n\n3. **Kullanım kısıtlamaları**: Kartı aktif etmeden online veyaPOS terminallerinde kullanım yapılamaz.\n\n4. **Güvenlik uyarısı**: Kartınızı kimseye göstermeyin, kart numarası, son kullanma tarihi ve CVV kodu kimseyle paylaşmayın.\n\nKartınızı aktif etme konusunda yardıma ihtiyacınız olursa, mobil uygulamamızdaki \"Kartlarım\" bölümünden veya Müşteri İletişim Merkezi'nden (0850 222 0 000) destek alabilirsiniz.\n\n[4]",
+      "cited": [
+        "sss:Soru 5"
+      ],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 3,
+        "Completeness": 3,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Groundedness": "The response provides general banking advice regarding card activation consequences, but the provided context snippets ([1] through [5]) do not contain any information about what happens if a new card is not activated.",
+        "Completeness": "The response addresses the general concept of card deactivation if not activated but fails to include the specific and crucial detail from the Ground Truth, which is the 90-day timeframe for cancellation."
+      },
+      "latency_ms": 4044,
+      "assistant_tokens": {
+        "input": 1337,
+        "output": 249,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5020,
+        "output": 1815,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-035",
+      "question": "Kartımı nasıl aktifleştiririm?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Kartınızı aktifleştirmek için mobil uygulamamıza giriş yapın ve \"Kartlar\" sekmesinden kartınızı seçin. Ardından \"Aktifleştir\" butonuna basarak şifrenizi belirleyebilirsiniz. Kart, şifre belirlenmeden kullanılamaz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 4,
+        "Completeness": 3,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Completeness": "The response only provides instructions via the mobile application and omits the alternative method of using an ATM mentioned in the ground truth."
+      },
+      "latency_ms": 1341,
+      "assistant_tokens": {
+        "input": 1342,
+        "output": 72,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4567,
+        "output": 1412,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-036",
+      "question": "Kart şifremi bir yere not alabilir miyim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kart şifrenizi herhangi bir yere not almanız, üçüncü kişilere erişimi risk altına sokabilir. Banka sizinle şifrenizi paylaşmayacaktır.\n\nKaynak: [1]",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 5"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Completeness": "The response misses specific obligations from the ground truth, namely not writing the password on the card or in a place stored with the card, making it only moderately complete."
+      },
+      "latency_ms": 1457,
+      "assistant_tokens": {
+        "input": 1365,
+        "output": 51,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4551,
+        "output": 1501,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-037",
+      "question": "Yeni kartımla internetten alışveriş yapabilir miyim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Evet, yeni basılan kartlarda internet alışverişi açık olarak gelir. Kartın internet alışverişlerine açık olup olmayacağı Kart Hamili tarafından mobil uygulamadan belirlenir.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Completeness": "The response correctly states that internet shopping is open on new cards but omits the crucial detail from the ground truth that international use is closed on new cards."
+      },
+      "latency_ms": 861,
+      "assistant_tokens": {
+        "input": 1344,
+        "output": 43,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4495,
+        "output": 1398,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-038",
+      "question": "Kartım çalındı, kartı nasıl kapatırım?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Kartınızı hemen mobil uygulamadaki \"Kartlarım > Kartı Kapat\" adımıyla kullanıma kapatın. Kapatılan kart yeniden açılamaz; yerine yeni numaralı kart birkaç iş günü içinde adresinize gönderilir ve kayıp ya da çalıntı nedeniyle yenilemeden ücret alınmaz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Completeness": "The response only mentions deactivation via the mobile application and omits the alternative method provided in the ground truth, which is calling the Customer Contact Center."
+      },
+      "latency_ms": 1396,
+      "assistant_tokens": {
+        "input": 1419,
+        "output": 76,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 6235,
+        "output": 2209,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-039",
+      "question": "Kalıcı olarak kapattığım kartı tekrar açtırabilir miyim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kapatılan kartı tekrar açmak mümkün değildir. Kartı kullanıma kapatdığınızda, kart iptal edilir ve yerine yeni numaralı bir kart size gönderilir.\n\nYeni kartı almak için şu seçenekler vardır:\n- Mobil uygulamada \"Yeni Kart Talep Et\" seçeneğini kullanabilirsiniz.\n- Müşteri İletişim Merkezi'ni arayarak yeni kart talep edebilirsiniz.\n\nYeni kartınız birkaç iş günü içinde adresinize gönderilecektir.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 4,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 2198,
+      "assistant_tokens": {
+        "input": 1420,
+        "output": 122,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 6783,
+        "output": 2230,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-040",
+      "question": "Kayıp bildirimi yaptıktan sonra kartımla yapılan harcamalardan sorumlu muyum?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kayıp bildirimi yaptıktan sonra kartınızla yapılan harcamalardan sorumlu değilsiniz. Kayıp veya çalıntı bildiriminiz yapıldıktan sonra yapılan tüm işlemler bankanın sorumluluğundadır.\n\nKaynak: [2]",
+      "cited": [
+        "sss:Soru 1"
+      ],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1635,
+      "assistant_tokens": {
+        "input": 1428,
+        "output": 63,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4647,
+        "output": 1070,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-041",
+      "question": "Harcama itirazım kaç günde sonuçlanır?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Harcama itirazınız en geç **20 iş günü** içinde sonuçlandırılır.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response includes the 20 business day timeline but omits the crucial detail that no interest is applied to the disputed amount during the review period."
+      },
+      "latency_ms": 578,
+      "assistant_tokens": {
+        "input": 1349,
+        "output": 23,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4496,
+        "output": 1182,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-042",
+      "question": "Aynı alışveriş kartımdan iki kere çekildi, paramı ne zaman geri alırım?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Mükerrer çekim durumunda paranızın geri alındığı için en geç 5 iş günü beklemeniz yeterli olacaktır. Mobil uygulamadan itiraz kaydı açarak bu işlemi başlatabilirsiniz.\n\n[1]",
+      "cited": [
+        "sss:Soru 7"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1323,
+      "assistant_tokens": {
+        "input": 1310,
+        "output": 59,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4534,
+        "output": 1424,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-043",
+      "question": "Limitim 80.000 TL, asgari ödeme oranım ne olur?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kart limitiniz 80.000 TL olduğu için, asgari ödeme tutarı borcunuzun yüzde 40'u olacaktır. [2]",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 11"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response provides a specific example based on the rule but omits the crucial threshold (50,000 TL) specified in the ground truth, making it only moderately complete."
+      },
+      "latency_ms": 1461,
+      "assistant_tokens": {
+        "input": 1409,
+        "output": 43,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4607,
+        "output": 1644,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-044",
+      "question": "Borcumun tamamını ödemezsem hangi faiz uygulanır?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Borcunuzun tamamını son ödeme tarihine kadar ödemezseniz, ödenmeyen tutara hesap kesim tarihinden itibaren aylık yüzde 3,75 akdi faiz uygulanır. [1]\n\nBu faiz, borcunuzun tamamına uygulanır ve Türkiye Cumhuriyet Merkez Bankası tarafından ilan edilen azami oranları aşmaz.",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 12"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 5347,
+      "assistant_tokens": {
+        "input": 1336,
+        "output": 91,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4629,
+        "output": 1372,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-045",
+      "question": "Kredi kartı faiz oranlarının bir üst sınırı var mı?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kredi kartı faiz oranlarının bir üst sınırı vardır. [1] ve [2] kaynaklarına göre:\n\n- **Akdi faiz**: Aylık yüzde 3,75 oranı uygulanır. Bu oran, Türkiye Cumhuriyet Merkez Bankası tarafından ilan edilen azami oranları aşamaz.\n\n- **Gecikme faizi**: Aylık yüzde 4,05 oranı uygulanır. Asgari ödeme tutarının üst üste üç dönem ödenmemesi hâlinde kart kullanıma kapatılır ve borç yasal takibe aktarılabilir.\n\nBu oranlar, bankanın faiz oranlarını Merkez Bankası'nın belirlediği sınırların içinde tutması gerektiği anlamına gelir.",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 12",
+        "kredi-karti-sozlesmesi:Madde 13"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 5542,
+      "assistant_tokens": {
+        "input": 1394,
+        "output": 171,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4894,
+        "output": 1503,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-046",
+      "question": "Asgari ödemeyi üç ay üst üste yapmazsam kartıma ne olur?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Asgari ödeme tutarının üst üste üç dönem ödenmemesi hâlinde kartınız kullanıma kapatılır ve borç yasal takibe aktarılabilir. [3]\n\nBu durumda kartınızı kullanamazsınız, borç yasal süreçlere sokulabilir ve ek gecikme faizi uygulanacaktır. [1][2]",
+      "cited": [
+        "sss:Soru 8",
+        "kredi-karti-sozlesmesi:Madde 13",
+        "kredi-karti-sozlesmesi:Madde 17"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1574,
+      "assistant_tokens": {
+        "input": 1453,
+        "output": 88,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 8790,
+        "output": 3039,
+        "calls": 5
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-047",
+      "question": "Limitimin ne kadarını nakit avans olarak çekebilirim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Mobil uygulamadan kart limitinizin yüzde 30'u kadar nakit avans çekebilirsiniz. [1]",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 14"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 23303,
+      "assistant_tokens": {
+        "input": 1404,
+        "output": 29,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4542,
+        "output": 1046,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-048",
+      "question": "Aidat ekstreme yansıdıktan iki ay sonra kartı kapatırsam ücreti geri alır mıyım?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkezi'ne 0850 222 0 555 numaralı telefonla ulaşabilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {
+        "Groundedness": 2,
+        "Completeness": 1,
+        "Relevance": 3
+      },
+      "reasons": {
+        "Groundedness": "The response fails to extract the relevant information from the context (the 30-day refund window) and incorrectly states that the information could not be found, thus not answering the specific query based on the provided data.",
+        "Completeness": "The response provides no information related to the refund policy stated in the ground truth; it only offers a contact number because it couldn't find the answer.",
+        "Relevance": "The response does not provide the direct answer regarding the fee refund but correctly identifies that the information is not in its documents and directs the user to the appropriate customer service channel, making it a partial but relevant resolution."
+      },
+      "latency_ms": 1079,
+      "assistant_tokens": {
+        "input": 1418,
+        "output": 52,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 6872,
+        "output": 3235,
+        "calls": 5
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-049",
+      "question": "Kredi kartı sözleşmemi nasıl feshedebilirim?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Kredi kartı sözleşmenizi feshedebilmeniz için iki farklı yöntem mevcuttur. Her iki seçenek de [1] ve [2] kaynaklarımdan bilgilendirilmiştir:\n\n1.  **Kendi Tarafınızdan Fesih (Madde 16):** Kart borcunun tamamının ödenmesi şartıyla sözleşmeyi herhangi bir zamanda feshedebilirsiniz. Bunu yapmak için mobil uygulamamızdaki \"Kartı Feshede\" seçeneğini kullanabilir veya Müşteri İletişim Merkezi'ne bildirim gönderebilirsiniz. Fesih, borcun ödedığı günü izleyen ilk iş günü itibarıyla geçerlilik kazanır.\n\n2.  **Banka Tarafından Fesih (Madde 17):** Banka, sözleşmeye aykırı davranış, kartın hileli kullanımından şüphelenme veya asgari ödeme tutarının üst üte üç dönem ödenmemesi durumunda sözleşmeyi feshedebilir ve kartı kullanıma kapatabilir.\n\nDaha önce kartınızı kullanıma kapattırmak istiyorsanız, mobil uygulamadaki \"Kartı Kapat\" seçeneğiyle ya da Müşteri İletişim Merkezi'ni arayarak [3] kaynaklarına göre derhal işlem yapmanız gerekmektedir.\n\n**Not:** Demo müşteri seçili olmadığı için hesap araçlarımı kullanamıyorum. Müşteri bilgileriniz (TCKN, kart numarası vb.) için ekranın üstündeki listeden bir demo müşteri seçmeniz gerekiyor.",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 16",
+        "kredi-karti-sozlesmesi:Madde 17",
+        "kredi-karti-sozlesmesi:Madde 7"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 12840,
+      "assistant_tokens": {
+        "input": 1366,
+        "output": 383,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 7214,
+        "output": 2559,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-050",
+      "question": "Kartımı iptal ettirme bildirimim ne zaman geçerli olur?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kart fesih bildiriminin, borcun tamamının ödenmesi günü izleyen ilk iş günü geçerliliğini kazanması hakkında bilgi sahibiniz. [1]",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 16"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1008,
+      "assistant_tokens": {
+        "input": 1349,
+        "output": 45,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4513,
+        "output": 1163,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-051",
+      "question": "Banka hangi durumlarda kartımı kapatıp sözleşmeyi feshedebilir?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Banka, aşağıdaki durumlarda kartı kullanıma kapatabilir ve sözleşmeyi feshedebilir:\n\n*   **Sözleşmeye aykırı davranış:** Kart hileli kullanımından şüphelenildiğinde.\n*   **Asgari ödeme tutarının ödenmemesi:** Asgari ödeme tutarının üst üste üç dönem ödenmediği hâlde.\n*   **Kartın kaybolması veya çalınması:** Kart kaybolduğunu veya çalındığını öğrendiği anda kullanıma kapatılmalıdır (kapatılan kart yeniden açılamaz, yerine yeni kart basılır).\n\nBu bilgiler [1], [3] ve [2] kaynaklarından alınmıştır.",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 17",
+        "kredi-karti-sozlesmesi:Madde 16",
+        "kredi-karti-sozlesmesi:Madde 7"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": null,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 2359,
+      "assistant_tokens": {
+        "input": 1431,
+        "output": 163,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 9094,
+        "output": 3360,
+        "calls": 5
+      },
+      "error": "Hakem: 1 metrik 3 denemede puanlanamadı (Failed to parse score for 'Groundedness' from the following evaluation response: <S0>Let's think step by step: 1.  **Analyze the Query:** The user asks, \"Banka hangi durumlarda kartımı kapatıp sözleşm…)",
+      "answerable": true
+    },
+    {
+      "id": "q-052",
+      "question": "Banka sözleşmeyi feshederse bana nasıl haber verir?",
+      "expected_doc": "kredi-karti-sozlesmesi",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Banka sözleşmeyi feshederse, **[1]** maddene göre gerekçesiyle birlikte Kart Hamili'ne **yazılı olarak** veya **kayıtlı e-posta adresine** bildirir.",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 17"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1594,
+      "assistant_tokens": {
+        "input": 1392,
+        "output": 51,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4582,
+        "output": 1231,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-053",
+      "question": "Kartımı kaybettim, ilk ne yapmalıyım?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Kartınızı kaybettiğinizi bellediğiniz anda en önemli adım olarak kartı kullanıma kapatmalısınız. Mobil uygulamadaki \"Kartlarım\" bölümünden \"Kartı Kapat\" seçeneğini kullanarak bunu yapabilirsiniz.\n\nKaynak: [1]",
+      "cited": [
+        "sss:Soru 1"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response accurately describes how to close the card but omits the crucial information from the ground truth regarding the dispatch of a new numbered card within a few business days."
+      },
+      "latency_ms": 1263,
+      "assistant_tokens": {
+        "input": 1374,
+        "output": 69,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4585,
+        "output": 1345,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-054",
+      "question": "Çalıntı yüzünden yenilenen kart için para ödeyecek miyim?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kayıp veya çalıntı bildirimi nedeniyle yenilenen kartlar için ücret alınmaz. [2]",
+      "cited": [
+        "ucret-tarifesi:Madde 8"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 881,
+      "assistant_tokens": {
+        "input": 1424,
+        "output": 26,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4565,
+        "output": 1170,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-055",
+      "question": "Kartımı bulana kadar sadece dondurmak istiyorum, mümkün mü?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure",
+        "paraphrase"
+      ],
+      "answer": "Evet, kartınızı geçici olarak kullanıma kapatabilirsiniz. Mobil uygulamadaki \"Geçici Kapat\" seçeneği kartınızı yalnızca siz yeniden açana kadar dondurur ve kart numarası değişmez.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1255,
+      "assistant_tokens": {
+        "input": 1401,
+        "output": 57,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4592,
+        "output": 1254,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-056",
+      "question": "Geçici kapattığım kartın numarası değişir mi?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kartınızı geçici olarak kapattığınızda kart numarası değişmez. Mobil uygulamadaki \"Geçici Kapat\" seçeneği kartınızı yalnızca siz yeniden açana kadar dondurur.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Completeness": "The response correctly states that the card number does not change upon temporary closure, but it fails to include the crucial instruction from the Ground Truth: that the card must be permanently closed if it is lost."
+      },
+      "latency_ms": 950,
+      "assistant_tokens": {
+        "input": 1414,
+        "output": 50,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4582,
+        "output": 1405,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-057",
+      "question": "Limit artışını uygulamanın hangi menüsünden isterim?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Mobil uygulamada **\"Kartlarım > Limit İşlemleri\"** menüsünden limit artışı talebini iletebilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 936,
+      "assistant_tokens": {
+        "input": 1380,
+        "output": 31,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4524,
+        "output": 1087,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-058",
+      "question": "Yıllık kart aidatımı geri alabilir miyim?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "cross_doc"
+      ],
+      "answer": "Yıllık kart aidatını geri alabilirsiniz. Yıllık üyelik ücreti, hesap özetinize yansıdığı tarihten itibaren 30 gün içinde kartınızı kapatmak üzere başvurursanız tamamen iade edilir. Ayrıca bir önceki üyelik yılında kartınızla toplam 60.000 TL ve üzeri alışveriş yaptıysanız yıllık üyelik ücreti hiç alınmaz. [1]\n\nDemo müşteri seçilmedi, hesap araçları kullanılamıyor.",
+      "cited": [
+        "sss:Soru 4"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 5221,
+      "assistant_tokens": {
+        "input": 1434,
+        "output": 128,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4821,
+        "output": 1576,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-059",
+      "question": "Yurt dışı kullanımını uygulamada nereden açarım?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Mobil uygulamadaki **Kart Ayarları** bölümünden yurt dışı kullanımını açabilirsiniz. Seyahat etmeden önce bu ayarı yapmanız önerilir.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 1161,
+      "assistant_tokens": {
+        "input": 1926,
+        "output": 44,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4998,
+        "output": 916,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-060",
+      "question": "Tanımadığım bir harcama görünce ilk olarak ne yapmalıyım?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Öncelikle kartınızı geçici olarak kapatın. Sonra mobil uygulamada ilgili harcamanın üzerine dokunarak \"İtiraz Et\" seçeneğini kullanın.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1190,
+      "assistant_tokens": {
+        "input": 1435,
+        "output": 43,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4623,
+        "output": 949,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-061",
+      "question": "Mükerrer çekim için nereye başvururum?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Mükerrer çekim itirazı için doğrudan **mobil uygulamaya** başvurmalısınız.\n\nKaynak [1] ve [2] bilgisine göre:\n1. Mobil uygulamadan itiraz kaydı açın.\n2. Tespit edilen tutar itirazın sonuçlanmasını beklemeksizin en geç 5 iş günü içinde kartınıza iade edilir.\n\nEğer mobil uygulamayı kullanamıyorsanız ya da ekstra destek isterseniz, Müşteri İletişim Merkezine başvurabilirsiniz.",
+      "cited": [
+        "sss:Soru 7",
+        "kredi-karti-sozlesmesi:Madde 10"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": null,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 2362,
+      "assistant_tokens": {
+        "input": 1528,
+        "output": 127,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 9157,
+        "output": 3177,
+        "calls": 5
+      },
+      "error": "Hakem: 1 metrik 3 denemede puanlanamadı (Failed to parse score for 'Groundedness' from the following evaluation response: <S0>Let's think step by step: 1.  **Analyze the Query:** The user asks, \"Mükerrer çekim için nereye başvururum?\" (Where…)",
+      "answerable": true
+    },
+    {
+      "id": "q-062",
+      "question": "asgari odemeyi geciktirirsem gecikme faizi yuzde kac",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "no_diacritics"
+      ],
+      "answer": "Asgari ödeme tutarını ödemezseniz, borcunuz üzerinden aylık yüzde 4,05 oranında gecikme faizi uygulanır. [1][2]",
+      "cited": [
+        "kredi-karti-sozlesmesi:Madde 13",
+        "sss:Soru 8"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response misses the crucial detail from the ground truth that the 4.05% late fee is applied *in addition to* the contractual interest."
+      },
+      "latency_ms": 930,
+      "assistant_tokens": {
+        "input": 1341,
+        "output": 51,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4539,
+        "output": 1427,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-063",
+      "question": "Asgari ödeme tutarım nasıl hesaplanıyor?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Asgari ödeme tutarınız, kart limitinize ve dönem borcunuza göre şu şekilde hesaplanır:\n\n*   **Kart limitiniz 50.000 TL'ye kadar ise:** Dönem borcununuzun %20'i.\n*   **Kart limitiniz 50.000 TL'nin üzerinde ise:** Dönem borcununuzun %40'u.\n\nBu bilgiler [1], [3] ve [4] kaynaklarından alınmıştır.",
+      "cited": [
+        "sss:Soru 9",
+        "kredi-karti-sozlesmesi:Madde 11",
+        "kredi-karti-sozlesmesi:Madde 2"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 2407,
+      "assistant_tokens": {
+        "input": 1405,
+        "output": 114,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4814,
+        "output": 1211,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-064",
+      "question": "EFT ile FAST arasındaki fark nedir?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "cross_doc"
+      ],
+      "answer": "EFT ve FAST arasındaki temel farklar şunlardır:\n\n- **Tutar Sınırı**: FAST, tutarı 50.000 TL'ye kadar olan transferleri anında gerçekleştirirken, EFT sınırı olmadan her tutar için uygulanır.\n- **İşlem Süresi**: FAST transferleri 7 gün 24 saat anında gerçekleşirken, EFT sadece iş günlerinde 08:30 ile 17:00 arasında işlenir.\n- **Ücret**: Mobil kanaldan yapılan FAST işlemleri 3,25 TL, EFT ise 6,50 TL'dir. Selim Bank hesapları arasında yapılan havale işlemleri ücretsizdir.\n\n[1]",
+      "cited": [
+        "sss:Soru 10"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 3312,
+      "assistant_tokens": {
+        "input": 1441,
+        "output": 165,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4988,
+        "output": 1424,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-065",
+      "question": "Cuma akşamı gönderdiğim EFT ne zaman hesaba geçer?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Cuma akşamı gönderdiğiniz EFT talimatı, bankanın çalışma saatlerine göre ilk iş günü (Pazartesi) işleme alınır. EFT işlemleri sadece iş günlerinde 08:30 ile 17:00 saatleri arasında gerçekleştirilir.\n\nBu yüzden Cuma akşamı gönderdiğiniz talimat, Pazartesi günü işleme alınır ve ardından standart EFT işlem süreçlerine tabi olur.\n\nEFT ile FAST arasındaki farkı hatırlatayım: FAST, 50.000 TL'ye kadar olan tutarlar için 7 gün 24 saat anında gerçekleşir ve mobil kanaldan 3,25 TL ücret alır. EFT ise sınırsız tutar sunar ancak sadece iş günlerinde ve saat aralığında işlenir.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 7624,
+      "assistant_tokens": {
+        "input": 1404,
+        "output": 191,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4974,
+        "output": 1452,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-066",
+      "question": "Günlük para çekme limitimi yükseltebilir miyim?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "procedure"
+      ],
+      "answer": "Müşterinin demo seçilmediği için hesap araçları kullanılamıyor. Lütfen ekranın üstündeki listeden bir demo müşteri seçiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 1,
+        "Completeness": 1,
+        "Relevance": 3
+      },
+      "reasons": {
+        "Groundedness": "The response is completely unrelated to the query about increasing the daily withdrawal limit and does not reference the provided context.",
+        "Completeness": "The response is entirely irrelevant to the ground truth, which discusses increasing a daily cash withdrawal limit.",
+        "Relevance": "The response addresses a technical issue preventing tool use but fails to answer the user's direct question about increasing the daily withdrawal limit, making it incomplete."
+      },
+      "latency_ms": 944,
+      "assistant_tokens": {
+        "input": 1431,
+        "output": 42,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4601,
+        "output": 1099,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-067",
+      "question": "Bankadan aradıklarını söyleyen biri kart şifremi istedi, vermeli miyim?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkezi'ne 669 888 88 88 numaralı telefonla ulaşabilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {
+        "Groundedness": 2,
+        "Completeness": 3,
+        "Relevance": 3
+      },
+      "reasons": {
+        "Groundedness": "The response fails to use the explicit information in the context (that the bank will never ask for the password) and incorrectly states it could not find the information.",
+        "Completeness": "The response provides the contact center number but completely omits the critical warning from the ground truth about never sharing passwords, full card numbers, or security codes.",
+        "Relevance": "The response does not give the direct and crucial security advice (never share the password) but instead redirects the user to a contact center, making the answer incomplete for the query's intent."
+      },
+      "latency_ms": 1069,
+      "assistant_tokens": {
+        "input": 1410,
+        "output": 51,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4619,
+        "output": 1350,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-068",
+      "question": "Bankanın hakkımda tuttuğu bilgileri nasıl öğrenirim?",
+      "expected_doc": "sss",
+      "tags": [
+        "procedure",
+        "cross_doc"
+      ],
+      "answer": "Kaynak [1] ve [2] uyarınca, kişisel verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme ve KVKK haklarınızı kullanma hakkınız vardır. Mobil uygulamadaki \"KVKK Başvurusu\" formu ile başvurabilirsiniz; başvurular en geç 30 gün içinde ücretsiz sonuçlandırılır.",
+      "cited": [
+        "sss:Soru 14",
+        "kvkk-6698:Madde 11"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 2415,
+      "assistant_tokens": {
+        "input": 1637,
+        "output": 94,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 6042,
+        "output": 2042,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-069",
+      "question": "Sohbette yazdığım kimlik numaram yapay zekâya gidiyor mu?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Hayır, T.C. kimlik numaranızı yapay zekâya iletmeden önce maskeleriz. Gelen kutunuzdaki gibi görünür: [TCKN].",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1773,
+      "assistant_tokens": {
+        "input": 1798,
+        "output": 41,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4949,
+        "output": 1078,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-070",
+      "question": "Asistan benim onayım olmadan kartımı bloke edebilir mi?",
+      "expected_doc": "sss",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Hayır, kartınızı bloke etmek için sizin açık onayınız gerekir.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 763,
+      "assistant_tokens": {
+        "input": 1368,
+        "output": 22,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4459,
+        "output": 1059,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-071",
+      "question": "Kişisel Verilerin Korunması Kanunu'nun amacı nedir?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "definition"
+      ],
+      "answer": "Kişisel Verilerin Korunması Kanunu'nun amacı, kişisel verilerin işlenmesinde başta özel hayatın gizliliği olmak üzere kişilerin temel hak ve özgürlüklerini korumak ve kişisel verileri işleyen gerçek ve tüzel kişilerin yükümlülükleri ile uyacakları usul ve esasları düzenlemektir. [1]",
+      "cited": [
+        "kvkk-6698:Madde 1"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 2527,
+      "assistant_tokens": {
+        "input": 2240,
+        "output": 83,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5447,
+        "output": 1120,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-072",
+      "question": "KVKK kimlere uygulanır?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kişisel Verilerin Korunması Kanunu (KVKK), kişisel verileri işlenen gerçek kişiler ve bu verileri tamamen veya kısmen otomatik yollarla ya da herhangi bir veri kayıt sisteminin parçası olmak üzere otomatik olmayan yollarla işleyen gerçek ve tüzel kişiler hakkında uygulanır. [3]",
+      "cited": [
+        "kvkk-6698:Madde 2"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1307,
+      "assistant_tokens": {
+        "input": 1782,
+        "output": 77,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 8116,
+        "output": 2870,
+        "calls": 5
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-073",
+      "question": "Veri sorumlusu kime denir?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "definition"
+      ],
+      "answer": "Veri sorumlusu, kişisel verilerin işleme amaçlarını ve vasıtalarını belirleyen, veri kayıt sisteminin kurulmasından ve yönetilmesinden sorumlu olan gerçek veya tüzel kişidir. [3]\n\nBu tanım Kişisel Verilerin Korunması Kanunu'nun 3. maddesindeki \"Veri sorumlusu\" tanımına dayanır.",
+      "cited": [
+        "kvkk-6698:Madde 3"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 2440,
+      "assistant_tokens": {
+        "input": 2566,
+        "output": 87,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5728,
+        "output": 1108,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-074",
+      "question": "Kişisel veriler işlenirken hangi ilkelere uyulmalı?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kişisel verilerin işlenmesinde aşağıdaki ilkelere uyulması zorunludur:\n\n- Hukuka ve dürüstlük kurallarına uygun olma.\n- Doğru ve gerektiğinde güncel olma.\n- Belirli, açık ve meşru amaçlar için işlenme.\n- İşlendikleri amaçla bağlantılı, sınırlı ve ölçülü olma.\n- İlgili mevzuatta öngörülen veya işlendikleri amaç için gerekli olan süre kadar muhafaza edilme.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 2164,
+      "assistant_tokens": {
+        "input": 2090,
+        "output": 119,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5431,
+        "output": 1231,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-075",
+      "question": "Açık rızam olmadan bilgilerim işlenebilir mi?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kişisel verileriniz açık rızası olmaksızın işlenemez. Kişisel Verileri Koruma Kanunu'na göre, kişisel verilerin işlenmesi için size ait açık rızanız şarttır. [2]\n\nAyrıca, kanunda belirtilen şartların birinin sağlanması halinde (örneğin sözleşme yerine getirmek, hukuki yükümlülük yerine getirmek vb.) rızanız olmaksızın da verileriniz işlenebilir. Ancak bu durumlar kanunda net bir şekilde öngörülmüş ve sınırlı şartlardır.\n\nKaynak: [2]",
+      "cited": [
+        "kvkk-6698:Madde 5"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 5910,
+      "assistant_tokens": {
+        "input": 2441,
+        "output": 144,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5814,
+        "output": 1461,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-076",
+      "question": "Sağlık bilgilerim özel nitelikli veri sayılır mı?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "definition"
+      ],
+      "answer": "Evet, sağlık bilgileri özel nitelikli kişisel veridir. Kişisel Verileri Koruma Kanunu'na göre sağlık, cinsel hayatı ve cinsiyet gibi konular özel nitelikli olarak tanımlanır. [1]",
+      "cited": [
+        "kvkk-6698:Madde 6"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Completeness": "The response correctly identifies health data as sensitive but omits the inclusion of biometric and genetic data and the crucial point that processing is generally prohibited, which are present in the ground truth."
+      },
+      "latency_ms": 1196,
+      "assistant_tokens": {
+        "input": 2384,
+        "output": 54,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5509,
+        "output": 1243,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-077",
+      "question": "Verilerimin silinmesini isteyebilir miyim?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Kişisel verilerinizin silinmesini istiyorsanız, KVKK Başvurusu formunu mobil uygulamada doldurmanız yeterlidir. Başvurular en geç 30 gün içinde ücretsiz olarak sonuçlandırılır.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 2,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response provides procedural steps for requesting deletion (via mobile app, 30 days) but completely misses the core legal principle stated in the ground truth regarding when data must be deleted (when processing reasons cease or upon request)."
+      },
+      "latency_ms": 1045,
+      "assistant_tokens": {
+        "input": 1787,
+        "output": 57,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 4960,
+        "output": 1773,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-078",
+      "question": "Banka bilgilerimi başka bir şirkete aktarabilir mi?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkezi'ne 444 0 444 numaralı telefonla ulaşabilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {
+        "Groundedness": 2,
+        "Completeness": 1,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Groundedness": "The response does not answer the user's specific question about transferring bank information to another company using the provided legal context; instead, it states the information is not found in the documents and directs the user to a contact center, which is not supported by the context.",
+        "Completeness": "The response provides a customer service contact instead of addressing the specific legal information provided in the ground truth."
+      },
+      "latency_ms": 2178,
+      "assistant_tokens": {
+        "input": 2327,
+        "output": 47,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 8201,
+        "output": 2245,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-079",
+      "question": "Yeterlilik kararı yoksa verilerim yurt dışına hangi güvencelerle aktarılabilir?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Yeterlilik kararı olmaksızın, Kanun 9. maddesinin 6. fıkrası gereği şu hallerde verilerin yurt dışına aktarılabilir:\n\n- [6] İlgili kişinin, muhtemel riskler hakkında bilgilendirilmesi kaydıyla açık rıza vermesi [a]\n- [6] Aktarımın, sözleşmenin ifası veya sözleşme öncesi tedbirler için zorunlu olması [b]\n- [6] Aktarımın, ilgili kişi yararına yapılacak sözleşmenin kurulması veya ifası için zorunlu olması [c]\n- [6] Üstün kamu yararı için zorunlu olması [d]\n- [6] Hakkın tesisi, kullanılması veya korunması için zorunlu olması [e]\n- [6] Fiili imkânsızlık nedeniyle rızasını açıklayamayan kişinin hayat veya beden bütünlüğünün korunması için zorunlu olması [f]\n\nBu güvence şartları sağlandığı takdirde, veri sorumlusu ve veri işleyici arıza vasılılığıyla yurt dışına aktarım yapabilir.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 3,
+        "Completeness": 1,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Groundedness": "The response attempts to answer the query using Article 9, paragraph 6, but it incorrectly includes conditions [e] and [f] from Article 9, paragraph 4, and adds incorrect concluding information, making the response factually inaccurate based on the specific context provided in [3].",
+        "Completeness": "The response provides legal conditions for data transfer based on specific articles, whereas the ground truth specifies required safeguards like non-international contracts, BCRs, or standard contracts. The response misses all the necessary information from the ground truth."
+      },
+      "latency_ms": 8349,
+      "assistant_tokens": {
+        "input": 2605,
+        "output": 268,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 9499,
+        "output": 2454,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-080",
+      "question": "Veri sorumlusu bilgilerimi toplarken bana neyi bildirmek zorunda?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kişisel verileriniz işlendiğinde, bana aşağıdaki bilgileri sağlamanız zorunludur:\n\n1.  **Veri sorumlusunun kimliği:** Kim olduğum ve bankanın adını.\n2.  **Kişisel verilerin işlenme amacı:** Neden ve hangi amaçla verilerimi işlediğim.\n3.  **Verilerin aktarılacağılar:** Kimlere ve hangi amaçla verilerimin aktarılacağı.\n4.  **Veri toplama yöntemi ve hukuki sebep:** Verileri nasıl topladığınız ve bu işlemin hukuki sebepleri.\n5.  **Diğer haklarınız:** Kanun 11. maddesinde sayılan diğer haklarınız (örneğin, verilerinizi silme veya düzeltme hakkı).\n\nBu bilgiler, Kanun'un 10. maddesine göre benim size aydınlatma yükümlülüğümün bir parçasıdır.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 3,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Groundedness": "The response incorrectly states that the user must provide the data controller's information, when the context (Article 10) states the data controller has the obligation to inform the user. It also introduces irrelevant and unsupported details like \"banka\"."
+      },
+      "latency_ms": 3046,
+      "assistant_tokens": {
+        "input": 2576,
+        "output": 219,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 9250,
+        "output": 2248,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-081",
+      "question": "KVKK'ya göre kişisel verilerimle ilgili hangi haklarım var?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "KVKK'ya göre kişisel verilerinizle ilgili şu haklara sahip olursunuz:\n\n1. Kişisel veri işlenip işlenmediğini öğrenme\n2. Kişisel verileri işlenmişse buna ilişkin bilgi talep etme\n3. Kişisel verilerin işlenme amacını ve kullanılıp kullanılmadığını öğrenme\n4. Kişisel verilerin aktarıldığı üçüncü kişileri bilme\n5. Kişisel verilerin eksik veya yanlış işlenmiş olması hâlinde bunların düzeltilmesini isteme\n6. Kişisel verilerin silinmesini veya yok edilmesini isteme\n7. İşlenen verilerin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle kişinin kendisi aleyhine bir sonucun ortaya çıkmasına itiraz etme\n8. Kişisel verilerin kanuna aykırı olarak işlenmesi sebebiyle zarara uğraması hâlinde zararın giderilmesini talep etme\n\nBu haklar doğrultusunda talep yapmak için mobil uygulamadaki \"KVKK Başvurusu\" formunu kullanabilirsiniz. Başvurular en geç 30 gün içinde ücretsiz sonuçlandırılır.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 5
+      },
+      "reasons": {},
+      "latency_ms": 5097,
+      "assistant_tokens": {
+        "input": 1942,
+        "output": 287,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5739,
+        "output": 1425,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-082",
+      "question": "Verilerim çalınırsa şirket ne yapmak zorunda?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kişisel verileriniz çalınması veya yetkisiz işlenmesi durumunda Selim Bank aşağıdaki adımları atar:\n\n1. **Güvenlik Tedbirleri**: Kanun gereği, verilerinüzün hukuka aykırı işlenmesini ve erişilmesini önlemek için teknik ve idari tedbirler alırız [1].\n2. **Bildirim**: Veri sorumlusu (bankamız) kişisel verilerin kanuni olmayan yollarla elde edildiğini fark ederse, en kısa sürede ilgili kişiye ve Kurula bildiririz [1].\n3. **Kontrol ve Denetim**: İç kurumumuzda Kanun hükümlerinin uygulanmasını sağlamak amacıyla gerekli denetlem yaparız [1].\n\nKaynak: [1]",
+      "cited": [
+        "kvkk-6698:Madde 12"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 3852,
+      "assistant_tokens": {
+        "input": 1934,
+        "output": 178,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5419,
+        "output": 1448,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-083",
+      "question": "Veri sorumlusuna yaptığım başvuru ne kadar sürede cevaplanmalı?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkezine başvurabilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {
+        "Groundedness": 3,
+        "Completeness": 1,
+        "Relevance": 3
+      },
+      "reasons": {
+        "Groundedness": "The context (Article 13-(2)) clearly states that the data controller must respond within a maximum of thirty days, but the response incorrectly claims it could not find this information in the documents.",
+        "Completeness": "The response provides no information from the ground truth; it only states that the information was not found and directs the user elsewhere.",
+        "Relevance": "The response does not provide the specific timeframe requested by the user, thus it is incomplete, although it offers a helpful redirection."
+      },
+      "latency_ms": 9019,
+      "assistant_tokens": {
+        "input": 2635,
+        "output": 34,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 8620,
+        "output": 2110,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-084",
+      "question": "Başvurum reddedilirse Kurula ne zamana kadar şikâyet edebilirim?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kanun 14. maddesine göre, başvurunun reddedilmesi, verilen cevabın yetersiz bulunması veya süresince cevap verilmemesi hâllerinde; ilgili kişi, veri sorumlusunun cevabını öğrendiği tarihten itibaren otuz ve her hâlde başvuru tarihinden itibaren altmış gün içinde Kurula şikâyette bulunabilir. [1]",
+      "cited": [
+        "kvkk-6698:Madde 14"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 2128,
+      "assistant_tokens": {
+        "input": 2714,
+        "output": 98,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5854,
+        "output": 1190,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-085",
+      "question": "Bankaya başvurmadan doğrudan Kurula şikâyette bulunabilir miyim?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "procedure"
+      ],
+      "answer": "Hayır, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun 13. maddesine göre önce veri sorumlusuna (bankaya) başvurulmalı ve en geç 30 gün içinde cevap alınmalıdır. Kaynak: [3]",
+      "cited": [
+        "kvkk-6698:Madde 15"
+      ],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1384,
+      "assistant_tokens": {
+        "input": 2433,
+        "output": 66,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5515,
+        "output": 1356,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-086",
+      "question": "Kurul şikâyetime iki ay içinde cevap vermezse ne olur?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Kanun hükümlerine göre, şikâyet üzerine veya resen yapılan inceleme sonucunda, şikâyet tarihinden itibaren altmış gün içinde cevap verilmezse talep reddedilmiş sayılır [2]. Müşterinin şikayetine ilişkin bir işlem yapması için Müşteri İletişim Merkezi'ne yönlendirilmelidir.",
+      "cited": [
+        "kvkk-6698:Madde 15"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 4,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 1908,
+      "assistant_tokens": {
+        "input": 2966,
+        "output": 88,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 12768,
+        "output": 3179,
+        "calls": 5
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-087",
+      "question": "Veri Sorumluları Siciline kimler kaydolmak zorunda?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kişisel verileri işleyen gerçek ve tüzel kişiler, veri işlemeye başlamadan önce Veri Sorumluları Siciline kaydolmak zorundadır. [1]",
+      "cited": [
+        "kvkk-6698:Madde 16"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 4,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 3232,
+      "assistant_tokens": {
+        "input": 2586,
+        "output": 41,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5631,
+        "output": 1374,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-088",
+      "question": "Kişisel verileri silmemek suç mu?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kişisel verileri silmek suç değildir. Kişisel Verilerin Korunması Kanunu (KVKK) Madde 7, kişisel verilerin işlenmesini gerektiren sebeplerin ortadan kalkması hâlinde veri sorumlusu tarafından silinmesi, yok edilmesi veya anonim hâle getirilmesi gerektiğini belirmektedir. Müşterinin talebi üzerine de veriler silinebilir.\n\n[4]",
+      "cited": [
+        "kvkk-6698:Madde 7"
+      ],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 3,
+        "Completeness": 2,
+        "Relevance": 5
+      },
+      "reasons": {
+        "Groundedness": "The response incorrectly states that not deleting personal data is not a crime, which contradicts Context [1] stating that failure to delete/anonymize contrary to Article 7 leads to penalties under Article 138 of Law 5237.",
+        "Completeness": "The response discusses the obligation to delete data under KVKK Article 7 but completely omits the crucial information from the Ground Truth, which specifies that failure to delete or anonymize data contrary to the law results in punishment under Article 138 of the Turkish Penal Code."
+      },
+      "latency_ms": 2674,
+      "assistant_tokens": {
+        "input": 2285,
+        "output": 98,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5529,
+        "output": 1608,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-089",
+      "question": "Aydınlatma yükümlülüğüne uymayan şirkete ne ceza verilir?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kişisel Verilerin Korunması Kanunu'na göre, aydınlatma yükümlülüğünü yerine getirmeyen şirketlere **5.000 TL ile 100.000 TL** arasında idari para ceza verilir. [1]",
+      "cited": [
+        "kvkk-6698:Madde 10"
+      ],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 4155,
+      "assistant_tokens": {
+        "input": 2550,
+        "output": 63,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 8653,
+        "output": 2178,
+        "calls": 4
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-090",
+      "question": "Kişisel Verileri Koruma Kurumu'nun merkezi nerede?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kişisel Verileri Koruma Kurumu'nun merkezi Ankara'dır. [3]",
+      "cited": [
+        "kvkk-6698:Madde 26"
+      ],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 5,
+        "Relevance": 4
+      },
+      "reasons": {},
+      "latency_ms": 741,
+      "assistant_tokens": {
+        "input": 2299,
+        "output": 20,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5276,
+        "output": 944,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-091",
+      "question": "Kişisel Verileri Koruma Kurulu kaç üyeden oluşuyor?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact"
+      ],
+      "answer": "Kişisel Verileri Koruma Kurulu 9 üye ile oluşmaktadır. [1]",
+      "cited": [
+        "kvkk-6698:Madde 21"
+      ],
+      "citation_correct": true,
+      "refused": false,
+      "scores": {
+        "Groundedness": 5,
+        "Completeness": 3,
+        "Relevance": 4
+      },
+      "reasons": {
+        "Completeness": "The response correctly states the total number of members (9) but omits the crucial details about how the members are selected (5 by TBMM and 4 by the President) as provided in the ground truth."
+      },
+      "latency_ms": 620,
+      "assistant_tokens": {
+        "input": 2806,
+        "output": 21,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 5784,
+        "output": 1122,
+        "calls": 3
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-092",
+      "question": "Evde ailemle ilgili tuttuğum notlar KVKK kapsamında mı?",
+      "expected_doc": "kvkk-6698",
+      "tags": [
+        "fact",
+        "paraphrase"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkezi'ne başvurmanız gerekebilir.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {
+        "Groundedness": 2,
+        "Completeness": 1,
+        "Relevance": 3
+      },
+      "reasons": {
+        "Groundedness": "The context (Article 28(1)(a)) explicitly states that processing personal data by natural persons for activities related to family members living in the home is an exception to the law. The response fails to extract this information from the context and instead states it could not find the information, thus failing to answer based on the provided data.",
+        "Completeness": "The response provides no information from the ground truth; instead, it states that the information could not be found in their documents.",
+        "Relevance": "The response does not answer the specific legal question about KVKK compliance but instead states it lacks the information and directs the user to a support channel, making it a partial response."
+      },
+      "latency_ms": 2054,
+      "assistant_tokens": {
+        "input": 2075,
+        "output": 36,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 10191,
+        "output": 3048,
+        "calls": 5
+      },
+      "error": null,
+      "answerable": true
+    },
+    {
+      "id": "q-093",
+      "question": "Selim Bank'ın genel müdürü kim?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkezi'ne 444 0 444 numaralı telefonla ulaşabilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {},
+      "reasons": {},
+      "latency_ms": 982,
+      "assistant_tokens": {
+        "input": 1262,
+        "output": 47,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 0,
+        "output": 0,
+        "calls": 0
+      },
+      "error": null,
+      "answerable": false
+    },
+    {
+      "id": "q-094",
+      "question": "Konut kredisi faiz oranınız kaç?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "answer": "Maalesef, konut kredisi faiz oranları hakkında bilgi bulamam. Sadece kredi kartı sözleşmesi ve ücretler hakkında kaynaklarım mevcut. Konut kredisi sorularınız için lütfen Müşteri İletişim Merkez'i arayın.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {},
+      "reasons": {},
+      "latency_ms": 1809,
+      "assistant_tokens": {
+        "input": 1358,
+        "output": 70,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 0,
+        "output": 0,
+        "calls": 0
+      },
+      "error": null,
+      "answerable": false
+    },
+    {
+      "id": "q-095",
+      "question": "Vadeli mevduata yıllık ne kadar faiz veriyorsunuz?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkez'i'ni arayarak bu bilgiyi öğrenebilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {},
+      "reasons": {},
+      "latency_ms": 1477,
+      "assistant_tokens": {
+        "input": 1422,
+        "output": 42,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 0,
+        "output": 0,
+        "calls": 0
+      },
+      "error": null,
+      "answerable": false
+    },
+    {
+      "id": "q-096",
+      "question": "En yakın şubeniz nerede, kaçta kapanıyor?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "answer": "Maalesef, şube konumları ve çalışma saatleri hakkında bilgi kaynaklarımızda yer almamakla birlikte, bu konuda yardımcı olamıyorum. Şube konumları ve iş saatleri hakkında güncel bilgi için lütfen Selim Bank Müşteri İletişim Merkezi'ni arayın.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {},
+      "reasons": {},
+      "latency_ms": 1549,
+      "assistant_tokens": {
+        "input": 1441,
+        "output": 78,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 0,
+        "output": 0,
+        "calls": 0
+      },
+      "error": null,
+      "answerable": false
+    },
+    {
+      "id": "q-097",
+      "question": "Bugün dolar kuru kaç?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkez'i'ni arayarak güncel döviz kurlarını öğrenebilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {},
+      "reasons": {},
+      "latency_ms": 2012,
+      "assistant_tokens": {
+        "input": 1709,
+        "output": 45,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 0,
+        "output": 0,
+        "calls": 0
+      },
+      "error": null,
+      "answerable": false
+    },
+    {
+      "id": "q-098",
+      "question": "Kredi kartı başvurusu için hangi belgeleri getirmem gerekiyor?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "answer": "Kredi kartı başvurusu için gerekli belgeler ve süreç hakkında bilgi vermek için müşterinin demo seçilmesi ve hesap araçlarının kullanılmasını istiyorum. Lütfen ekranın üstündeki listeden bir demo müşteri seçiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": false,
+      "scores": {},
+      "reasons": {},
+      "latency_ms": 1182,
+      "assistant_tokens": {
+        "input": 1414,
+        "output": 63,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 0,
+        "output": 0,
+        "calls": 0
+      },
+      "error": null,
+      "answerable": false
+    },
+    {
+      "id": "q-099",
+      "question": "Müşteri İletişim Merkezi'nin telefon numarası nedir?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Müşteri İletişim Merkezi'ne yönlendirilirsiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {},
+      "reasons": {},
+      "latency_ms": 697,
+      "assistant_tokens": {
+        "input": 1383,
+        "output": 34,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 0,
+        "output": 0,
+        "calls": 0
+      },
+      "error": null,
+      "answerable": false
+    },
+    {
+      "id": "q-100",
+      "question": "Selim Bank'ın hisseleri borsada işlem görüyor mu?",
+      "expected_doc": null,
+      "tags": [
+        "unanswerable"
+      ],
+      "answer": "Bu konuda dokümanlarımızda bilgi bulamadım. Selim Bank kurgusal bir bankadır ve hisselerinin borsada işlem görüp görmediği hakkında bilgi kaynaklarımızda yer almamaktadır.\n\nBanka hizmetleri, mevcut hesaplarınız, bakiyeniz veya geçmiş işlemleriniz hakkında bilgi almak isterseniz, lütfen ekranda seçebileceğiniz demo müşterilerden birini seçiniz.",
+      "cited": [],
+      "citation_correct": false,
+      "refused": true,
+      "scores": {},
+      "reasons": {},
+      "latency_ms": 2033,
+      "assistant_tokens": {
+        "input": 1342,
+        "output": 111,
+        "calls": 1
+      },
+      "judge_tokens": {
+        "input": 0,
+        "output": 0,
+        "calls": 0
+      },
+      "error": null,
+      "answerable": false
+    }
+  ]
+}

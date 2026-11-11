@@ -86,10 +86,14 @@ try
     if (options.Mode == "answer")
     {
         var mainClient = services.GetRequiredService<IChatClient>();
+        var judgeClient = options.Judge == "small"
+            ? services.GetRequiredKeyedService<IChatClient>(ModelServiceCollectionExtensions.SmallChatClientKey)
+            : mainClient;
+        string judgeModel = options.Judge == "small" ? nim.SmallChatModel : nim.ChatModel;
         var assistantMeter = new UsageMeter(mainClient);
-        var judgeMeter = new UsageMeter(mainClient);
+        var judgeMeter = new UsageMeter(judgeClient);
         var assistant = new BankAssistant(assistantMeter, services.GetRequiredService<IDocumentRetriever>());
-        var evaluator = new AnswerEvaluator(assistant, assistantMeter, AnswerEvaluator.CreateJudge(), new ChatConfiguration(judgeMeter), judgeMeter);
+        var evaluator = new AnswerEvaluator(assistant, assistantMeter, AnswerEvaluator.CreateJudges(),new ChatConfiguration(judgeMeter), judgeMeter);
 
         var answers = await evaluator.RunAsync(questions, (n, r) => Console.WriteLine(string.Create(CultureInfo.InvariantCulture,
             $"[{n}/{questions.Count}] {r.Id} {string.Join(" ", r.Scores.Select(s => $"{s.Key[..1]}={s.Value?.ToString("F0", CultureInfo.InvariantCulture) ?? "-"}"))}{(r.Refused ? " ret" : "")}{(r.Error is null ? "" : " HATA " + r.Error)} ({r.LatencyMs / 1000:F1} sn)")), cts.Token);
@@ -99,7 +103,7 @@ try
             createdUtc,
             options.Subset,
             nim.ChatModel,
-            nim.ChatModel, // ADR-001: the judge is the main model
+            judgeModel, // ADR-001 default: the main model
             nameof(RetrievalMode.Hybrid),
             options.PriceIn is double pin && options.PriceOut is double pout ? new Pricing(pin, pout) : null,
             answers);

@@ -16,12 +16,14 @@ namespace Eval.Runner;
 internal sealed class AnswerEvaluator(
     BankAssistant assistant,
     UsageMeter assistantMeter,
-    IEvaluator judge,
+    IReadOnlyList<IEvaluator> judges,
     ChatConfiguration judgeConfiguration,
     UsageMeter judgeMeter)
 {
-    public static IEvaluator CreateJudge() =>
-        new CompositeEvaluator(new GroundednessEvaluator(), new CompletenessEvaluator(), new RelevanceEvaluator());
+    public const int MaxJudgeAttempts = 3;
+
+    public static IReadOnlyList<IEvaluator> CreateJudges() =>
+        [new GroundednessEvaluator(), new CompletenessEvaluator(), new RelevanceEvaluator()];
 
     public async Task<IReadOnlyList<AnswerResult>> RunAsync(
         IReadOnlyList<EvalQuestion> questions, Action<int, AnswerResult>? progress, CancellationToken cancellationToken)
@@ -97,56 +99,70 @@ internal sealed class AnswerEvaluator(
             error);
     }
 
+    /// <summary>
+    /// Runs each judge on its own. A metric whose score could not be parsed (the small judge model sometimes leaves
+    /// its &lt;S2&gt; tag out, about 8% of calls on 2026-11-11) is retried with that judge, up to <see cref="MaxJudgeAttempts"/>.
+    /// </summary>
     private async Task<string?> JudgeAsync(
         EvalQuestion question, string answer, IReadOnlyList<CitedSource> sources,
         Dictionary<string, double?> scores, Dictionary<string, string> reasons, CancellationToken cancellationToken)
     {
-        try
+        foreach (string name in AnswerReport.Metrics)
         {
-            var result = await judge.EvaluateAsync(
-                [new ChatMessage(ChatRole.User, question.Question)],
-                new ChatResponse(new ChatMessage(ChatRole.Assistant, answer)),
-                judgeConfiguration,
-                [new GroundednessEvaluatorContext(GroundingContext(sources)), new CompletenessEvaluatorContext(question.ReferenceAnswer)],
-                cancellationToken).ConfigureAwait(false);
+            scores[name] = null;
+        }
 
-            foreach (string name in AnswerReport.Metrics)
+        string? lastError = null;
+        foreach (var judge in judges)
+        {
+            var pending = judge.EvaluationMetricNames.Where(AnswerReport.Metrics.Contains).ToHashSet();
+            for (int attempt = 1; attempt <= MaxJudgeAttempts && pending.Count > 0; attempt++)
             {
-                if (result.TryGet(name, out NumericMetric? metric))
+                try
                 {
-                    scores[name] = metric.Value;
-                    if (metric.Value is < 4 && !string.IsNullOrWhiteSpace(metric.Reason))
+                    var result = await judge.EvaluateAsync(
+                        [new ChatMessage(ChatRole.User, question.Question)],
+                        new ChatResponse(new ChatMessage(ChatRole.Assistant, answer)),
+                        judgeConfiguration,
+                        [new GroundednessEvaluatorContext(GroundingContext(sources)), new CompletenessEvaluatorContext(question.ReferenceAnswer)],
+                        cancellationToken).ConfigureAwait(false);
+
+                    foreach (string name in pending.ToList())
                     {
-                        reasons[name] = metric.Reason;
+                        if (result.TryGet(name, out NumericMetric? metric) && metric.Value is not null
+                            && !(metric.Diagnostics ?? []).Any(d => d.Severity == EvaluationDiagnosticSeverity.Error))
+                        {
+                            scores[name] = metric.Value;
+                            if (metric.Value < 4 && !string.IsNullOrWhiteSpace(metric.Reason))
+                            {
+                                reasons[name] = metric.Reason;
+                            }
+
+                            pending.Remove(name);
+                        }
+                        else
+                        {
+                            string? message = (result.TryGet(name, out EvaluationMetric? any) ? any.Diagnostics : null)?
+                                .FirstOrDefault(d => d.Severity == EvaluationDiagnosticSeverity.Error)?.Message;
+                            lastError = message is null ? $"{name} puanı yok" : Shorten(message);
+                        }
                     }
                 }
-                else
+                catch (Exception ex) when (ex is not OperationCanceledException)
                 {
-                    scores[name] = null;
+                    lastError = ex.GetType().Name;
                 }
             }
-
-            var errors = result.Metrics.Values
-                .SelectMany(m => m.Diagnostics ?? [])
-                .Where(d => d.Severity == EvaluationDiagnosticSeverity.Error)
-                .ToList();
-            if (errors.Count == 0)
-            {
-                return null;
-            }
-
-            string first = errors[0].Message.ReplaceLineEndings(" ");
-            return $"Hakem: {errors.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)} tanı hatası ({(first.Length <= 200 ? first : first[..200] + "…")})";
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            foreach (string name in AnswerReport.Metrics)
-            {
-                scores[name] = null;
-            }
 
-            return "Hakem: " + ex.GetType().Name;
-        }
+        int missing = scores.Count(s => s.Value is null);
+        return missing == 0 ? null : $"Hakem: {missing.ToString(System.Globalization.CultureInfo.InvariantCulture)} metrik {MaxJudgeAttempts} denemede puanlanamadı ({lastError})";
+    }
+
+    private static string Shorten(string message)
+    {
+        string line = message.ReplaceLineEndings(" ");
+        return line.Length <= 200 ? line : line[..200] + "…";
     }
 
     /// <summary>The five passages as the model saw them, numbered, so the judge checks against exactly that.</summary>

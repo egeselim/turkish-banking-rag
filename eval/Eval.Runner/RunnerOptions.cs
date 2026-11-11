@@ -17,6 +17,7 @@ internal sealed record RunnerOptions
           --baseline              Raporu eval/reports/baseline-<mod>.{json,md} olarak yaz (yalnızca --subset full)
           --limit <n>             Yalnızca ilk n soru (deneme için; --baseline ile kullanılamaz)
           --fail-under-hit5 <0-1> retrieval: Hybrid Hit@5 bu oranın altındaysa çıkış kodu 1
+          --judge main|small      answer: hakem modeli (varsayılan main = Nim:ChatModel; small = Nim:SmallChatModel)
           --price-in <usd>        answer: milyon giriş token'ı başına varsayımsal fiyat
           --price-out <usd>       answer: milyon çıkış token'ı başına varsayımsal fiyat
         """;
@@ -40,6 +41,9 @@ internal sealed record RunnerOptions
     public double? FailUnderHit5 { get; init; }
 
     public int? Limit { get; init; }
+
+    /// <summary>answer mode: "main" (ADR-001 default) or "small" (Nim:SmallChatModel) as the judge.</summary>
+    public string Judge { get; init; } = "main";
 
     public double? PriceIn { get; init; }
 
@@ -65,6 +69,7 @@ internal sealed record RunnerOptions
                 "--baseline" => options with { WriteBaseline = true },
                 "--fail-under-hit5" => options with { FailUnderHit5 = ParseRatio(Value(args, ref i, arg)) },
                 "--limit" => options with { Limit = ParseCount(Value(args, ref i, arg)) },
+                "--judge" => options with { Judge = OneOf(Value(args, ref i, arg), arg, "main", "small") },
                 "--price-in" => options with { PriceIn = ParsePrice(Value(args, ref i, arg), arg) },
                 "--price-out" => options with { PriceOut = ParsePrice(Value(args, ref i, arg), arg) },
                 _ => throw new ArgumentException($"Bilinmeyen seçenek: {arg}"),

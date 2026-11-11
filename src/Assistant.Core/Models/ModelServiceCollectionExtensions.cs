@@ -35,7 +35,12 @@ public static class ModelServiceCollectionExtensions
         // Chat: retries come from the OpenAI SDK (NimOptions.MaxRetries); an HTTP retry layer would multiply
         // them, and a short attempt timeout would cut long answers.
         services.AddHttpClient(NimClientFactory.HttpClientName, (sp, http) =>
-            http.Timeout = sp.GetRequiredService<IOptions<NimOptions>>().Value.RequestTimeout);
+                http.Timeout = sp.GetRequiredService<IOptions<NimOptions>>().Value.RequestTimeout)
+            .AddHttpMessageHandler(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<NimOptions>>();
+                return new NimChatRequestHandler(() => options.Value.DisableThinking);
+            });
 
         // Embeddings answer in under a second, but free-tier requests occasionally hang indefinitely.
         // Ingestion makes many calls, so cut a stuck attempt early and retry instead of failing the whole sync.

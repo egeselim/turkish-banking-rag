@@ -1,6 +1,6 @@
 # ADR-001: NIM model seçimi (ana, küçük, embedding)
 
-- **Durum:** Kabul edildi. Embedding kararı 2026-10-25'te (1.5) **revize edildi**: 1b yerine 8b; aşağıdaki "Revizyon" bölümüne bakın.
+- **Durum:** Kabul edildi. Embedding kararı 2026-10-25'te (1.5) **revize edildi**: 1b yerine 8b; aşağıdaki "Revizyon" bölümüne bakın. **2026-11-11 (3.3): ana model geçici olarak yedeğe alındı, düşünme kapalı; eval hakemi küçük model.** Aşağıdaki "Geçici değişiklik" bölümüne bakın.
 - **Tarih:** 2026-10-24
 - **Adım:** 1.2
 
@@ -8,9 +8,24 @@
 
 | Rol | Model (konfigürasyon anahtarı) | Yedek |
 |---|---|---|
-| Ana sohbet ve araç çağrısı | `nvidia/nemotron-3-ultra-550b-a55b` (`Nim:ChatModel`) | `nvidia/nemotron-3.5-lightning-30b-a3b` |
+| Ana sohbet ve araç çağrısı | `nvidia/nemotron-3-ultra-550b-a55b` (`Nim:ChatModel`); **2026-11-11'den beri geçici olarak yedek, düşünme kapalı** | `nvidia/nemotron-3.5-lightning-30b-a3b` |
 | Küçük model (niyet sınıflandırma ve yönlendirme) | `nvidia/nemotron-3.5-bolt-e4b` (`Nim:SmallChatModel`) | yok |
 | Embedding | `nvidia/nemotron-3.5-embed-8b` (`Nim:EmbeddingModel`, 4096 boyut, asimetrik) | `nvidia/nemotron-3.5-embed-1b` (2048 boyut; Türkçe parafrazda belirgin biçimde zayıf) |
+
+## Geçici değişiklik (2026-11-11, adım 3.3): ana model lightning, düşünme kapalı; hakem bolt
+
+**Neden:** NIM ücretsiz katmanında `nemotron-3-ultra-550b-a55b` 2026-11-11'de saatlerce boş cevap döndü. Ham API sondası: basit bir Türkçe soruya 12 reasoning token'ı ve `finish_reason=stop` ile boş içerik; `enable_thinking=false` ile 2 token ve yine boş içerik. Ham istemciyle çalışan `NimLiveTests` de düştü; yani sorun sağlayıcı tarafında. Önceki gün aynı testler geçiyordu.
+
+**Yapılan (kullanıcı kararı):**
+- `Nim:ChatModel` = `nvidia/nemotron-3.5-lightning-30b-a3b` (bu ADR'deki yedek).
+- `Nim:DisableThinking` = `true`: `NimChatRequestHandler` her sohbet isteğine `chat_template_kwargs: {"enable_thinking": false}` ekliyor. Düşünme açıkken lightning, 5 kaynaklı RAG prompt'unda 1.500 token'lık çıkış sınırını reasoning'e harcayıp boş cevap verdi; düşünme kapalıyken uygulamanın canlı testleri 11/11 geçti (sohbet, araç çağrısı, onay).
+- **Eval hakemi küçük model** (`nemotron-3.5-bolt-e4b`, runner'da `--judge small`). Lightning hakem olarak MEAI.Evaluation'ın beklediği `<S0>/<S1>/<S2>` puan biçimine uymadı ("Let's think step by step" ile serbest metin yazdı). Bolt biçime uyuyor.
+
+**Sonuçları ve sınırları:**
+- 3.3 baseline'ları bu yapılandırmayla alındı ([docs/eval/baseline.md](../eval/baseline.md)). Kararın asıl modeli olan ultra ile ölçülmüş değil.
+- 1.2'deki nitel değerlendirmeye göre lightning'in Türkçesi ultra'dan zayıf (yazım ve olgu hataları); bu değerlendirme düşünme açıkken yapılmıştı.
+- Daha küçük bir model (bolt) daha büyük bir modelin cevabını puanlıyor. Puanlar mutlak değil, aynı hakemle yapılan karşılaştırmalar için anlamlı.
+- **Geri dönüş:** ultra düzelince `Nim:ChatModel` eski değerine, `Nim:DisableThinking` `false`'a alınır. Aynı answer eval ultra hem asistan hem hakem olarak çalıştırılıp bu baseline'la karşılaştırılır (kullanıcı kararı).
 
 ## Revizyon (2026-10-25, adım 1.5): embedding 1b'den 8b'ye
 

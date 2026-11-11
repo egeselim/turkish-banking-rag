@@ -30,6 +30,12 @@ public sealed class NimOptions
     /// <summary>With the cache on: never call NIM; a text missing from the cache is an error.</summary>
     public bool EmbeddingCacheOffline { get; set; }
 
+    /// <summary>
+    /// Sends <c>enable_thinking=false</c> with every chat request (<c>Nim:DisableThinking</c>). Needed for the
+    /// nemotron-3.5 backup model, whose reasoning otherwise fills the output budget (ADR-001, 2026-11-11).
+    /// </summary>
+    public bool DisableThinking { get; set; }
+
     public TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(120);
 
     /// <summary>Chat SDK retries per request. Kept low: a stuck free-tier model would otherwise block for minutes.</summary>
