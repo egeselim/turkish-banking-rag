@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup Label="Aspire">
-    <PackageVersion Include="Aspire.Hosting.Qdrant" Version="13.6.4" />
-    <PackageVersion Include="Aspire.Qdrant.Client" Version="13.6.4" />
+    <PackageVersion Include="Aspire.Hosting.Qdrant" Version="13.6.5" />
+    <PackageVersion Include="Aspire.Qdrant.Client" Version="13.6.5" />
   </ItemGroup>
 
   <ItemGroup Label="ServiceDefaults">
@@ -24,6 +24,9 @@
     <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Agents.AI" Version="1.26.0" />
+    <!-- Eval.Runner answer mode (3.3): Groundedness, Completeness, Relevance with an LLM judge. -->
+    <PackageVersion Include="Microsoft.Extensions.AI.Evaluation" Version="10.11.0" />
+    <PackageVersion Include="Microsoft.Extensions.AI.Evaluation.Quality" Version="10.11.0" />
   </ItemGroup>
 
   <ItemGroup Label="VectorData">

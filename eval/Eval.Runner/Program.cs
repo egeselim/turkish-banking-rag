@@ -1,9 +1,11 @@
 using System.Globalization;
+using Assistant.Core.Chat;
 using Assistant.Core.Models;
 using Assistant.Core.Retrieval;
 using Assistant.Rag.Search;
 using Eval.Runner;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.AI.Evaluation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Qdrant.Client;
@@ -11,6 +13,9 @@ using Testcontainers.Qdrant;
 
 // Eval runner (step 3.2): retrieval mode. Uses the app's own composition (AddNimModels + AddRag), with the
 // on-disk embedding cache switched on, so a run without an API key measures exactly what the app searches.
+
+// Answer mode: above this share of failed questions the run is not written as the baseline.
+const double MaxErrorShare = 0.05;
 
 RunnerOptions options;
 try
@@ -62,15 +67,63 @@ try
 
     var questions = QuestionSet.Load(Path.Combine(root, "eval", "questions.jsonl"))
         .Where(q => options.Subset == "full" || q.Smoke)
+        .Take(options.Limit ?? int.MaxValue)
         .ToList();
-    Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"{chunks.Count} chunk yüklendi; {questions.Count} soru ölçülüyor ({options.Subset})..."));
+    Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"{chunks.Count} chunk yüklendi; {questions.Count} soru ölçülüyor ({options.Subset}, {options.Mode})..."));
+
+    string reportsDir = Path.Combine(root, "eval", "reports");
+    string? comparePath = options.NoCompare ? null : options.Compare ?? Path.Combine(reportsDir, options.BaselineName + ".json");
+    if (options.Compare is not null && !File.Exists(options.Compare))
+    {
+        Console.Error.WriteLine($"Karşılaştırma raporu bulunamadı: {options.Compare}");
+        return 2;
+    }
+
+    string? baselineJson = comparePath is not null && File.Exists(comparePath) ? await File.ReadAllTextAsync(comparePath, cts.Token) : null;
+    string? baselineName = baselineJson is null ? null : Path.GetFileName(comparePath);
+    var createdUtc = DateTimeOffset.UtcNow;
+
+    if (options.Mode == "answer")
+    {
+        var mainClient = services.GetRequiredService<IChatClient>();
+        var assistantMeter = new UsageMeter(mainClient);
+        var judgeMeter = new UsageMeter(mainClient);
+        var assistant = new BankAssistant(assistantMeter, services.GetRequiredService<IDocumentRetriever>());
+        var evaluator = new AnswerEvaluator(assistant, assistantMeter, AnswerEvaluator.CreateJudge(), new ChatConfiguration(judgeMeter), judgeMeter);
+
+        var answers = await evaluator.RunAsync(questions, (n, r) => Console.WriteLine(string.Create(CultureInfo.InvariantCulture,
+            $"[{n}/{questions.Count}] {r.Id} {string.Join(" ", r.Scores.Select(s => $"{s.Key[..1]}={s.Value?.ToString("F0", CultureInfo.InvariantCulture) ?? "-"}"))}{(r.Refused ? " ret" : "")}{(r.Error is null ? "" : " HATA " + r.Error)} ({r.LatencyMs / 1000:F1} sn)")), cts.Token);
+
+        var answerReport = new AnswerReport(
+            AnswerReport.CurrentSchemaVersion,
+            createdUtc,
+            options.Subset,
+            nim.ChatModel,
+            nim.ChatModel, // ADR-001: the judge is the main model
+            nameof(RetrievalMode.Hybrid),
+            options.PriceIn is double pin && options.PriceOut is double pout ? new Pricing(pin, pout) : null,
+            answers);
+        var answerBaseline = baselineJson is null ? null : AnswerReport.FromJson(baselineJson);
+        int errors = answers.Count(a => a.Error is not null);
+        bool tooManyErrors = answers.Count > 0 && (double)errors / answers.Count > MaxErrorShare;
+        if (tooManyErrors && options.WriteBaseline)
+        {
+            // An outage must not become the baseline; the run is kept under local/ for inspection.
+            Console.Error.WriteLine(string.Create(CultureInfo.InvariantCulture,
+                $"{errors}/{answers.Count} soruda hata var; baseline yazılmadı, rapor eval/reports/local/ altında."));
+            options = options with { WriteBaseline = false };
+        }
+
+        await WriteAsync(answerReport.ToJson(), AnswerMarkdown.Render(answerReport, answerBaseline, baselineName));
+        return tooManyErrors ? 1 : 0;
+    }
 
     var results = await RetrievalEvaluator.RunAsync(services.GetRequiredService<IDocumentRetriever>(), questions, cts.Token);
     var stats = services.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>().GetService<EmbeddingCacheStats>()!;
 
     var report = new RetrievalReport(
         RetrievalReport.CurrentSchemaVersion,
-        DateTimeOffset.UtcNow,
+        createdUtc,
         options.Subset,
         nim.EmbeddingModel,
         nim.EmbeddingDimensions,
@@ -78,30 +131,26 @@ try
         stats.Hits,
         stats.Added,
         results);
+    var baseline = baselineJson is null ? null : RetrievalReport.FromJson(baselineJson);
+    await WriteAsync(report.ToJson(), MarkdownReport.Render(report, baseline, baselineName));
 
-    string reportsDir = Path.Combine(root, "eval", "reports");
-    string? comparePath = options.NoCompare ? null : options.Compare ?? Path.Combine(reportsDir, "baseline-retrieval.json");
-    RetrievalReport? baseline = comparePath is not null && File.Exists(comparePath)
-        ? RetrievalReport.FromJson(await File.ReadAllTextAsync(comparePath, cts.Token))
-        : null;
-    if (options.Compare is not null && baseline is null)
+    async Task WriteAsync(string json, string markdown)
     {
-        Console.Error.WriteLine($"Karşılaştırma raporu bulunamadı: {options.Compare}");
-        return 2;
+        string outDir = options.WriteBaseline ? reportsDir : options.OutDir ?? Path.Combine(reportsDir, "local");
+        string name = options.WriteBaseline
+            ? options.BaselineName
+            : string.Create(CultureInfo.InvariantCulture, $"{options.Mode}-{options.Subset}-{createdUtc:yyyyMMdd-HHmmss}");
+        Directory.CreateDirectory(outDir);
+        await File.WriteAllTextAsync(Path.Combine(outDir, name + ".json"), json.ReplaceLineEndings("\n"), cts.Token);
+        await File.WriteAllTextAsync(Path.Combine(outDir, name + ".md"), markdown.ReplaceLineEndings("\n"), cts.Token);
+
+        int sectionEnd = markdown.IndexOf("\n## Zayıf", StringComparison.Ordinal) is int z and >= 0 ? z
+            : markdown.IndexOf("\n## ", StringComparison.Ordinal) is int s and >= 0 && options.Mode == "retrieval" ? s
+            : markdown.Length;
+        Console.WriteLine();
+        Console.WriteLine(markdown[..sectionEnd]);
+        Console.WriteLine($"\nRapor: {Path.GetRelativePath(root, Path.Combine(outDir, name + ".md"))}");
     }
-
-    string outDir = options.WriteBaseline ? reportsDir : options.OutDir ?? Path.Combine(reportsDir, "local");
-    string name = options.WriteBaseline
-        ? "baseline-retrieval"
-        : string.Create(CultureInfo.InvariantCulture, $"retrieval-{options.Subset}-{report.CreatedUtc:yyyyMMdd-HHmmss}");
-    Directory.CreateDirectory(outDir);
-    string markdown = MarkdownReport.Render(report, baseline, comparePath is null ? null : Path.GetFileName(comparePath));
-    await File.WriteAllTextAsync(Path.Combine(outDir, name + ".json"), report.ToJson().ReplaceLineEndings("\n"), cts.Token);
-    await File.WriteAllTextAsync(Path.Combine(outDir, name + ".md"), markdown.ReplaceLineEndings("\n"), cts.Token);
-
-    Console.WriteLine();
-    Console.WriteLine(markdown[..markdown.IndexOf("\n## ", StringComparison.Ordinal)]);
-    Console.WriteLine($"\nRapor: {Path.GetRelativePath(root, Path.Combine(outDir, name + ".md"))}");
 
     var hybrid = report.Summaries().Single(s => s.Mode == RetrievalMode.Hybrid);
     double hit5 = hybrid.Questions == 0 ? 0 : (double)hybrid.Hit5 / hybrid.Questions;

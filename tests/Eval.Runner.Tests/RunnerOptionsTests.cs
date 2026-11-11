@@ -28,10 +28,27 @@ public sealed class RunnerOptionsTests
         Assert.Equal(0.8, options.FailUnderHit5);
     }
 
+    [Fact]
+    public void Answer_mode_takes_prices_and_a_limit()
+    {
+        var options = RunnerOptions.Parse(["--mode", "answer", "--limit", "3", "--price-in", "0.5", "--price-out", "1.5"]);
+
+        Assert.Equal("answer", options.Mode);
+        Assert.Equal(3, options.Limit);
+        Assert.Equal(0.5, options.PriceIn);
+        Assert.Equal(1.5, options.PriceOut);
+        Assert.Equal("baseline-answer", options.BaselineName);
+    }
+
     [Theory]
     [InlineData("--subset", "all")]
-    [InlineData("--mode", "answer")]
     [InlineData("--mode", "other")]
+    [InlineData("--mode", "answer", "--offline")]
+    [InlineData("--mode", "answer", "--fail-under-hit5", "0.8")]
+    [InlineData("--price-in", "1", "--price-out", "1")]
+    [InlineData("--mode", "answer", "--price-in", "1")]
+    [InlineData("--limit", "0")]
+    [InlineData("--subset", "full", "--baseline", "--limit", "5")]
     [InlineData("--baseline")]
     [InlineData("--qdrant", "localhost:6334")]
     [InlineData("--fail-under-hit5", "80")]
