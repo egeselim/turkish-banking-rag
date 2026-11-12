@@ -30,6 +30,15 @@ public sealed class NimOptions
     /// <summary>With the cache on: never call NIM; a text missing from the cache is an error.</summary>
     public bool EmbeddingCacheOffline { get; set; }
 
+    /// <summary>Base of the NIM reranking endpoints; the model id and "/reranking" are appended (ADR-003).</summary>
+    public Uri RerankEndpoint { get; set; } = new("https://ai.api.nvidia.com/v1/retrieval/");
+
+    /// <summary>Folder of the on-disk rerank score cache (<c>Nim:RerankCachePath</c>); set by the eval runner only.</summary>
+    public string? RerankCachePath { get; set; }
+
+    /// <summary>With the rerank cache on: never call NIM; a missing score is an error.</summary>
+    public bool RerankCacheOffline { get; set; }
+
     /// <summary>
     /// Sends <c>enable_thinking=false</c> with every chat request (<c>Nim:DisableThinking</c>). Needed for the
     /// nemotron-3.5 backup model, whose reasoning otherwise fills the output budget (ADR-001, 2026-11-11).

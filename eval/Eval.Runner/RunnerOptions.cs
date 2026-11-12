@@ -17,6 +17,7 @@ internal sealed record RunnerOptions
           --baseline              Raporu eval/reports/baseline-<mod>.{json,md} olarak yaz (yalnızca --subset full)
           --limit <n>             Yalnızca ilk n soru (deneme için; --baseline ile kullanılamaz)
           --fail-under-hit5 <0-1> retrieval: Hybrid Hit@5 bu oranın altındaysa çıkış kodu 1
+          --rerank <id>[,<id>]    retrieval: re-ranker modellerini de karşılaştır (Vektör+rerank, Hybrid+rerank)
           --judge main|small      answer: hakem modeli (varsayılan main = Nim:ChatModel; small = Nim:SmallChatModel)
           --price-in <usd>        answer: milyon giriş token'ı başına varsayımsal fiyat
           --price-out <usd>       answer: milyon çıkış token'ı başına varsayımsal fiyat
@@ -41,6 +42,9 @@ internal sealed record RunnerOptions
     public double? FailUnderHit5 { get; init; }
 
     public int? Limit { get; init; }
+
+    /// <summary>retrieval mode: rerank model ids to compare; each adds "VectorOnly+id" and "Hybrid+id".</summary>
+    public IReadOnlyList<string> RerankModels { get; init; } = [];
 
     /// <summary>answer mode: "main" (ADR-001 default) or "small" (Nim:SmallChatModel) as the judge.</summary>
     public string Judge { get; init; } = "main";
@@ -70,6 +74,10 @@ internal sealed record RunnerOptions
                 "--fail-under-hit5" => options with { FailUnderHit5 = ParseRatio(Value(args, ref i, arg)) },
                 "--limit" => options with { Limit = ParseCount(Value(args, ref i, arg)) },
                 "--judge" => options with { Judge = OneOf(Value(args, ref i, arg), arg, "main", "small") },
+                "--rerank" => options with
+                {
+                    RerankModels = [.. Value(args, ref i, arg).Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)],
+                },
                 "--price-in" => options with { PriceIn = ParsePrice(Value(args, ref i, arg), arg) },
                 "--price-out" => options with { PriceOut = ParsePrice(Value(args, ref i, arg), arg) },
                 _ => throw new ArgumentException($"Bilinmeyen seçenek: {arg}"),
@@ -89,6 +97,11 @@ internal sealed record RunnerOptions
         if (options.Mode == "answer" && options.FailUnderHit5 is not null)
         {
             throw new ArgumentException("--fail-under-hit5 yalnızca retrieval modunda geçerli.");
+        }
+
+        if (options.Mode == "answer" && options.RerankModels.Count > 0)
+        {
+            throw new ArgumentException("--rerank yalnızca retrieval modunda geçerli; answer modu uygulamanın Rag:RerankModel ayarını kullanır.");
         }
 
         if (options.Mode == "retrieval" && (options.PriceIn is not null || options.PriceOut is not null))

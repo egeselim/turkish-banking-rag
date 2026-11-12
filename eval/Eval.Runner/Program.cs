@@ -60,7 +60,9 @@ try
         .AddNimModels(configuration)
         .AddSingleton(new QdrantClient(qdrantUri))
         .AddRag()
+        .Configure<RagOptions>(configuration.GetSection(RagOptions.SectionName)) // the app's Rag:Mode and Rag:RerankModel
         .BuildServiceProvider();
+    var rag = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<RagOptions>>().Value;
 
     var chunks = SourceDocuments.LoadChunks(Path.Combine(root, "docs", "sources"));
     await services.GetRequiredService<ChunkIndex>().SyncAsync(chunks, cts.Token);
@@ -92,8 +94,9 @@ try
         string judgeModel = options.Judge == "small" ? nim.SmallChatModel : nim.ChatModel;
         var assistantMeter = new UsageMeter(mainClient);
         var judgeMeter = new UsageMeter(judgeClient);
-        var assistant = new BankAssistant(assistantMeter, services.GetRequiredService<IDocumentRetriever>());
-        var evaluator = new AnswerEvaluator(assistant, assistantMeter, AnswerEvaluator.CreateJudges(),new ChatConfiguration(judgeMeter), judgeMeter);
+        // Exactly what the app searches with: the DI retriever (reranked when Rag:RerankModel is set) and Rag:Mode.
+        var assistant = new BankAssistant(assistantMeter, services.GetRequiredService<IDocumentRetriever>(), retrievalMode: rag.Mode);
+        var evaluator = new AnswerEvaluator(assistant, assistantMeter, AnswerEvaluator.CreateJudges(), new ChatConfiguration(judgeMeter), judgeMeter);
 
         var answers = await evaluator.RunAsync(questions, (n, r) => Console.WriteLine(string.Create(CultureInfo.InvariantCulture,
             $"[{n}/{questions.Count}] {r.Id} {string.Join(" ", r.Scores.Select(s => $"{s.Key[..1]}={s.Value?.ToString("F0", CultureInfo.InvariantCulture) ?? "-"}"))}{(r.Refused ? " ret" : "")}{(r.Error is null ? "" : " HATA " + r.Error)} ({r.LatencyMs / 1000:F1} sn)")), cts.Token);
@@ -104,7 +107,7 @@ try
             options.Subset,
             nim.ChatModel,
             judgeModel, // ADR-001 default: the main model
-            nameof(RetrievalMode.Hybrid),
+            string.IsNullOrWhiteSpace(rag.RerankModel) ? rag.Mode.ToString() : $"{rag.Mode}+{rag.RerankModel}",
             options.PriceIn is double pin && options.PriceOut is double pout ? new Pricing(pin, pout) : null,
             answers);
         var answerBaseline = baselineJson is null ? null : AnswerReport.FromJson(baselineJson);
@@ -122,7 +125,18 @@ try
         return tooManyErrors ? 1 : 0;
     }
 
-    var results = await RetrievalEvaluator.RunAsync(services.GetRequiredService<IDocumentRetriever>(), questions, cts.Token);
+    // Base methods on the plain hybrid retriever (never the app's reranked one), plus one pair per --rerank model.
+    var hybridRetriever = services.GetRequiredService<HybridRetriever>();
+    var rerankers = services.GetRequiredService<RerankerFactory>();
+    List<RetrievalMethod> methods = [.. RetrievalEvaluator.BaseMethods(hybridRetriever)];
+    foreach (string model in options.RerankModels)
+    {
+        var reranking = new RerankingRetriever(hybridRetriever, rerankers.Create(model), RetrievalMetrics.CandidateDepth);
+        methods.Add(new RetrievalMethod($"VectorOnly+{model}", reranking, RetrievalMode.VectorOnly, RetrievalMetrics.TopK));
+        methods.Add(new RetrievalMethod($"{RetrievalReport.Hybrid}+{model}", reranking, RetrievalMode.Hybrid, RetrievalMetrics.TopK));
+    }
+
+    var results = await RetrievalEvaluator.RunAsync(methods, questions, cts.Token);
     var stats = services.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>().GetService<EmbeddingCacheStats>()!;
 
     var report = new RetrievalReport(
@@ -156,7 +170,7 @@ try
         Console.WriteLine($"\nRapor: {Path.GetRelativePath(root, Path.Combine(outDir, name + ".md"))}");
     }
 
-    var hybrid = report.Summaries().Single(s => s.Mode == RetrievalMode.Hybrid);
+    var hybrid = report.Summaries().Single(s => s.Method == RetrievalReport.Hybrid);
     double hit5 = hybrid.Questions == 0 ? 0 : (double)hybrid.Hit5 / hybrid.Questions;
     if (options.FailUnderHit5 is double floor && hit5 < floor)
     {
@@ -165,6 +179,11 @@ try
     }
 
     return 0;
+}
+catch (DotNet.Testcontainers.Builders.DockerUnavailableException)
+{
+    Console.Error.WriteLine("Docker çalışmıyor: Qdrant başlatılamadı. Docker Desktop'ı açın ya da var olan bir Qdrant için --qdrant <url> verin.");
+    return 2;
 }
 catch (OperationCanceledException) when (cts.IsCancellationRequested)
 {

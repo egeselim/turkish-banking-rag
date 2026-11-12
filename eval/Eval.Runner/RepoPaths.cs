@@ -38,6 +38,8 @@ internal static class RepoPaths
             {
                 ["Nim:EmbeddingCachePath"] = Path.Combine(root, "eval", "cache", "embeddings"),
                 ["Nim:EmbeddingCacheOffline"] = offline ? "true" : "false",
+                ["Nim:RerankCachePath"] = Path.Combine(root, "eval", "cache", "rerank"),
+                ["Nim:RerankCacheOffline"] = offline ? "true" : "false",
             })
             .Build();
     }

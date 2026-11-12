@@ -20,9 +20,43 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 2.6 Injection örnekleri | Tamam | Çevrimdışı 293/293; Live injection 20/20 kesin kontrol geçti (tek çalıştırma); model 20 örneğin 3'ünde kandırıldı ama hiçbir işlem onaysız çalışmadı |
 | 3.1 Soru seti + injection 30 + şema doğrulama | Tamam | Çevrimdışı 623/623; 100 soru (smoke 20), injection 30; bozma deneyi rakam ve madde hatasını yakaladı. Yeni 10 injection örneği canlı çalıştırılmadı (3.3) |
 | 3.2 Eval.Runner, retrieval modu | Tamam | Çevrimdışı 652/652; anahtarsız offline smoke çalışıyor; baseline: Hybrid Hit@1 79/92, vektör 88/92 (hybrid vektörden kötü, ADR-002'ye eklendi, karar bekliyor) |
+| 3.4 Re-ranker + arama kararı | Tamam | Çevrimdışı 689/689; önceden yazılan kurala göre uygulama yalnız vektör (MRR 0,975), re-ranker kapalı (8b: 0,995, fark 0,0199 < 0,02). Answer: atıf doğruluğu %89 → %98, puanlar gürültü içinde. Smoke offline (rerank dahil) baseline'la aynı. [ADR-003](decisions/ADR-003-reranker.md) |
 | 3.3 Answer modu + injection geçme oranı | Tamam (geçici modelle) | Çevrimdışı 673/673; Live sohbet 11/11, injection 30/30 kesin kontrol, geçme 29/30 (elle sıkı sayım 25/30). Baseline lightning (düşünme kapalı) + hakem bolt ile alındı; ultra düzelince tekrar edilecek. [docs/eval/baseline.md](eval/baseline.md) |
 
 ## Günlük
+
+### 2026-11-12 (oturum 13): 3.4
+- **Kullanıcı kararları:**
+  - İki re-ranker da ölçülsün.
+  - Seçim önceden belirlenmiş kurala göre yapılsın; kural sonuçlardan önce ADR-002'ye yazıldı.
+  - Answer eval yalnızca seçilen yapılandırmayla çalıştırılsın.
+- **Re-ranker modeli:**
+  - PLAN'daki `llama-nemotron-rerank-1b-v2` NIM'de kaldırılmış: HTTP 410, "end of life 2026-08-25".
+  - Bu hesapla erişilebilen halefler `nemotron-3.5-rerank-8b` ve `llama-nemotron-rerank-vl-1b-v2`. 500m-v2 ve 3.5-rerank-1b 404 döndü.
+  - Şema ham sondayla doğrulandı (anahtar yazdırılmadı).
+- **Kod:**
+  - Rag: `IReranker` ve `RerankingRetriever` (seçilen yöntemle 20 aday → rerank → ilk 5).
+  - Core: `NimReranker`, `PiiMaskingReranker`, `DiskRerankCache`, `RerankerFactory` (yalnızca maskeleme sarmalayıcısını döndürür) ve `nim-rerank` HttpClient'ı.
+  - `RagOptions.Mode`, `RerankModel` ve `RerankCandidates` eklendi. `BankAssistant` arama yöntemini konfigürasyondan alıyor; Web: `Rag:Mode=VectorOnly`.
+  - Runner:
+    - `--rerank` seçeneği ve metin tabanlı yöntem adları (3.2 JSON'u uyumlu kalıyor).
+    - Temel yöntemlerde 20 derinlik ve Hit@20.
+    - MRR ilk 5 ile sınırlı.
+    - Docker yoksa stack trace yerine kısa bir Türkçe mesaj.
+- **Ölçüm:** [ADR-003](decisions/ADR-003-reranker.md) ve [docs/eval/baseline.md](eval/baseline.md).
+  - Hit@20 her temel yöntemde 92/92.
+  - 8b, vektör ve Hybrid adaylarıyla aynı sonucu veriyor (Hit@1 91/92, MRR 0,9946).
+  - vl-1b vektörden biraz kötü (0,9674).
+  - Gerçek rerank gecikmesi (önbellek boşken): 8b p95 619 ms, vl-1b p95 342 ms.
+  - **Ölçüm tuzağı:** sonra çalışan yöntemler önbellekten okuduğu için gecikmeleri düşük görünüyor; gerçek maliyet ilk çalışan yöntemden okundu.
+- **Kural uygulandı:** vektör + 8b, yalnız vektöre göre +0,01993 (eşik 0,02); Hybrid + 8b ile yalnız vektör arasındaki fark da 0,02'nin altında. Sonuç: **yalnız vektör, re-ranker kapalı.**
+- **Answer eval (kural 4, yalnız vektör):**
+  - G 4,67, C 4,12, R 4,22 (gürültü içinde).
+  - Atıf doğruluğu %89 → %98; p95 süre 0,9 sn kısa.
+  - Doğru ret 5/8 → 3/8: 2'si cümle eşleşmesi kusuru, q-096'da uydurma adres. Belirgin düşüş yok.
+  - Rapor `baseline-answer.*` olarak kaydedildi.
+- **Testler (+16, çevrimdışı 689):** `RerankingRetrieverTests`, `RerankerTests` (istek şekli, sıra, anahtarsız hata, önbellek, maskeleme, DI), `ReportTests` (Hit@20, eski rapor uyumu, yöntem adları), entegrasyon testinde sahte re-ranker.
+- **Docker** bu oturumda iki kez kendiliğinden kapandı; kullanıcı yeniden başlattı.
 
 ### 2026-11-11/12 (oturum 12): 3.3'ün bitirilmesi
 - **Kullanıcı kararları:**
@@ -483,8 +517,12 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
 
 ## Sıradaki adım
-**3.3 bitti (geçici modelle); sıradaki 3.4 (re-ranker; Hybrid, yalnız vektör ve Hybrid + re-ranker karşılaştırması; ADR-002 kararı). Henüz planlanmadı; kullanıcı "devam" diyene kadar başlanmıyor.**
-- 3.4'teki answer karşılaştırması baseline'la aynı yapılandırmayla (lightning, düşünme kapalı, hakem bolt) yapılmalı; aksi hâlde puanlar karşılaştırılamaz.
+**3.4 bitti; sıradaki 3.5 (GitHub Actions: build, test, offline smoke retrieval eval; anahtar varsa answer eval). Henüz planlanmadı; kullanıcı "devam" diyene kadar başlanmıyor.**
+- 3.5'ten önce GitHub remote açılmalı (Açık işler).
+- CI'daki `--fail-under-hit5` eşiği şu an Hybrid satırına bakıyor; uygulamanın yöntemine (`Rag:Mode`) bağlanmalı.
+- Answer karşılaştırmaları baseline'la aynı yapılandırmayla (lightning, düşünme kapalı, hakem bolt) yapılmalı.
+- **Prompt adayı:** "bulamadım"dan sonra iletişim bilgisi uydurma (q-093, q-096, q-100) ve injection elle okuma bulguları (inj-18, 19, 25, 26). Prompt değişirse smoke eval ve `InjectionLiveTests` tekrar çalıştırılmalı.
+- **Ölçüm aracı:** ret kontrolü cümle eşleşmesine dayanıyor ("bulamıyorum" gibi anlamca retleri kaçırıyor); iyileştirilmesi metriğin karşılaştırılabilirliğini bozar, o yüzden ayrı ve bilinçli yapılmalı.
 - **Ultra düzelince:** `NimLiveTests` yeşilse `Nim:ChatModel` ultra'ya, `Nim:DisableThinking` false'a alınır; answer eval `--judge main` ile tekrar çalıştırılır ve baseline'la karşılaştırılır (kullanıcı kararı). ADR-001'deki "Geçici değişiklik" bölümü kapatılır.
 - Elle okumada bulunan injection davranışları (inj-18, 19, 25, 26) ve q-093'teki uydurma, prompt değişikliği adayları. Prompt değişirse smoke eval ve `InjectionLiveTests` tekrar çalıştırılmalı.
 - 2. hafta sonu sürümü henüz arayüzde elle denenmedi (onay kartı, audit). Önce tampon oturumda bunu yapmak önerilir.

@@ -1,5 +1,7 @@
 using Assistant.Core.Audit;
 using Assistant.Core.Banking;
+using Assistant.Core.Retrieval;
+using Microsoft.Extensions.Options;
 using Assistant.Rag.Search;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,5 +22,6 @@ public static class ChatServiceCollectionExtensions
             sp.GetRequiredService<IDocumentRetriever>(),
             sp.GetService<ILoggerFactory>(),
             sp.GetService<SelimBankClient>(),
-            sp.GetService<AuditTrail>()));
+            sp.GetService<AuditTrail>(),
+            sp.GetService<IOptions<RagOptions>>()?.Value.Mode ?? RetrievalMode.Hybrid));
 }

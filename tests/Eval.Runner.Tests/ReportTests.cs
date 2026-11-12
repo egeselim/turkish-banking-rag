@@ -1,9 +1,9 @@
-using Assistant.Rag.Search;
-
 namespace Eval.Runner.Tests;
 
 public sealed class ReportTests
 {
+    private const string Hybrid = RetrievalReport.Hybrid;
+
     [Fact]
     public void Metrics_follow_hand_computed_values()
     {
@@ -11,7 +11,7 @@ public sealed class ReportTests
         // question only counts for latency: 10, 20, 30, 40, 50 ms → p50 30, p95 50.
         var report = Report(Q("a", 1, 10), Q("b", 2, 20), Q("c", null, 30), Q("d", 5, 40), Unanswerable("u", 50));
 
-        var hybrid = report.Summaries().Single(s => s.Mode == RetrievalMode.Hybrid);
+        var hybrid = report.Summaries().Single(s => s.Method == Hybrid);
 
         Assert.Equal(4, hybrid.Questions);
         Assert.Equal(1, hybrid.Hit1);
@@ -19,6 +19,27 @@ public sealed class ReportTests
         Assert.Equal(0.425, hybrid.Mrr, 10);
         Assert.Equal(30, hybrid.P50Ms);
         Assert.Equal(50, hybrid.P95Ms);
+    }
+
+    // Base methods are searched 20 deep: a rank of 12 counts for Hit@20 only, never for Hit@5 or MRR.
+    [Fact]
+    public void Ranks_beyond_five_count_for_hit20_only()
+    {
+        var report = Report(Q("a", 1, 1, depth: 20), Q("b", 12, 1, depth: 20), Q("c", null, 1, depth: 20));
+
+        var hybrid = report.Summaries().Single(s => s.Method == Hybrid);
+
+        Assert.Equal(1, hybrid.Hit5);
+        Assert.Equal(2, hybrid.Hit20);
+        Assert.Equal(1.0 / 3, hybrid.Mrr, 10);
+    }
+
+    [Fact]
+    public void Reports_without_depths_have_no_hit20()
+    {
+        var hybrid = Report(Q("a", 1, 1)).Summaries().Single(s => s.Method == Hybrid);
+
+        Assert.Null(hybrid.Hit20);
     }
 
     [Theory]
@@ -31,15 +52,18 @@ public sealed class ReportTests
         Assert.Equal(expected, RetrievalMetrics.Percentile(values, p));
     }
 
+    // Step 3.2 baselines stored enum names as keys; they must still load and compare.
     [Fact]
-    public void Json_round_trip_keeps_ranks_and_nulls()
+    public void Json_round_trip_keeps_ranks_nulls_and_method_names()
     {
         var report = Report(Q("a", 1, 10), Q("b", null, 20), Unanswerable("u", 5));
 
-        var back = RetrievalReport.FromJson(report.ToJson());
+        string json = report.ToJson();
+        var back = RetrievalReport.FromJson(json);
 
-        Assert.Equal(1, back.Questions[0].Ranks[RetrievalMode.Hybrid]);
-        Assert.Null(back.Questions[1].Ranks[RetrievalMode.Hybrid]);
+        Assert.Contains("\"Hybrid\": 1", json, StringComparison.Ordinal);
+        Assert.Equal(1, back.Questions[0].Ranks[Hybrid]);
+        Assert.Null(back.Questions[1].Ranks[Hybrid]);
         Assert.Empty(back.Questions[2].Ranks);
         Assert.Equal(report.Summaries(), back.Summaries());
     }
@@ -77,24 +101,40 @@ public sealed class ReportTests
         Assert.Contains("- u: soru u → sss:Soru 1", markdown, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Reranked_methods_get_their_own_rows_and_readable_names()
+    {
+        var q = Q("a", 2, 10) with
+        {
+            Ranks = new Dictionary<string, int?> { [Hybrid] = 2, ["Hybrid+nvidia/nemotron-3.5-rerank-8b"] = 1 },
+            LatencyMs = new Dictionary<string, double> { [Hybrid] = 3, ["Hybrid+nvidia/nemotron-3.5-rerank-8b"] = 800 },
+        };
+
+        string markdown = MarkdownReport.Render(Report(q), null, null);
+
+        Assert.Equal("Vektör + rerank (llama-nemotron-rerank-vl-1b-v2)", MarkdownReport.MethodName("VectorOnly+nvidia/llama-nemotron-rerank-vl-1b-v2"));
+        Assert.Contains("| Hybrid + rerank (nemotron-3.5-rerank-8b) | 1/1 |", markdown, StringComparison.Ordinal);
+    }
+
     private static RetrievalReport Report(params QuestionResult[] questions) =>
         new(RetrievalReport.CurrentSchemaVersion, DateTimeOffset.UnixEpoch, "test", "fake", 8, 3, 0, 0, questions);
 
-    private static QuestionResult Q(string id, int? hybridRank, double ms) => new(
+    private static QuestionResult Q(string id, int? hybridRank, double ms, int? depth = null) => new(
         id,
         "soru " + id,
         "sss",
         ["fact"],
-        new Dictionary<RetrievalMode, int?> { [RetrievalMode.VectorOnly] = hybridRank, [RetrievalMode.KeywordOnly] = null, [RetrievalMode.Hybrid] = hybridRank },
-        RetrievalReport.Modes.ToDictionary(m => m, _ => ms),
-        ["sss:Soru 1"]);
+        new Dictionary<string, int?> { ["VectorOnly"] = hybridRank, ["KeywordOnly"] = null, [Hybrid] = hybridRank },
+        RetrievalReport.BaseMethods.ToDictionary(m => m, _ => ms),
+        ["sss:Soru 1"],
+        depth is int d ? RetrievalReport.BaseMethods.ToDictionary(m => m, _ => d) : null);
 
     private static QuestionResult Unanswerable(string id, double ms) => new(
         id,
         "soru " + id,
         null,
         ["unanswerable"],
-        new Dictionary<RetrievalMode, int?>(),
-        RetrievalReport.Modes.ToDictionary(m => m, _ => ms),
+        new Dictionary<string, int?>(),
+        RetrievalReport.BaseMethods.ToDictionary(m => m, _ => ms),
         ["sss:Soru 1"]);
 }

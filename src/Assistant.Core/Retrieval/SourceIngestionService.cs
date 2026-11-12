@@ -13,6 +13,15 @@ public sealed class RagOptions
 
     /// <summary>Folder with the source PDFs (docs/sources); the AppHost sets it.</summary>
     public string SourcesPath { get; set; } = "";
+
+    /// <summary>How the assistant searches (<c>Rag:Mode</c>); ADR-002.</summary>
+    public RetrievalMode Mode { get; set; } = RetrievalMode.Hybrid;
+
+    /// <summary>Rerank model id (<c>Rag:RerankModel</c>); empty means no re-ranking. ADR-003.</summary>
+    public string? RerankModel { get; set; }
+
+    /// <summary>Candidates the reranker orders before the top 5 are kept.</summary>
+    public int RerankCandidates { get; set; } = RerankingRetriever.DefaultCandidates;
 }
 
 /// <summary>

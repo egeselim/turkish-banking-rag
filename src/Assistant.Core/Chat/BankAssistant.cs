@@ -37,11 +37,14 @@ public sealed class BankAssistant
     private readonly SelimBankClient? _bank;
     private readonly AuditTrail? _audit;
     private readonly PiiMasker _outputMasker = new();
+    private readonly RetrievalMode _retrievalMode;
 
     public BankAssistant(
-        IChatClient chatClient, IDocumentRetriever retriever, ILoggerFactory? loggerFactory = null, SelimBankClient? bank = null, AuditTrail? audit = null)
+        IChatClient chatClient, IDocumentRetriever retriever, ILoggerFactory? loggerFactory = null, SelimBankClient? bank = null, AuditTrail? audit = null,
+        RetrievalMode retrievalMode = RetrievalMode.Hybrid)
     {
         _retriever = retriever;
+        _retrievalMode = retrievalMode;
         _bank = bank;
         _audit = audit;
 
@@ -90,7 +93,7 @@ public sealed class BankAssistant
             return await BlockAsync(session, verdict).ConfigureAwait(false);
         }
 
-        var hits = await _retriever.SearchAsync(question, SourceCount, RetrievalMode.Hybrid, cancellationToken).ConfigureAwait(false);
+        var hits = await _retriever.SearchAsync(question, SourceCount, _retrievalMode, cancellationToken).ConfigureAwait(false);
         var sources = hits.Select((h, i) => CitedSource.From(i + 1, h.Chunk)).ToList();
 
         return Run(session, new ChatMessage(ChatRole.User, question), AssistantPrompts.FormatTurn(sources, session.CustomerId is not null), sources, cancellationToken);

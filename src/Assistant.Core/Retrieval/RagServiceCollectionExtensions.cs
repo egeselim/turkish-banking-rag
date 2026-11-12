@@ -31,7 +31,17 @@ public static partial class RagServiceCollectionExtensions
         services.AddSingleton(sp => new HybridRetriever(
             sp.GetRequiredService<ChunkIndex>(),
             sp.GetRequiredService<Microsoft.Extensions.AI.IEmbeddingGenerator<string, Microsoft.Extensions.AI.Embedding<float>>>()));
-        services.AddSingleton<IDocumentRetriever>(sp => sp.GetRequiredService<HybridRetriever>());
+
+        // Rag:RerankModel turns re-ranking on (ADR-003); the mode itself (Rag:Mode) is passed per search by the caller.
+        services.AddOptions<RagOptions>();
+        services.AddSingleton<IDocumentRetriever>(sp =>
+        {
+            var hybrid = sp.GetRequiredService<HybridRetriever>();
+            var rag = sp.GetRequiredService<IOptions<RagOptions>>().Value;
+            return string.IsNullOrWhiteSpace(rag.RerankModel)
+                ? hybrid
+                : new RerankingRetriever(hybrid, sp.GetRequiredService<RerankerFactory>().Create(rag.RerankModel), rag.RerankCandidates);
+        });
 
         return services;
     }

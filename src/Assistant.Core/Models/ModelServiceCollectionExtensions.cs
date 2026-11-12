@@ -53,7 +53,19 @@ public static class ModelServiceCollectionExtensions
                 o.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(90);
             });
 
+        // Rerank: one call per question with ~20 passages; answers in well under a second (probe, 2026-11-12).
+        services.AddHttpClient(RerankerFactory.HttpClientName)
+            .AddStandardResilienceHandler(o =>
+            {
+                o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(15);
+                o.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
+                o.Retry.MaxRetryAttempts = 3;
+                o.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
+            });
+
         services.TryAddSingleton<IPiiMasker, PiiMasker>();
+        services.AddSingleton(sp => new RerankerFactory(
+            sp.GetRequiredService<IOptions<NimOptions>>(), sp.GetRequiredService<IHttpClientFactory>(), sp.GetRequiredService<IPiiMasker>()));
 
         services.AddChatClient(sp => CreateChatClient(sp, o => o.ChatModel));
         services.AddKeyedChatClient(SmallChatClientKey, sp => CreateChatClient(sp, o => o.SmallChatModel));

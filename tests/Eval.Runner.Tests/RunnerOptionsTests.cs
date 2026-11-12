@@ -26,6 +26,7 @@ public sealed class RunnerOptionsTests
         Assert.Equal("x", options.OutDir);
         Assert.True(options.WriteBaseline);
         Assert.Equal(0.8, options.FailUnderHit5);
+        Assert.Equal(["nvidia/a", "nvidia/b"], RunnerOptions.Parse(["--rerank", "nvidia/a, nvidia/b"]).RerankModels);
     }
 
     [Fact]
@@ -51,6 +52,7 @@ public sealed class RunnerOptionsTests
     [InlineData("--mode", "answer", "--price-in", "1")]
     [InlineData("--limit", "0")]
     [InlineData("--mode", "answer", "--judge", "big")]
+    [InlineData("--mode", "answer", "--rerank", "nvidia/x")]
     [InlineData("--subset", "full", "--baseline", "--limit", "5")]
     [InlineData("--baseline")]
     [InlineData("--qdrant", "localhost:6334")]

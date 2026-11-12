@@ -44,21 +44,38 @@ public sealed class RetrievalEvaluatorIntegrationTests : IAsyncLifetime
         await provider.GetRequiredService<ChunkIndex>().SyncAsync(chunks, ct);
         var questions = QuestionSet.Load(Path.Combine(AppContext.BaseDirectory, "Eval", "questions.jsonl")).Where(q => q.Smoke).ToList();
 
-        var results = await RetrievalEvaluator.RunAsync(provider.GetRequiredService<IDocumentRetriever>(), questions, ct);
+        var hybrid = provider.GetRequiredService<HybridRetriever>();
+        List<RetrievalMethod> methods =
+        [
+            .. RetrievalEvaluator.BaseMethods(hybrid),
+            new("Hybrid+fake", new RerankingRetriever(hybrid, new ReverseReranker()), RetrievalMode.Hybrid, RetrievalMetrics.TopK),
+        ];
+
+        var results = await RetrievalEvaluator.RunAsync(methods, questions, ct);
 
         Assert.Equal(questions.Select(q => q.Id), results.Select(r => r.Id));
         Assert.All(results, r =>
         {
-            Assert.Equal(RetrievalReport.Modes.Length, r.LatencyMs.Count);
+            Assert.Equal(methods.Count, r.LatencyMs.Count);
             Assert.Equal(3, r.HybridTop3.Count);
-            Assert.Equal(r.Answerable ? RetrievalReport.Modes.Length : 0, r.Ranks.Count);
-            Assert.All(r.Ranks.Values, rank => Assert.True(rank is null or (>= 1 and <= 5)));
+            Assert.Equal(r.Answerable ? methods.Count : 0, r.Ranks.Count);
+            Assert.All(RetrievalReport.BaseMethods, m => Assert.True(r.Ranks.GetValueOrDefault(m) is null or (>= 1 and <= 20)));
+            Assert.True(r.Ranks.GetValueOrDefault("Hybrid+fake") is null or (>= 1 and <= 5));
         });
 
         // BM25 does not depend on the fake vectors, so it must find something for these keyword-rich questions.
-        var bm25 = new RetrievalReport(1, DateTimeOffset.UtcNow, "smoke", "fake/hash", Dimensions, chunks.Count, 0, 0, results)
-            .Summaries().Single(s => s.Mode == RetrievalMode.KeywordOnly);
+        var summaries = new RetrievalReport(1, DateTimeOffset.UtcNow, "smoke", "fake/hash", Dimensions, chunks.Count, 0, 0, results).Summaries();
+        var bm25 = summaries.Single(s => s.Method == "KeywordOnly");
         Assert.True(bm25.Hit5 >= bm25.Questions / 2, $"BM25 Hit@5 {bm25.Hit5}/{bm25.Questions}");
+        Assert.NotNull(bm25.Hit20);
+        Assert.Null(summaries.Single(s => s.Method == "Hybrid+fake").Hit20);
+    }
+
+    /// <summary>Puts the last candidate first: enough to show the reranked method really reorders.</summary>
+    private sealed class ReverseReranker : IReranker
+    {
+        public Task<IReadOnlyList<double>> ScoreAsync(string query, IReadOnlyList<string> passages, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<double>>([.. passages.Select((_, i) => (double)i)]);
     }
 
     private sealed class HashEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>>

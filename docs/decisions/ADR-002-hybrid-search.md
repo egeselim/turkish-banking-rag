@@ -1,6 +1,6 @@
 # ADR-002: Hybrid search, Qdrant vektörü + kendi BM25'imiz + RRF
 
-- **Durum:** Kabul edildi
+- **Durum:** Kabul edildi; **2026-11-12'de (3.4) uygulamanın varsayılanı yalnız vektör oldu**, aşağıdaki "Karar" bölümü
 - **Tarih:** 2026-10-25
 - **Adım:** 1.5
 
@@ -49,6 +49,22 @@ Eval.Runner, `eval/questions.jsonl` (92 cevaplı soru), embed-8b, aynı 101 chun
 - **Mekanizma:** Bu soruların çoğunda BM25 doğru chunk'ı ilk 5'te bulamıyor, ama 20 yanlış adayı eşit ağırlıkla RRF'e giriyor. Vektörün 1. sıradaki doğru cevabı 2.–4. sıraya itiliyor. En çok KVKK (Hit@1 17/24) ve dokümandaki kelimeleri kullanmayan sorular (paraphrase 26/33) etkileniyor.
 - 1.5'teki "BM25 güvenlik ağı" gerekçesi zayıf embedding (1b) içindi. 8b ile bu sette ağ işe yaramıyor, zarar veriyor.
 - **Karar henüz değişmedi.** Seçenekler: (a) yalnız vektör, (b) vektöre daha çok ağırlık veren RRF, (c) hybrid adayları + re-ranker (3.4). Arama değişikliği olduğu için kullanıcı kararı ve aynı baseline'la öncesi/sonrası ölçümü gerekiyor.
+
+## Seçim kuralı (2026-11-12, 3.4; sonuçlar alınmadan önce yazıldı)
+
+Adaylar: yalnız vektör, Hybrid, yalnız vektör + re-ranker, Hybrid + re-ranker. Re-ranker iki modelle ölçülür (`nemotron-3.5-rerank-8b`, `llama-nemotron-rerank-vl-1b-v2`); her ikisi de seçilen yöntemin ilk 20 adayını sıralar.
+
+1. Tam sette (92 cevaplı soru) en yüksek MRR'ye sahip yapılandırma seçilir.
+2. Re-ranker'lı bir yapılandırma ancak şu iki koşulu sağlarsa seçilebilir: aynı aday yönteminin re-ranker'sız hâline göre MRR'yi en az 0,02 artırır (3.3'te görülen ölçüm gürültüsünün üstü) ve p95 gecikmeye en fazla 1,5 sn ekler (gerçek NIM çağrısıyla ölçülen değer).
+3. MRR farkı 0,02'den küçükse daha basit ya da daha hızlı olan seçilir.
+4. Seçilen yapılandırma answer modunda bir kez çalıştırılır ve 3.3 baseline'ıyla (Hybrid) aynı koşullarda karşılaştırılır. Cevap kalitesi belirgin biçimde düşerse karar kullanıcıya geri getirilir.
+
+## Karar (2026-11-12, 3.4): uygulama yalnız vektörle arıyor
+
+Seçim kuralı uygulandı; ayrıntı ve tablo [ADR-003](ADR-003-reranker.md)'te.
+- Uygulamanın araması `Rag:Mode=VectorOnly`, re-ranker kapalı. Hybrid (MRR 0,9103) yalnız vektörün (0,9746) belirgin biçimde gerisinde. En iyi re-ranker'lı yapılandırma (0,9946) ise yalnız vektörden 0,0199 önde, eşiğin altında.
+- BM25 ve RRF kodu kalıyor; `Rag:Mode=Hybrid` ile açılabilir. Zayıf bir embedding modeline (örneğin 1b) dönülürse Hybrid'in güvenlik ağı değeri yeniden ölçülmeli (1.5'te 1b ile Hit@5'i 4/10'dan 9/10'a çıkarmıştı).
+- Answer eval sonucu (kural 4): PROGRESS ve [docs/eval/baseline.md](../eval/baseline.md).
 
 ## Sınırlar ve riskler
 
