@@ -57,6 +57,21 @@ public partial class SourcePdfTests
         Assert.Equal(expected, labels);
     }
 
+    // The KVKK PDF does not embed Times New Roman, so glyph widths depend on the installed fonts. Measuring the
+    // right edge made the Madde 7 title "centered" on Linux and promoted it to a chapter (CI, 2026-11-13). The
+    // chapter path must be the same on every platform, as the embedding cache keys depend on it.
+    [Theory]
+    [InlineData("Madde 7")]
+    [InlineData("Madde 8")]
+    [InlineData("Madde 9")]
+    public void Kvkk_article_titles_stay_under_their_chapter_on_every_platform(string label)
+    {
+        var chunk = Chunk("kvkk-6698").First(c => c.Label == label);
+
+        Assert.Equal("İKİNCİ BÖLÜM Kişisel Verilerin İşlenmesi", chunk.SectionPath[0]);
+        Assert.Equal(2, chunk.SectionPath.Count);
+    }
+
     [Fact]
     public void Kvkk_article_text_starts_at_the_article_and_keeps_its_items()
     {

@@ -24,4 +24,5 @@ Desteklenen Markdown alt kümesi: `#` başlık, `##` bölüm, `###` madde/soru b
 ## Bilinen okuma sınırları
 
 - KVKK PDF'inin sonundaki kadro cetveli ve değişiklik listesi tablo olarak okunamıyor; düz satırlar hâlinde, etiketsiz chunk'lara giriyor.
+- KVKK PDF'i fontunu (Times New Roman) gömmüyor. PdfPig eksik fontun genişliklerini sistemdeki fontlardan aldığı için satırların sağ kenarı Windows'ta ve Linux'ta farklı çıkıyor. Okuyucu bu yüzden yerleşim kararlarında yalnızca sol kenarı kullanıyor (`PdfDocumentReader.IsCentered`). Sağ kenara dayanan yeni bir kural eklenirse chunk'lar platforma göre değişir; `SourcePdfTests` ve CI'daki smoke eval bunu yakalar.
 - Tekrarlanan sayfa üst ve alt bilgileri ayıklanmıyor (bu dokümanlarda bulunmuyor). Yalnızca rakamdan oluşan satırlar (sayfa numarası, dipnot işareti) atlanıyor.

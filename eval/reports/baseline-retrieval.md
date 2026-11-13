@@ -1,23 +1,23 @@
 # Retrieval eval (full)
 
-- Tarih (UTC): 2026-11-12 20:28
+- Tarih (UTC): 2026-11-13 14:24
 - Embedding: nvidia/nemotron-3.5-embed-8b (4096 boyut), 101 chunk
 - Soru: 100 (92 cevaplı, 8 cevapsız; cevapsızlar isabet metriklerine girmez)
 - Embedding önbelleği: 707 isabet, 0 yeni (NIM'den)
-- Karşılaştırma: baseline-retrieval-3.2.json (2026-11-10), ortak 100 soru üzerinden; parantez içi fark
+- Karşılaştırma: baseline-retrieval.json (2026-11-12), ortak 100 soru üzerinden; parantez içi fark
 
 > Gecikme, `SearchAsync` çağrısının duvar saati süresidir. Embedding ve rerank skorları önbellekten geldiğinde NIM süresi dahil değildir; yalnızca yerel iş ölçülür.
 > Hit@20: doğru kaynağın ilk 20 aday içinde olması, yani bir re-ranker'ın en fazla ulaşabileceği oran.
 
 | Yöntem | Hit@1 | Hit@5 | Hit@20 | MRR | p50 ms | p95 ms |
 |---|---|---|---|---|---|---|
-| Vektör | 88/92 (=) | 92/92 (=) | 92/92 | 0.97 (=) | 3.7 (+0.8) | 5.0 (+1.1) |
-| BM25 | 71/92 (=) | 84/92 (=) | 92/92 | 0.83 (=) | 0.1 (=) | 0.1 (=) |
-| Hybrid | 79/92 (=) | 90/92 (=) | 92/92 | 0.91 (=) | 3.6 (+0.7) | 5.1 (+1.1) |
-| Vektör + rerank (nemotron-3.5-rerank-8b) | 91/92 | 92/92 | - | 0.99 | 4.8 | 7.0 |
-| Hybrid + rerank (nemotron-3.5-rerank-8b) | 91/92 | 92/92 | - | 0.99 | 5.0 | 7.1 |
-| Vektör + rerank (llama-nemotron-rerank-vl-1b-v2) | 87/92 | 92/92 | - | 0.97 | 5.0 | 6.9 |
-| Hybrid + rerank (llama-nemotron-rerank-vl-1b-v2) | 87/92 | 92/92 | - | 0.97 | 5.0 | 6.9 |
+| Vektör | 88/92 (=) | 92/92 (=) | 92/92 | 0.97 (=) | 3.8 (+0.1) | 5.5 (+0.6) |
+| BM25 | 71/92 (=) | 84/92 (=) | 92/92 | 0.83 (=) | 0.1 (=) | 0.2 (=) |
+| Hybrid | 79/92 (=) | 90/92 (=) | 92/92 | 0.91 (=) | 3.8 (+0.1) | 5.4 (+0.3) |
+| Vektör + rerank (nemotron-3.5-rerank-8b) | 91/92 (=) | 92/92 (=) | - | 0.99 (=) | 4.8 (=) | 7.2 (+0.2) |
+| Hybrid + rerank (nemotron-3.5-rerank-8b) | 91/92 (=) | 92/92 (=) | - | 0.99 (=) | 5.1 (+0.1) | 7.5 (+0.4) |
+| Vektör + rerank (llama-nemotron-rerank-vl-1b-v2) | 87/92 (=) | 92/92 (=) | - | 0.97 (=) | 4.7 (-0.3) | 7.1 (+0.2) |
+| Hybrid + rerank (llama-nemotron-rerank-vl-1b-v2) | 87/92 (=) | 92/92 (=) | - | 0.97 (=) | 5.1 (+0.1) | 7.8 (+0.9) |
 
 ## Dokümana göre MRR
 

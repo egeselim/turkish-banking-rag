@@ -20,7 +20,8 @@ public static partial class PdfDocumentReader
     [System.Text.RegularExpressions.GeneratedRegex(@"^(\(\d+\)|\p{Ll}\)|\d+\.)\s")]
     private static partial System.Text.RegularExpressions.Regex ItemMarkerRegex();
 
-    private sealed record Line(int Page, double Top, double Bottom, double Left, double Right, double Size, bool Bold, bool Centered, string Text);
+    // Centered is set in BuildBlocks, once the page's text margin is known (see IsCentered).
+    private sealed record Line(int Page, double PageWidth, double Top, double Bottom, double Left, double Size, bool Bold, string Text, bool Centered = false);
 
     public static SourceDocument Read(string path) =>
         Read(File.OpenRead(path), Path.GetFileNameWithoutExtension(path), leaveOpen: false);
@@ -45,24 +46,28 @@ public static partial class PdfDocumentReader
         }
     }
 
-    private static IEnumerable<Line> ReadLines(Page page)
-    {
-        double pageCenter = page.Width / 2;
-
-        return ClusterIntoLines(page.GetWords().Where(w => w.Letters.Count > 0))
+    private static IEnumerable<Line> ReadLines(Page page) =>
+        ClusterIntoLines(page.GetWords().Where(w => w.Letters.Count > 0))
             .Select(cluster =>
             {
                 var words = cluster.OrderBy(w => w.BoundingBox.Left).ToList();
                 var letters = words.SelectMany(w => w.Letters).ToList();
-                double left = words[0].BoundingBox.Left;
-                double right = words[^1].BoundingBox.Right;
                 double size = letters.GroupBy(l => Math.Round(l.PointSize, 1)).MaxBy(s => s.Count())!.Key;
                 bool bold = letters.Count(l => IsBold(l.FontName)) >= letters.Count * 0.8;
-                bool centered = Math.Abs(((left + right) / 2) - pageCenter) < 15 && left > page.Width * 0.15;
-                return new Line(page.Number, words.Max(w => w.BoundingBox.Top), words.Min(w => w.BoundingBox.Bottom),
-                    left, right, size, bold, centered, string.Join(' ', words.Select(w => w.Text)));
+                return new Line(page.Number, page.Width, words.Max(w => w.BoundingBox.Top), words.Min(w => w.BoundingBox.Bottom),
+                    words[0].BoundingBox.Left, size, bold, string.Join(' ', words.Select(w => w.Text)));
             });
-    }
+
+    /// <summary>
+    /// A heading is "centered" when it starts well inside the page's text margin. Only the left edge is used: it is
+    /// written in the PDF, whereas the right edge depends on glyph widths, which PdfPig takes from installed system
+    /// fonts when a font is not embedded (the KVKK PDF's Times New Roman). Measuring the right edge made the same
+    /// heading centered on Linux and left-aligned on Windows (2026-11-13, CI), changing chunk sections.
+    /// The 10%-of-page step is wider than a first-line indent (KVKK article titles: ~35 pt) and narrower
+    /// than any centered section title in the sources (≥ 64 pt).
+    /// </summary>
+    private static bool IsCentered(Line line, double margin) =>
+        line.Left > line.PageWidth * 0.15 && line.Left - margin > line.PageWidth * 0.1;
 
     // Words whose baselines are within 40% of the font size belong to one visual line. Fixed-size
     // buckets would split e.g. a bold "MADDE 7-" from the rest of its line when the baselines differ slightly.
@@ -123,6 +128,10 @@ public static partial class PdfDocumentReader
         var baseMargin = bodyLines.GroupBy(l => l.Page).ToDictionary(
             g => g.Key,
             g => g.GroupBy(l => Math.Round(l.Left)).Where(x => x.Count() >= 2).Select(x => x.Key).DefaultIfEmpty(g.Min(l => l.Left)).Min());
+
+        // Pages without body text (a title page) fall back to their leftmost line as the margin.
+        var pageMinLeft = lines.GroupBy(l => l.Page).ToDictionary(g => g.Key, g => g.Min(l => l.Left));
+        lines = [.. lines.Select(l => l with { Centered = IsCentered(l, baseMargin.GetValueOrDefault(l.Page, pageMinLeft[l.Page])) })];
 
         // Heading levels: larger font first; at equal size, centered headings rank above left-aligned ones.
         var headingStyles = lines.Where(IsHeading)

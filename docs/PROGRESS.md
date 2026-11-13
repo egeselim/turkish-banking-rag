@@ -44,6 +44,15 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
   - Anahtar yalnızca env ile geçiyor ve yalnızca varlığı kontrol ediliyor. Workflow girdisi de script'e env ile geçiyor (script injection kalıbından kaçınmak için).
 - **`.gitattributes`:** `text=auto`; PDF ve font binary; eval önbellekleri diff'siz ve "generated" olarak işaretli. Depo zaten LF'ti; yeniden normalleştirme bir şey değiştirmedi.
 - **Testler (+8, çevrimdışı 697):** `RegressionGateTests` ve seçenek testleri.
+- **İlk CI koşusu (43398690697): build ve testler yeşil, smoke kırmızı.** "7 embedding(s) missing from the cache" hatası veriyordu.
+  - Kök neden: KVKK PDF'i Times New Roman'ı gömmüyor. PdfPig eksik font için sistem fontlarına bakıyor (Windows'ta var, Ubuntu'da yok), bu yüzden harf genişlikleri ve satırın sağ kenarı platforma göre değişiyor. Okuyucu "ortalanmış başlık" kararını sağ kenara göre veriyordu. Madde 7 başlığı Linux'ta ortalanmış sayılıp bölüm düzeyine çıktı; Madde 7, 8 ve 9'un bölüm yolu, dolayısıyla 7 chunk'ın metni ve önbellek anahtarı değişti.
+  - Teşhis: Windows'ta ve Docker'daki bir Linux .NET 10 konteynerinde, önbelleğe giren metinlerin karmalarını yazdıran bir sonda çalıştırıldı (scratchpad'de, repoya girmedi). Madde 7 başlığının sağ kenarı Windows'ta 453,9, Linux'ta 481,3; sol kenar ikisinde de 106,3.
+  - PdfPig 0.1.16'da sistem fontunu kapatan bir ayar yok (`ParsingOptions` ve `SystemFontFinder` dokümanı kontrol edildi).
+  - **Düzeltme (`PdfDocumentReader.IsCentered`):** "Ortalanmış" kararı artık yalnızca PDF'te yazılı olan sol kenara dayanıyor: satır, sayfanın metin kenarından sayfa genişliğinin %10'undan fazla içeride başlıyorsa ortalanmış sayılıyor.
+  - Sonuç: Windows'ta yalnızca 1 chunk değişti (KVKK sonundaki etiketsiz değişiklik listesi tablosu). Windows ve Linux karmaları 121/121 aynı.
+  - Önbelleklere 1 embedding ve 6+6 rerank skoru eklendi (yalnızca sona). Tam set retrieval metrikleri baseline'la birebir aynı; baseline yenilendi.
+  - Yeni test: `Kvkk_article_titles_stay_under_their_chapter_on_every_platform`. Eski kodla Linux'ta kırmızı olurdu.
+- **Action sürümleri:** Node 20 uyarısı için `checkout@v7`, `setup-dotnet@v6`, `cache@v6` ve `upload-artifact@v7`. Sürümler `gh api` ile güncel sürüm listesinden alındı.
 
 ### 2026-11-12 (oturum 13): 3.4
 - **Kullanıcı kararları:**
