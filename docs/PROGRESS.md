@@ -25,6 +25,26 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 
 ## Günlük
 
+### 2026-11-13 (oturum 14): 3.5
+- **Kullanıcı kararları:**
+  - Private repo açıldı ve `main` push'landı.
+  - Smoke kapısı baseline'dan geriye gidişe göre çalışıyor.
+  - Answer eval CI'da yalnızca elle tetikleniyor.
+  - `gh` CLI kuruldu (winget, v2.103.3); oturumu kullanıcı açıyor.
+- **Push öncesi:** Tüm geçmiş tarandı. Gerçek anahtar biçiminde değer yok; yalnızca üç kısa, açıkça sahte test değeri var (`ModelServiceCollectionExtensionsTests`, `NimEmbeddingGeneratorTests`). Sır benzeri dosya izlenmiyor.
+- **Runner:**
+  - `RegressionGate`: kapı, uygulamanın yöntemini (`Rag:Mode` ve varsa `Rag:RerankModel`) ölçüyor. `--fail-on-regression` Hit@1, Hit@5 ve MRR baseline'ın (ortak sorular üzerinden) altına düşerse çıkış kodu 1 veriyor.
+  - `--fail-under-hit5` artık sabit Hybrid satırına değil uygulamanın yöntemine bakıyor.
+  - Bozma deneyi: uygulamanın yönteminin silindiği sahte bir baseline'la kapı kırmızı verdi ve nedenini yazdı.
+- **`.github/workflows/ci.yml`:**
+  - `build-test`: build ve Live hariç testler; Qdrant Testcontainers ile.
+  - `smoke-eval`: offline, kapılı; rapor artifact olarak yükleniyor.
+  - `answer-eval`: yalnızca workflow_dispatch ile; secret yoksa not düşüp atlanıyor; hakem small.
+  - `permissions: contents: read`, aynı dal için eşzamanlılık iptali, NuGet önbelleği.
+  - Anahtar yalnızca env ile geçiyor ve yalnızca varlığı kontrol ediliyor. Workflow girdisi de script'e env ile geçiyor (script injection kalıbından kaçınmak için).
+- **`.gitattributes`:** `text=auto`; PDF ve font binary; eval önbellekleri diff'siz ve "generated" olarak işaretli. Depo zaten LF'ti; yeniden normalleştirme bir şey değiştirmedi.
+- **Testler (+8, çevrimdışı 697):** `RegressionGateTests` ve seçenek testleri.
+
 ### 2026-11-12 (oturum 13): 3.4
 - **Kullanıcı kararları:**
   - İki re-ranker da ölçülsün.
@@ -514,12 +534,11 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
   - Privacy.Tests ve Rag.Tests'te geçici `--ignore-exit-code 8` (sıfır test). İlk testler gelince kaldırılacak (TODO işaretli).
 
 ## Açık işler
-- GitHub remote yok; commit'ler yalnızca yerelde. Kullanıcı şimdilik ertelemeyi seçti. 3.5'teki CI'dan önce repo açılmalı (önerilen: önce private) ve `.gitattributes` eklenmeli.
+- ~~GitHub remote yok.~~ 2026-11-13: private repo `egeselim/turkish-banking-rag` açıldı, `origin` olarak eklendi; ilk push'tan önce tüm geçmiş anahtar için tarandı (yalnızca sahte test değerleri). `.gitattributes` eklendi.
 
 ## Sıradaki adım
-**3.4 bitti; sıradaki 3.5 (GitHub Actions: build, test, offline smoke retrieval eval; anahtar varsa answer eval). Henüz planlanmadı; kullanıcı "devam" diyene kadar başlanmıyor.**
-- 3.5'ten önce GitHub remote açılmalı (Açık işler).
-- CI'daki `--fail-under-hit5` eşiği şu an Hybrid satırına bakıyor; uygulamanın yöntemine (`Rag:Mode`) bağlanmalı.
+**3.5'in kodu hazır; CI'ın GitHub'da yeşil olduğu doğrulanınca biter.** Ardından 3.6 (README).
+- Kabul kriteri: PR'da yeşil, secret olmayan fork PR'ında da yeşil. Fork PR'ı ayrıca denenmedi; iki iş de sır kullanmadığı için aynı davranmalı.
 - Answer karşılaştırmaları baseline'la aynı yapılandırmayla (lightning, düşünme kapalı, hakem bolt) yapılmalı.
 - **Prompt adayı:** "bulamadım"dan sonra iletişim bilgisi uydurma (q-093, q-096, q-100) ve injection elle okuma bulguları (inj-18, 19, 25, 26). Prompt değişirse smoke eval ve `InjectionLiveTests` tekrar çalıştırılmalı.
 - **Ölçüm aracı:** ret kontrolü cümle eşleşmesine dayanıyor ("bulamıyorum" gibi anlamca retleri kaçırıyor); iyileştirilmesi metriğin karşılaştırılabilirliğini bozar, o yüzden ayrı ve bilinçli yapılmalı.

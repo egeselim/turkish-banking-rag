@@ -53,6 +53,8 @@ public sealed class RunnerOptionsTests
     [InlineData("--limit", "0")]
     [InlineData("--mode", "answer", "--judge", "big")]
     [InlineData("--mode", "answer", "--rerank", "nvidia/x")]
+    [InlineData("--mode", "answer", "--fail-on-regression")]
+    [InlineData("--fail-on-regression", "--no-compare")]
     [InlineData("--subset", "full", "--baseline", "--limit", "5")]
     [InlineData("--baseline")]
     [InlineData("--qdrant", "localhost:6334")]

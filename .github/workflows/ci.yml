@@ -1,0 +1,129 @@
+# CI (step 3.5). Build, tests without live NIM calls, and the offline retrieval smoke eval run on every push and PR,
+# need no secrets and therefore also pass on fork PRs. The answer eval calls NIM and runs only by hand.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      answer_subset:
+        description: "Answer eval (NIM anahtarı ister): none, smoke (20 soru, ~5 dk) ya da full (100 soru, ~25 dk)"
+        type: choice
+        options: [none, smoke, full]
+        default: none
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+
+jobs:
+  build-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - run: dotnet build
+
+      # Integration tests start Qdrant with Testcontainers; the runner's Docker is enough.
+      - run: dotnet test --no-build --filter-not-trait "Category=Live"
+
+  smoke-eval:
+    name: Retrieval smoke eval (offline)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # Embeddings come from eval/cache (committed), so this needs no key and is deterministic: any drop of the app's
+      # search method (Rag:Mode) below eval/reports/baseline-retrieval.json fails the job.
+      - run: >
+          dotnet run --project eval/Eval.Runner --
+          --subset smoke --offline --fail-on-regression --fail-under-hit5 0.8 --out eval/reports/ci
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: retrieval-smoke-report
+          path: eval/reports/ci/
+          if-no-files-found: ignore
+
+  answer-eval:
+    name: Answer eval (NIM, manual)
+    if: github.event_name == 'workflow_dispatch' && inputs.answer_subset != 'none'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      # The key is only tested for presence; it is never printed (GitHub also masks secrets in logs).
+      - name: Check for the NIM key
+        id: key
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          if [ -n "$NVIDIA_API_KEY" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::NVIDIA_API_KEY repo secret yok; answer eval atlandı."
+          fi
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.key.outputs.present == 'true'
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v4
+        if: steps.key.outputs.present == 'true'
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # Same setup as docs/eval/baseline.md (judge: small model); compared with eval/reports/baseline-answer.json.
+      - name: Answer eval
+        if: steps.key.outputs.present == 'true'
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          SUBSET: ${{ inputs.answer_subset }} # passed through env, not interpolated into the script
+        run: >
+          dotnet run --project eval/Eval.Runner --
+          --mode answer --subset "$SUBSET" --judge small --out eval/reports/ci
+
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.key.outputs.present == 'true'
+        with:
+          name: answer-${{ inputs.answer_subset }}-report
+          path: eval/reports/ci/
+          if-no-files-found: ignore

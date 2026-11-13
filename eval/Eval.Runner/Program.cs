@@ -170,15 +170,26 @@ try
         Console.WriteLine($"\nRapor: {Path.GetRelativePath(root, Path.Combine(outDir, name + ".md"))}");
     }
 
-    var hybrid = report.Summaries().Single(s => s.Method == RetrievalReport.Hybrid);
-    double hit5 = hybrid.Questions == 0 ? 0 : (double)hybrid.Hit5 / hybrid.Questions;
-    if (options.FailUnderHit5 is double floor && hit5 < floor)
+    if (options.FailUnderHit5 is null && !options.FailOnRegression)
     {
-        Console.Error.WriteLine(string.Create(CultureInfo.InvariantCulture, $"Hybrid Hit@5 {hit5:P0}, eşik {floor:P0} altında."));
-        return 1;
+        return 0;
     }
 
-    return 0;
+    // The gate checks the method the app actually searches with (Rag:Mode / Rag:RerankModel), not a fixed one.
+    string appMethod = RegressionGate.AppMethod(rag);
+    var failures = RegressionGate.Check(report, options.FailOnRegression ? baseline : null, appMethod, options.FailUnderHit5);
+    if (options.FailOnRegression && baseline is null)
+    {
+        failures = [.. failures, "Karşılaştırılacak baseline bulunamadı (--fail-on-regression)."];
+    }
+
+    foreach (string failure in failures)
+    {
+        Console.Error.WriteLine("KAPI: " + failure);
+    }
+
+    Console.WriteLine(failures.Count == 0 ? $"Kapı geçti ({appMethod})." : "");
+    return failures.Count == 0 ? 0 : 1;
 }
 catch (DotNet.Testcontainers.Builders.DockerUnavailableException)
 {

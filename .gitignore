@@ -15,6 +15,7 @@ TestResults/
 *.db-shm
 *.db-wal
 eval/reports/local/
+eval/reports/ci/
 
 # Sırlar (user-secrets repo dışında tutulur; yine de emniyet için)
 .env

@@ -1,0 +1,11 @@
+# Text files are stored with LF in the repository; Git converts per platform on checkout.
+* text=auto
+
+# Binary sources (generated PDFs, embedded fonts).
+*.pdf binary
+*.ttf binary
+*.png binary
+
+# Eval caches: base64 vectors and hashed scores, not worth diffing; commit them, do not review them.
+eval/cache/** -diff linguist-generated=true
+eval/reports/*.json linguist-generated=true

@@ -16,7 +16,8 @@ internal sealed record RunnerOptions
           --no-compare            Karşılaştırma yapma
           --baseline              Raporu eval/reports/baseline-<mod>.{json,md} olarak yaz (yalnızca --subset full)
           --limit <n>             Yalnızca ilk n soru (deneme için; --baseline ile kullanılamaz)
-          --fail-under-hit5 <0-1> retrieval: Hybrid Hit@5 bu oranın altındaysa çıkış kodu 1
+          --fail-under-hit5 <0-1> retrieval: uygulamanın yöntemi (Rag:Mode) Hit@5'te bu oranın altındaysa çıkış kodu 1
+          --fail-on-regression    retrieval: uygulamanın yöntemi Hit@1, Hit@5 ya da MRR'da baseline'ın altındaysa çıkış kodu 1
           --rerank <id>[,<id>]    retrieval: re-ranker modellerini de karşılaştır (Vektör+rerank, Hybrid+rerank)
           --judge main|small      answer: hakem modeli (varsayılan main = Nim:ChatModel; small = Nim:SmallChatModel)
           --price-in <usd>        answer: milyon giriş token'ı başına varsayımsal fiyat
@@ -42,6 +43,9 @@ internal sealed record RunnerOptions
     public double? FailUnderHit5 { get; init; }
 
     public int? Limit { get; init; }
+
+    /// <summary>retrieval mode: exit 1 if the app's method is below the baseline on Hit@1, Hit@5 or MRR (CI gate).</summary>
+    public bool FailOnRegression { get; init; }
 
     /// <summary>retrieval mode: rerank model ids to compare; each adds "VectorOnly+id" and "Hybrid+id".</summary>
     public IReadOnlyList<string> RerankModels { get; init; } = [];
@@ -73,6 +77,7 @@ internal sealed record RunnerOptions
                 "--baseline" => options with { WriteBaseline = true },
                 "--fail-under-hit5" => options with { FailUnderHit5 = ParseRatio(Value(args, ref i, arg)) },
                 "--limit" => options with { Limit = ParseCount(Value(args, ref i, arg)) },
+                "--fail-on-regression" => options with { FailOnRegression = true },
                 "--judge" => options with { Judge = OneOf(Value(args, ref i, arg), arg, "main", "small") },
                 "--rerank" => options with
                 {
@@ -94,9 +99,14 @@ internal sealed record RunnerOptions
             throw new ArgumentException("answer modu modeli çağırır; --offline ile çalışmaz.");
         }
 
-        if (options.Mode == "answer" && options.FailUnderHit5 is not null)
+        if (options.Mode == "answer" && (options.FailUnderHit5 is not null || options.FailOnRegression))
         {
-            throw new ArgumentException("--fail-under-hit5 yalnızca retrieval modunda geçerli.");
+            throw new ArgumentException("--fail-under-hit5 ve --fail-on-regression yalnızca retrieval modunda geçerli.");
+        }
+
+        if (options.FailOnRegression && options.NoCompare)
+        {
+            throw new ArgumentException("--fail-on-regression bir baseline ister; --no-compare ile kullanılamaz.");
         }
 
         if (options.Mode == "answer" && options.RerankModels.Count > 0)
