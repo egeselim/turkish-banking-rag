@@ -20,6 +20,7 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 2.6 Injection örnekleri | Tamam | Çevrimdışı 293/293; Live injection 20/20 kesin kontrol geçti (tek çalıştırma); model 20 örneğin 3'ünde kandırıldı ama hiçbir işlem onaysız çalışmadı |
 | 3.1 Soru seti + injection 30 + şema doğrulama | Tamam | Çevrimdışı 623/623; 100 soru (smoke 20), injection 30; bozma deneyi rakam ve madde hatasını yakaladı. Yeni 10 injection örneği canlı çalıştırılmadı (3.3) |
 | 3.2 Eval.Runner, retrieval modu | Tamam | Çevrimdışı 652/652; anahtarsız offline smoke çalışıyor; baseline: Hybrid Hit@1 79/92, vektör 88/92 (hybrid vektörden kötü, ADR-002'ye eklendi, karar bekliyor) |
+| 3.5 CI (GitHub Actions) | Tamam | Koşu 43501785307 yeşil: Linux'ta 700/700 test; offline smoke (143 embedding önbellekten, 0 NIM çağrısı), kapı geçti. İlk koşuda bulunan platform hatası (PDF başlık algılama) düzeltildi. Fork PR'ı ayrıca denenmedi (iki iş de sır kullanmıyor) |
 | 3.4 Re-ranker + arama kararı | Tamam | Çevrimdışı 689/689; önceden yazılan kurala göre uygulama yalnız vektör (MRR 0,975), re-ranker kapalı (8b: 0,995, fark 0,0199 < 0,02). Answer: atıf doğruluğu %89 → %98, puanlar gürültü içinde. Smoke offline (rerank dahil) baseline'la aynı. [ADR-003](decisions/ADR-003-reranker.md) |
 | 3.3 Answer modu + injection geçme oranı | Tamam (geçici modelle) | Çevrimdışı 673/673; Live sohbet 11/11, injection 30/30 kesin kontrol, geçme 29/30 (elle sıkı sayım 25/30). Baseline lightning (düşünme kapalı) + hakem bolt ile alındı; ultra düzelince tekrar edilecek. [docs/eval/baseline.md](eval/baseline.md) |
 
@@ -546,8 +547,10 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - ~~GitHub remote yok.~~ 2026-11-13: private repo `egeselim/turkish-banking-rag` açıldı, `origin` olarak eklendi; ilk push'tan önce tüm geçmiş anahtar için tarandı (yalnızca sahte test değerleri). `.gitattributes` eklendi.
 
 ## Sıradaki adım
-**3.5'in kodu hazır; CI'ın GitHub'da yeşil olduğu doğrulanınca biter.** Ardından 3.6 (README).
-- Kabul kriteri: PR'da yeşil, secret olmayan fork PR'ında da yeşil. Fork PR'ı ayrıca denenmedi; iki iş de sır kullanmadığı için aynı davranmalı.
+**3.5 bitti; sıradaki 3.6 (README: mermaid mimari diyagramı, demo GIF'i, eval tablosu, "neden bu tasarım", güvenlik bölümü, kurulum; temiz klonla deneme). Henüz planlanmadı; kullanıcı "devam" diyene kadar başlanmıyor.**
+- Fork PR'ı ayrıca denenmedi; iki iş de sır kullanmadığı için aynı davranmalı.
+- Answer eval'i CI'da çalıştırmak için kullanıcının `NVIDIA_API_KEY` repo secret'ını eklemesi gerekiyor (henüz eklenmedi).
+- Yerelde `backup/before-msg-rewrite` branch'i duruyor; kullanıcı emin olunca silebilir.
 - Answer karşılaştırmaları baseline'la aynı yapılandırmayla (lightning, düşünme kapalı, hakem bolt) yapılmalı.
 - **Prompt adayı:** "bulamadım"dan sonra iletişim bilgisi uydurma (q-093, q-096, q-100) ve injection elle okuma bulguları (inj-18, 19, 25, 26). Prompt değişirse smoke eval ve `InjectionLiveTests` tekrar çalıştırılmalı.
 - **Ölçüm aracı:** ret kontrolü cümle eşleşmesine dayanıyor ("bulamıyorum" gibi anlamca retleri kaçırıyor); iyileştirilmesi metriğin karşılaştırılabilirliğini bozar, o yüzden ayrı ve bilinçli yapılmalı.
