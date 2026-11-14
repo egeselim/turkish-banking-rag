@@ -2,7 +2,7 @@
 # Visual Studio and Rider support .http files natively.
 # The data is recreated on every start, so a blocked card becomes active again after a restart.
 
-@host = http://localhost:5290
+@host = http://localhost:7290
 @customer = 1
 
 ### Demo customers (no header needed)

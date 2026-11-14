@@ -20,11 +20,34 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 | 2.6 Injection örnekleri | Tamam | Çevrimdışı 293/293; Live injection 20/20 kesin kontrol geçti (tek çalıştırma); model 20 örneğin 3'ünde kandırıldı ama hiçbir işlem onaysız çalışmadı |
 | 3.1 Soru seti + injection 30 + şema doğrulama | Tamam | Çevrimdışı 623/623; 100 soru (smoke 20), injection 30; bozma deneyi rakam ve madde hatasını yakaladı. Yeni 10 injection örneği canlı çalıştırılmadı (3.3) |
 | 3.2 Eval.Runner, retrieval modu | Tamam | Çevrimdışı 652/652; anahtarsız offline smoke çalışıyor; baseline: Hybrid Hit@1 79/92, vektör 88/92 (hybrid vektörden kötü, ADR-002'ye eklendi, karar bekliyor) |
+| 3.6 README | Tamam | İngilizce README (Türkçe özetli), mermaid diyagramı, demo GIF'i ve 2 ekran görüntüsü, eval tablosu, tasarım gerekçeleri, güvenlik, kurulum. Temiz klonda build, 700/700 test, offline smoke, answer eval ve AppHost ile uçtan uca demo çalıştı. Port çakışması nedeniyle web 7185'e, API 7290'a taşındı |
 | 3.5 CI (GitHub Actions) | Tamam | Koşu 43501785307 yeşil: Linux'ta 700/700 test; offline smoke (143 embedding önbellekten, 0 NIM çağrısı), kapı geçti. İlk koşuda bulunan platform hatası (PDF başlık algılama) düzeltildi. Fork PR'ı ayrıca denenmedi (iki iş de sır kullanmıyor) |
 | 3.4 Re-ranker + arama kararı | Tamam | Çevrimdışı 689/689; önceden yazılan kurala göre uygulama yalnız vektör (MRR 0,975), re-ranker kapalı (8b: 0,995, fark 0,0199 < 0,02). Answer: atıf doğruluğu %89 → %98, puanlar gürültü içinde. Smoke offline (rerank dahil) baseline'la aynı. [ADR-003](decisions/ADR-003-reranker.md) |
 | 3.3 Answer modu + injection geçme oranı | Tamam (geçici modelle) | Çevrimdışı 673/673; Live sohbet 11/11, injection 30/30 kesin kontrol, geçme 29/30 (elle sıkı sayım 25/30). Baseline lightning (düşünme kapalı) + hakem bolt ile alındı; ultra düzelince tekrar edilecek. [docs/eval/baseline.md](eval/baseline.md) |
 
 ## Günlük
+
+### 2026-11-14/15 (oturum 15): 3.6
+- **Kullanıcı kararları:** README İngilizce olacak ve en üstte Türkçe bir özet içerecek. Demo GIF'i Playwright + ffmpeg ile hazırlanacak.
+- **README:**
+  - Özet ve özellikler.
+  - Mermaid mimari diyagramı: mermaid 11.4.1 ile Playwright'ta render edilip kontrol edildi; ilk hâlindeki kesik başlık ve karmaşık çizgiler sadeleştirildi.
+  - Proje tablosu, eval tabloları (retrieval, answer, injection) ve hangi modelle alındıkları.
+  - "Neden bu tasarım" (ADR bağlantılarıyla), güvenlik bölümü ve bilinen riskler.
+  - Kurulum, test ve eval komutları; port sorunu için sorun giderme notu.
+  - Audit anahtarı ve audit kaydının yeri bölümleri İngilizceye çevrilerek korundu (koddaki "see README" atıfları geçerli kaldı).
+- **Demo:**
+  - Playwright 1.64.1 ve Chromium yalnızca scratchpad'e kuruldu; ffmpeg winget ile kuruldu.
+  - Senaryo: doküman sorusu ve kaynak kartı → demo müşteri ve son 3 harcama → "9280 ile biten kartımı bloke et" → onay kartı → Reddet (işlem yapılmadı).
+  - `docs/images/demo.gif` (1,7 MB, 1,5 kat hız), `document-question.png`, `approval.png`. Ekranda yalnızca kurgusal Bogus verisi var.
+- **Bulunan sorun: AppHost açılmıyordu.** Panoda `selimbank-api` "Unhealthy", `web` "Waiting" görünüyordu. API kendi portunda sağlıklıydı, ama Windows (Hyper-V/WinNAT) 5096–5395 aralığını ayırmıştı; Aspire'ın 5290 (API) ve 5185 (web) proxy'leri açılamıyordu.
+  - Kullanıcı kararıyla portlar taşındı: web 7185 (https 7221 aynı kaldı), API 7290; `SelimBank.Api.http` güncellendi.
+  - README'ye `netsh int ipv4 show excludedportrange protocol=tcp` kontrolü eklendi.
+  - Tanı için Aspire panosu headless Playwright ile okundu. Bu sırada bekleme döngüsü saatlerce boşuna döndü; artık hızlı başarısız olan bir kontrol kullanılıyor.
+- **Demo sırasında görülen model davranışları (geçici model: lightning, düşünme kapalı):**
+  - Bir çalıştırmada model `BlockCard`'ı çağırmak yerine metinle "Evet deyin" diye onay istedi (prompt'taki ipucuna rağmen). Güvenlik açısından sorun yok: metinle verilen "evet" bir şey çalıştırmıyor, onay kartı yine zorunlu. Sonraki çalıştırmalarda aracı doğrudan çağırdı.
+  - Onay beklenirken "Kart bloke ediliyor..." yazıyor; işlem henüz yapılmadığı için yanıltıcı. Prompt adayı.
+- **Temiz klon denemesi:** Repo scratchpad'e klonlandı ve bekleyen değişiklikler üzerine kopyalandı. Build 0 uyarı, testler 700/700, offline smoke baseline'la aynı, answer eval (3 soru), AppHost 18 sn'de açıldı ve demo senaryosu uçtan uca geçti. Klonun Qdrant konteyneri, volume'ü ve klasörü silindi.
 
 ### 2026-11-13 (oturum 14): 3.5
 - **Kullanıcı kararları:**
@@ -547,7 +570,10 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 - ~~GitHub remote yok.~~ 2026-11-13: private repo `egeselim/turkish-banking-rag` açıldı, `origin` olarak eklendi; ilk push'tan önce tüm geçmiş anahtar için tarandı (yalnızca sahte test değerleri). `.gitattributes` eklendi.
 
 ## Sıradaki adım
-**3.5 bitti; sıradaki 3.6 (README: mermaid mimari diyagramı, demo GIF'i, eval tablosu, "neden bu tasarım", güvenlik bölümü, kurulum; temiz klonla deneme). Henüz planlanmadı; kullanıcı "devam" diyene kadar başlanmıyor.**
+**3. hafta planı tamamlandı (3.1–3.6). Sıradakiler PLAN'ın dışında kalan, kullanıcının seçeceği işler:**
+- Ultra düzelince: model geri dönüşü ve aynı eval'in ultra ile tekrarı (ADR-001).
+- Prompt iyileştirmeleri: uydurma iletişim bilgisi (q-093, q-096, q-100), doküman talimatını aktarma (inj-18, 19), "Kart bloke ediliyor..." ifadesi, metinle onay isteme. Prompt değişirse smoke eval ve `InjectionLiveTests` tekrar çalıştırılmalı.
+- Stretch hedefleri (PLAN): küçük modelle niyet yönlendirme, konuşma özetleme, caching; bge-m3 karşılaştırması (tampon oturum).
 - Fork PR'ı ayrıca denenmedi; iki iş de sır kullanmadığı için aynı davranmalı.
 - Answer eval'i CI'da çalıştırmak için kullanıcının `NVIDIA_API_KEY` repo secret'ını eklemesi gerekiyor (henüz eklenmedi).
 - Yerelde `backup/before-msg-rewrite` branch'i duruyor; kullanıcı emin olunca silebilir.
