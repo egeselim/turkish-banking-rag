@@ -25,6 +25,11 @@
 - 3.3 baseline'ları bu yapılandırmayla alındı ([docs/eval/baseline.md](../eval/baseline.md)). Kararın asıl modeli olan ultra ile ölçülmüş değil.
 - 1.2'deki nitel değerlendirmeye göre lightning'in Türkçesi ultra'dan zayıf (yazım ve olgu hataları); bu değerlendirme düşünme açıkken yapılmıştı.
 - Daha küçük bir model (bolt) daha büyük bir modelin cevabını puanlıyor. Puanlar mutlak değil, aynı hakemle yapılan karşılaştırmalar için anlamlı.
+- **2026-11-15 yeniden deneme (geri dönülmedi):**
+  - Ham sonda: ultra yine cevap veriyor (düşünme açık ve kapalı); cevapta yeni bir `refusal` alanı var, NIM tarafında güncelleme olmuş görünüyor.
+  - `NimLiveTests` 4/4 geçti.
+  - `BankAssistantLiveTests` ise ultra ile (düşünme açık; ortam değişkeniyle, depo değişmeden) çok yavaş ve tutarsız: 1. tur 11'de 9 (9 dk 15 sn), 2. turda ilk 4 test düştü (tek test 7 dk 48 sn sürdü). Lightning aynı testleri yaklaşık 1–2 dakikada 11/11 geçiyordu.
+  - 2. tur kullanıcı bilgisayarı yeniden başlatacağı için yarıda durduruldu. Lightning'de kalındı; birkaç gün sonra aynı testlerle yeniden denenecek.
 - **Geri dönüş:** ultra düzelince `Nim:ChatModel` eski değerine, `Nim:DisableThinking` `false`'a alınır. Aynı answer eval ultra hem asistan hem hakem olarak çalıştırılıp bu baseline'la karşılaştırılır (kullanıcı kararı).
 
 ## Revizyon (2026-10-25, adım 1.5): embedding 1b'den 8b'ye

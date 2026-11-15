@@ -571,7 +571,7 @@ Plan: [PLAN.md](PLAN.md). Her oturum sonunda güncellenir: ne bitti, ne kaldı, 
 
 ## Sıradaki adım
 **3. hafta planı tamamlandı (3.1–3.6). Sıradakiler PLAN'ın dışında kalan, kullanıcının seçeceği işler:**
-- Ultra düzelince: model geri dönüşü ve aynı eval'in ultra ile tekrarı (ADR-001).
+- Ultra düzelince: model geri dönüşü ve aynı eval'in ultra ile tekrarı (ADR-001). **2026-11-15 denendi:** ultra cevap veriyor ama ücretsiz katmanda çok yavaş ve tutarsız (`BankAssistantLiveTests` 1. tur 9/11, 9 dk; 2. tur ilk 4 test düştü, tek test 7,8 dk sürdü). Lightning'de kalındı; birkaç gün sonra yeniden denenecek.
 - Prompt iyileştirmeleri: uydurma iletişim bilgisi (q-093, q-096, q-100), doküman talimatını aktarma (inj-18, 19), "Kart bloke ediliyor..." ifadesi, metinle onay isteme. Prompt değişirse smoke eval ve `InjectionLiveTests` tekrar çalıştırılmalı.
 - Stretch hedefleri (PLAN): küçük modelle niyet yönlendirme, konuşma özetleme, caching; bge-m3 karşılaştırması (tampon oturum).
 - Fork PR'ı ayrıca denenmedi; iki iş de sır kullanmadığı için aynı davranmalı.
