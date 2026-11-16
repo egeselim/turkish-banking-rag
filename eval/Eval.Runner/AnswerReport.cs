@@ -44,7 +44,8 @@ internal sealed record AnswerSummary(
     double P50Ms,
     double P95Ms,
     TokenUsage AssistantTokens,
-    TokenUsage JudgeTokens);
+    TokenUsage JudgeTokens,
+    IReadOnlyList<string> InventedPhoneIds);
 
 internal sealed record AnswerReport(
     int SchemaVersion,
@@ -54,7 +55,8 @@ internal sealed record AnswerReport(
     string JudgeModel,
     string RetrievalMode,
     Pricing? Pricing,
-    IReadOnlyList<AnswerResult> Questions)
+    IReadOnlyList<AnswerResult> Questions,
+    IReadOnlyList<string>? SourcePhones = null)
 {
     public const int CurrentSchemaVersion = 1;
 
@@ -110,7 +112,18 @@ internal sealed record AnswerReport(
             RetrievalMetrics.Percentile(latencies, 0.50),
             RetrievalMetrics.Percentile(latencies, 0.95),
             all.Aggregate(TokenUsage.None, (sum, q) => sum.Add(q.AssistantTokens)),
-            all.Aggregate(TokenUsage.None, (sum, q) => sum.Add(q.JudgeTokens)));
+            all.Aggregate(TokenUsage.None, (sum, q) => sum.Add(q.JudgeTokens)),
+            InventedPhoneIds(all));
+    }
+
+    /// <summary>
+    /// Questions whose answer contains a phone number that is not in the sources. Computed from the stored answer
+    /// text, so it also works for reports written before the check existed (their sources had no phone numbers).
+    /// </summary>
+    private List<string> InventedPhoneIds(IEnumerable<AnswerResult> questions)
+    {
+        var known = (SourcePhones ?? []).ToHashSet(StringComparer.Ordinal);
+        return [.. questions.Where(q => ContactCheck.InventedPhones(q.Answer, known).Count > 0).Select(q => q.Id)];
     }
 
     public string ToJson() => JsonSerializer.Serialize(this, Json);

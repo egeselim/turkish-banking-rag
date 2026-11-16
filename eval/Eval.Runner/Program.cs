@@ -109,7 +109,8 @@ try
             judgeModel, // ADR-001 default: the main model
             string.IsNullOrWhiteSpace(rag.RerankModel) ? rag.Mode.ToString() : $"{rag.Mode}+{rag.RerankModel}",
             options.PriceIn is double pin && options.PriceOut is double pout ? new Pricing(pin, pout) : null,
-            answers);
+            answers,
+            [.. ContactCheck.PhonesIn(chunks.Select(c => c.Text))]);
         var answerBaseline = baselineJson is null ? null : AnswerReport.FromJson(baselineJson);
         int errors = answers.Count(a => a.Error is not null);
         bool tooManyErrors = answers.Count > 0 && (double)errors / answers.Count > MaxErrorShare;

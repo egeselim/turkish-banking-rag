@@ -40,6 +40,9 @@ internal static class AnswerMarkdown
         Row(sb, "Atfın doğru kaynağa gitmesi (atıf yapanlarda)", now.CitationAccuracy, before?.CitationAccuracy);
         Row(sb, "Yanlış ret: cevabı olan soruya \"bulamadım\"", now.FalseRefusalRate, before?.FalseRefusalRate);
         Row(sb, "Doğru ret: cevabı olmayan soruya \"bulamadım\"", now.CorrectRefusalRate, before?.CorrectRefusalRate);
+        sb.Append(Inv, $"| Kaynakta olmayan telefon numarası yazan cevap (tüm sorular) | {now.InventedPhoneIds.Count}")
+          .Append(before is null ? "" : string.Create(Inv, $" (önce {before.InventedPhoneIds.Count})"))
+          .Append(now.InventedPhoneIds.Count == 0 ? "" : ": " + string.Join(", ", now.InventedPhoneIds)).Append(" |\n");
 
         sb.Append("\n## Süre ve token\n\n");
         sb.Append(Inv, $"- Cevap süresi (arama + akışın sonu): p50 {now.P50Ms / 1000:F1} sn{Delta(now.P50Ms / 1000, before?.P50Ms / 1000, "F1")}, p95 {now.P95Ms / 1000:F1} sn{Delta(now.P95Ms / 1000, before?.P95Ms / 1000, "F1")}\n");
