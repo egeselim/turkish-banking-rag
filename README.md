@@ -175,4 +175,4 @@ Rows go to the `AuditEntries` table in `src/Assistant.Web/audit.db` (ignored by 
 
 ## License and data
 
-The fictional documents and all code are part of this portfolio project. The KVKK text (Law No. 6698) is an official legal text from mevzuat.gov.tr and may be reproduced freely (FSEK art. 31). No real bank, logo or customer data is used; all customer data is generated with Bogus and checksum algorithms.
+Code and fictional documents are released under the [MIT License](LICENSE); the bundled DejaVu fonts keep their own license (`tools/SourceDocs.Generator/Fonts/DejaVu-LICENSE.txt`). The KVKK text (Law No. 6698) is an official legal text from mevzuat.gov.tr and may be reproduced freely (FSEK art. 31). No real bank, logo or customer data is used; all customer data is generated with Bogus and checksum algorithms.
